@@ -1,0 +1,138 @@
+#pragma once
+
+#include <string>
+#include <iostream>
+
+#include "move.hpp"
+#include "bitboard.hpp"
+#include "move_gen_helpers.hpp"
+#include "piece_eval_tables.hpp"
+
+namespace Chess
+{
+  class Board
+  {
+  public:
+    Board(std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+    int sideToMove;
+
+    int whiteKingIndex;
+    int blackKingIndex;
+
+    int enPassantFile;
+
+    int castlingRights;
+
+    bool whiteHasCastled;
+    bool blackHasCastled;
+
+    int halfMoves;
+
+    enum CastlingRights
+    {
+      WHITE_KINGSIDE = 1,
+      WHITE_QUEENSIDE = 2,
+      BLACK_KINGSIDE = 4,
+      BLACK_QUEENSIDE = 8
+    };
+
+    enum GameStatus
+    {
+      NO_MATE = 0,
+      STALEMATE = 1,
+      LOSE = 2
+    };
+
+    enum EvaluationBonus
+    {
+      BISHOP_PAIR_BONUS = 100,
+      CASTLED_KING_BONUS = 50,
+      CAN_CASTLE_BONUS = 25,
+      ROOK_ON_OPEN_FILE_BONUS = 50,
+      ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
+      KNIGHT_OUTPOST_BONUS = 50,
+      PASSED_PAWN_BONUS = 50,
+      DOUBLED_PAWN_PENALTY = 50,
+      ISOLATED_PAWN_PENALTY = 25,
+      BACKWARDS_PAWN_PENALTY = 50,
+      KING_SAFETY_PAWN_SHIELD_BONUS = 50,
+    };
+
+    int debug;
+
+    Bitboard whitePawnsBitboard;
+    Bitboard whiteKnightsBitboard;
+    Bitboard whiteBishopsBitboard;
+    Bitboard whiteRooksBitboard;
+    Bitboard whiteQueensBitboard;
+
+    Bitboard blackPawnsBitboard;
+    Bitboard blackKnightsBitboard;
+    Bitboard blackBishopsBitboard;
+    Bitboard blackRooksBitboard;
+    Bitboard blackQueensBitboard;
+
+    Piece board[64];
+
+    void printBoard();
+
+    void makeMove(Move move);
+    void unmakeMove(Move move);
+
+    bool pieceCanMove(int pieceIndex, int to);
+
+    static bool isOnBoard(int x, int y);
+
+    static int countLegalMoves(Move *moves);
+
+    Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false);
+
+    Bitboard getPawnMoves(int pieceIndex, bool onlyCaptures = false);
+    Bitboard getKnightMoves(int pieceIndex);
+    Bitboard getBishopMoves(int pieceIndex);
+    Bitboard getRookMoves(int pieceIndex);
+    Bitboard getQueenMoves(int pieceIndex);
+    Bitboard getKingMoves(int pieceIndex, bool includeCastling = true);
+
+    void addPieceToBitboard(int pieceIndex);
+    void removePieceFromBitboard(int pieceIndex);
+
+    bool isInCheck(int color);
+
+    bool isAttacked(int square, int color);
+
+    Move *getLegalMoves(int color);
+    Bitboard getLegalPieceMovesBitboard(int pieceIndex);
+
+    Bitboard getAttackedSquaresBitboard(int color);
+
+    int getGameStatus(int color);
+
+    int countGames(int depth, bool verbose = true);
+
+    Move generateRandomMove();
+
+    Move generateOneDeepMove();
+
+    Move generateBestMove(int depth, int alpha = -1000000, int beta = 1000000);
+
+    Move generateBotMove();
+
+    int getStaticEvaluation();
+
+    int getMaterialEvaluation();
+
+    int getPositionalEvaluation();
+
+    int getEvaluationBonus();
+
+    int negamax(int depth, int alpha, int beta);
+
+    int heuristicEvaluation(Move move);
+
+    Move *heuristicSortMoves(Move *moves);
+
+    std::string getStringRepresentation();
+  };
+}
