@@ -1162,36 +1162,7 @@ namespace Chess
 
   int Board::getEvaluationBonus()
   {
-    // enum EvaluationBonus
-    // {
-    //   BISHOP_PAIR_BONUS = 100,
-    //   CASTLED_KING_BONUS = 50,
-    //   CAN_CASTLE_BONUS = 15,
-    //   ROOK_ON_OPEN_FILE_BONUS = 50,
-    //   ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
-    //   KNIGHT_OUTPOST_BONUS = 50,
-    //   PASSED_PAWN_BONUS = 50,
-    //   DOUBLED_PAWN_PENALTY = 50,
-    //   ISOLATED_PAWN_PENALTY = 50,
-    //   KING_SAFETY_PAWN_SHIELD_BONUS = 50,
-    // };
-
     int evaluationBonus = 0;
-
-    // Bitboard pieceBitboards[Piece::BLACK_KING + 1];
-    // pieceBitboards[Piece::WHITE_PAWN] = whitePawnsBitBoard;
-    // pieceBitboards[Piece::WHITE_KNIGHT] = whiteKnightsBitBoard;
-    // pieceBitboards[Piece::WHITE_BISHOP] = whiteBishopsBitBoard;
-    // pieceBitboards[Piece::WHITE_ROOK] = whiteRooksBitBoard;
-    // pieceBitboards[Piece::WHITE_QUEEN] = whiteQueensBitBoard;
-    // pieceBitboards[Piece::WHITE_KING] = Bitboard(1ULL << whiteKingIndex);
-
-    // pieceBitboards[Piece::BLACK_PAWN] = blackPawnsBitBoard;
-    // pieceBitboards[Piece::BLACK_KNIGHT] = blackKnightsBitBoard;
-    // pieceBitboards[Piece::BLACK_BISHOP] = blackBishopsBitBoard;
-    // pieceBitboards[Piece::BLACK_ROOK] = blackRooksBitBoard;
-    // pieceBitboards[Piece::BLACK_QUEEN] = blackQueensBitBoard;
-    // pieceBitboards[Piece::BLACK_KING] = Bitboard(1ULL << blackKingIndex);
 
     if (whiteBishopsBitboard.countBits() >= 2)
       evaluationBonus += BISHOP_PAIR_BONUS;
@@ -1214,11 +1185,34 @@ namespace Chess
 
     for (int i = 0; i < 64; i++)
     {
-      if (board[i].isEmpty())
-        continue;
-
       int file = i % 8;
       int rank = i / 8;
+      
+      if (rank == 0)
+      {
+        if (whitePawnsBitboard.file(file).countBits() > 1)
+          evaluationBonus -= DOUBLED_PAWN_PENALTY;
+        if (blackPawnsBitboard.file(file).countBits() > 1)
+          evaluationBonus += DOUBLED_PAWN_PENALTY;
+
+        if (whitePawnsBitboard.file(file))
+        {
+          if (blackPawnsBitboard.file(file - 1).isEmpty() && blackPawnsBitboard.file(file + 1).isEmpty())
+            evaluationBonus += PASSED_PAWN_BONUS;
+          if (whitePawnsBitboard.file(file - 1).isEmpty() && whitePawnsBitboard.file(file + 1).isEmpty())
+            evaluationBonus -= ISOLATED_PAWN_PENALTY;
+        }
+        if (blackPawnsBitboard.file(file))
+        {
+          if (whitePawnsBitboard.file(file - 1).isEmpty() && whitePawnsBitboard.file(file + 1).isEmpty())
+            evaluationBonus -= PASSED_PAWN_BONUS;
+          if (blackPawnsBitboard.file(file - 1).isEmpty() && blackPawnsBitboard.file(file + 1).isEmpty())
+            evaluationBonus += ISOLATED_PAWN_PENALTY;
+        }
+      }
+      
+      if (board[i].isEmpty())
+        continue;
 
       if (board[i].piece == Piece::WHITE_ROOK)
       {
@@ -1254,33 +1248,6 @@ namespace Chess
         if (file > 0 && file < 7 && whitePawnsBitboard.file(file - 1).isEmpty() && whitePawnsBitboard.file(file + 1).isEmpty())
           evaluationBonus -= KNIGHT_OUTPOST_BONUS;
         continue;
-      }
-
-      if (board[i].piece == Piece::WHITE_KING)
-      {
-      }
-
-      if (rank == 0)
-      {
-        if (whitePawnsBitboard.file(file).countBits() > 1)
-          evaluationBonus -= DOUBLED_PAWN_PENALTY;
-        if (blackPawnsBitboard.file(file).countBits() > 1)
-          evaluationBonus += DOUBLED_PAWN_PENALTY;
-
-        if (whitePawnsBitboard.file(file))
-        {
-          if (blackPawnsBitboard.file(file - 1).isEmpty() && blackPawnsBitboard.file(file + 1).isEmpty())
-            evaluationBonus += PASSED_PAWN_BONUS;
-          if (whitePawnsBitboard.file(file - 1).isEmpty() && whitePawnsBitboard.file(file + 1).isEmpty())
-            evaluationBonus -= ISOLATED_PAWN_PENALTY;
-        }
-        if (blackPawnsBitboard.file(file))
-        {
-          if (whitePawnsBitboard.file(file - 1).isEmpty() && whitePawnsBitboard.file(file + 1).isEmpty())
-            evaluationBonus -= PASSED_PAWN_BONUS;
-          if (blackPawnsBitboard.file(file - 1).isEmpty() && blackPawnsBitboard.file(file + 1).isEmpty())
-            evaluationBonus += ISOLATED_PAWN_PENALTY;
-        }
       }
     }
 
