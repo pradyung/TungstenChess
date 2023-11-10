@@ -73,6 +73,8 @@ namespace Chess
     Bitboard blackRooksBitboard;
     Bitboard blackQueensBitboard;
 
+    Bitboard *bitboards[Piece::BLACK_KING + 1];
+
     Piece board[64];
 
     void printBoard();
@@ -88,12 +90,22 @@ namespace Chess
 
     Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false);
 
-    Bitboard getPawnMoves(int pieceIndex, bool onlyCaptures = false);
-    Bitboard getKnightMoves(int pieceIndex);
-    Bitboard getBishopMoves(int pieceIndex);
-    Bitboard getRookMoves(int pieceIndex);
-    Bitboard getQueenMoves(int pieceIndex);
-    Bitboard getKingMoves(int pieceIndex, bool includeCastling = true);
+    Bitboard getPawnMoves(int pieceIndex, bool _ = false, bool onlyCaptures = false);
+    Bitboard getKnightMoves(int pieceIndex, bool _ = false, bool __ = false);
+    Bitboard getBishopMoves(int pieceIndex, bool _ = false, bool __ = false);
+    Bitboard getRookMoves(int pieceIndex, bool _ = false, bool __ = false);
+    Bitboard getQueenMoves(int pieceIndex, bool _ = false, bool __ = false);
+    Bitboard getKingMoves(int pieceIndex, bool includeCastling = true, bool __ = false);
+
+    using PieceMovesFunc = Bitboard (Chess::Board::*)(int, bool, bool);
+    PieceMovesFunc getPieceMoves[Piece::KING + 1] = {
+        nullptr,
+        &Chess::Board::getPawnMoves,
+        &Chess::Board::getKnightMoves,
+        &Chess::Board::getBishopMoves,
+        &Chess::Board::getRookMoves,
+        &Chess::Board::getQueenMoves,
+        &Chess::Board::getKingMoves};
 
     void addPieceToBitboard(int pieceIndex);
     void removePieceFromBitboard(int pieceIndex);

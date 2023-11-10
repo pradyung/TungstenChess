@@ -15,8 +15,8 @@ namespace Chess
   {
   public:
     static const int SQUARE_SIZE = 80;
-    static const int WIDTH_PADDING = 60;
-    static const int HEIGHT_PADDING = 60;
+    static const int WIDTH_PADDING = 0;
+    static const int HEIGHT_PADDING = 0;
 
     Board board;
 
