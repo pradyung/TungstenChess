@@ -1,4 +1,4 @@
-#include "Headers/GUI.hpp"
+#include "Headers/gui.hpp"
 
 namespace Chess
 {
@@ -507,7 +507,7 @@ namespace Chess
     if (move.from == move.to)
       return;
 
-    board.makeMove(move);
+    board.makeMove(move, false);
 
     clearHighlights();
 

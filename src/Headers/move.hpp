@@ -8,7 +8,7 @@ namespace Chess
   {
   public:
     Move();
-    Move(int from, int to, int movePiece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = Piece::QUEEN);
+    Move(int from, int to, int movePiece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = Piece::EMPTY);
 
     int from;
     int to;
@@ -20,6 +20,8 @@ namespace Chess
     int castlingRights;
 
     int flags;
+
+    bool speculative;
 
     enum Flags
     {
@@ -33,5 +35,6 @@ namespace Chess
     };
 
     std::string toString();
+    int toInt();
   };
 }

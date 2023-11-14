@@ -4,7 +4,6 @@ namespace Chess
 {
   Board::Board(std::string fen)
   {
-
     std::string fenParts[6];
 
     int fenPartIndex = 0;
@@ -133,11 +132,14 @@ namespace Chess
     std::cout << std::endl;
   }
 
-  void Board::makeMove(Move move)
+  void Board::makeMove(Move move, bool speculative)
   {
     halfMoves++;
 
     sideToMove ^= 24;
+
+    if (!speculative && inOpeningBook)
+      inOpeningBook = openings.addMove(move.toInt());
 
     int from = move.from;
     int to = move.to;
@@ -910,6 +912,17 @@ namespace Chess
     return games;
   }
 
+  Move Board::generateMoveFromInt(int moveInt)
+  {
+    int from = moveInt & 0x3f ^ 0x38;
+    int to = (moveInt >> 6) & 0x3f ^ 0x38;
+
+    int movePiece = board[from].piece;
+    int capturedPiece = board[to].piece;
+
+    return Move(from, to, movePiece, capturedPiece, enPassantFile, castlingRights);
+  }
+
   Move Board::generateRandomMove()
   {
     Move *legalMoves = getLegalMoves(sideToMove);
@@ -926,8 +939,15 @@ namespace Chess
 
   Move Board::generateBotMove()
   {
+    if (inOpeningBook)
+    {
+      Move move = generateMoveFromInt(openings.getNextMove());
+
+      if (move.from != 0 && move.to != 0)
+        return move;
+    }
+
     return generateBestMove(3);
-    // return generateRandomMove();
   }
 
   int Board::getStaticEvaluation()

@@ -7,6 +7,7 @@
 #include "bitboard.hpp"
 #include "move_gen_helpers.hpp"
 #include "piece_eval_tables.hpp"
+#include "openings.hpp"
 
 namespace Chess
 {
@@ -28,6 +29,9 @@ namespace Chess
     bool blackHasCastled;
 
     int halfMoves;
+
+    Openings openings;
+    bool inOpeningBook = true;
 
     enum CastlingRights
     {
@@ -73,13 +77,13 @@ namespace Chess
     Bitboard blackRooksBitboard;
     Bitboard blackQueensBitboard;
 
-    Bitboard *bitboards[Piece::BLACK_KING + 1];
+    Bitboard *bitboards[Piece::PIECE_NUMBER];
 
     Piece board[64];
 
     void printBoard();
 
-    void makeMove(Move move);
+    void makeMove(Move move, bool speculative = true);
     void unmakeMove(Move move);
 
     bool pieceCanMove(int pieceIndex, int to);
@@ -97,8 +101,7 @@ namespace Chess
     Bitboard getQueenMoves(int pieceIndex, bool _ = false, bool __ = false);
     Bitboard getKingMoves(int pieceIndex, bool includeCastling = true, bool __ = false);
 
-    using PieceMovesFunc = Bitboard (Chess::Board::*)(int, bool, bool);
-    PieceMovesFunc getPieceMoves[Piece::KING + 1] = {
+    Bitboard (Chess::Board::*getPieceMoves[Piece::PIECE_TYPE_NUMBER])(int, bool, bool) = {
         nullptr,
         &Chess::Board::getPawnMoves,
         &Chess::Board::getKnightMoves,
@@ -122,6 +125,8 @@ namespace Chess
     int getGameStatus(int color);
 
     int countGames(int depth, bool verbose = true);
+
+    Move generateMoveFromInt(int moveInt);
 
     Move generateRandomMove();
 

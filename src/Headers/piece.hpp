@@ -58,5 +58,11 @@ namespace Chess
       BLACK_QUEEN = BLACK | QUEEN,
       BLACK_KING = BLACK | KING
     };
+
+    enum Numbers
+    {
+      PIECE_TYPE_NUMBER = 7,
+      PIECE_NUMBER = 23
+    };
   };
 }

@@ -103,4 +103,9 @@ namespace Chess
 
     return result;
   }
+
+  int Move::toInt()
+  {
+    return from ^ 0x38 | ((to ^ 0x38) << 6);
+  }
 }
