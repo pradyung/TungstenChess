@@ -52,4 +52,16 @@ namespace Chess
     char pieceChar = pieceChars[getPieceType()];
     return getPieceColor() == WHITE ? toupper(pieceChar) : tolower(pieceChar);
   }
+
+  int *Piece::generateIntArray(Piece board[64])
+  {
+    int *intBoard = new int[64];
+
+    for (int i = 0; i < 64; i++)
+    {
+      intBoard[i] = board[i].piece;
+    }
+
+    return intBoard;
+  }
 }
