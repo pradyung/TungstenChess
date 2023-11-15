@@ -4,6 +4,8 @@ namespace Chess
 {
   const int Piece::PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 
+  const int Piece::PIECE_INDICES[12] = {9, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 22};
+
   Piece::Piece()
   {
     piece = EMPTY;

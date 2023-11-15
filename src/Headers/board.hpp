@@ -8,6 +8,7 @@
 #include "move_gen_helpers.hpp"
 #include "piece_eval_tables.hpp"
 #include "openings.hpp"
+#include "zobrist.hpp"
 
 namespace Chess
 {
@@ -32,6 +33,9 @@ namespace Chess
 
     Openings openings;
     bool inOpeningBook = true;
+
+    Zobrist zobrist;
+    ZobristKey zobristKey;
 
     enum CastlingRights
     {
@@ -81,7 +85,12 @@ namespace Chess
 
     Piece board[64];
 
+    void initZobrist();
+
     void printBoard();
+
+    void updatePiece(int pieceIndex, int piece);
+    void removeCastlingRights(int rights);
 
     void makeMove(Move move, bool speculative = true);
     void unmakeMove(Move move);

@@ -64,5 +64,9 @@ namespace Chess
       PIECE_TYPE_NUMBER = 7,
       PIECE_NUMBER = 23
     };
+
+    static const int PIECE_INDICES[12];
+
+    static int *generateIntArray(Piece board[64]);
   };
 }

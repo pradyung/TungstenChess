@@ -2,8 +2,6 @@
 
 namespace Chess
 {
-  Board board;
-
   Images images;
 
   int draggingPieceIndex;
@@ -88,9 +86,11 @@ namespace Chess
     return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE) + Vector2f(WIDTH_PADDING, HEIGHT_PADDING);
   }
 
-  GUIHandler::GUIHandler(RenderWindow &window, Board board)
+  GUIHandler::GUIHandler(RenderWindow &window, std::string fen)
   {
-    this->board = board;
+    this->board = Board(fen);
+
+    board.initZobrist();
 
     this->window = &window;
 
@@ -104,11 +104,6 @@ namespace Chess
     Image icon;
     icon.loadFromMemory(images.WHITE_KNIGHT, images.WHITE_KNIGHT_SIZE);
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-  }
-
-  GUIHandler::GUIHandler(RenderWindow &window, std::string fen)
-  {
-    GUIHandler(window, Board(fen));
   }
 
   void GUIHandler::runMainLoop()
