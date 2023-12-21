@@ -12,6 +12,7 @@ namespace Chess
   {
   public:
     Zobrist();
+    ~Zobrist();
 
     ZobristKey **pieceKeys;
     ZobristKey *castlingKeys;

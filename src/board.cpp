@@ -122,7 +122,11 @@ namespace Chess
   {
     zobrist.init();
 
-    zobristKey = zobrist.getInitialHash(Piece::generateIntArray(board), castlingRights, enPassantFile, sideToMove);
+    int *intBoard = Piece::generateIntArray(board);
+
+    zobristKey = zobrist.getInitialHash(intBoard, castlingRights, enPassantFile, sideToMove);
+
+    delete[] intBoard;
   }
 
   void Board::printBoard()
@@ -424,21 +428,6 @@ namespace Chess
   bool Board::isOnBoard(int x, int y)
   {
     return x >= 0 && x <= 7 && y >= 0 && y <= 7;
-  }
-
-  int Board::countLegalMoves(Move *moves)
-  {
-    int legalMovesCount = 0;
-
-    for (int i = 0; i < 256; i++)
-    {
-      if (moves[i].from == 0 && moves[i].to == 0)
-        break;
-
-      legalMovesCount++;
-    }
-
-    return legalMovesCount;
   }
 
   Bitboard Board::getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling, bool onlyCaptures)
@@ -779,11 +768,9 @@ namespace Chess
       blackQueensBitboard.removeBit(pieceIndex);
   }
 
-  Move *Board::getLegalMoves(int color)
+  std::vector<Move> Board::getLegalMoves(int color)
   {
-    Move *legalMoves = new Move[256];
-
-    int legalMovesCount = 0;
+    std::vector<Move> legalMoves;
 
     for (int i = 0; i < 64; i++)
     {
@@ -796,20 +783,15 @@ namespace Chess
       {
         if (movesBitboard.hasBit(j))
         {
-          legalMoves[legalMovesCount] = Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights);
+          legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights));
 
-          if (legalMoves[legalMovesCount].flags & Move::PROMOTION)
+          if (legalMoves.back().flags & Move::PROMOTION)
           {
-            legalMoves[legalMovesCount].promotionPiece = Piece::QUEEN;
-            legalMovesCount++;
-            legalMoves[legalMovesCount] = Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::KNIGHT);
-            legalMovesCount++;
-            legalMoves[legalMovesCount] = Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::BISHOP);
-            legalMovesCount++;
-            legalMoves[legalMovesCount] = Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::ROOK);
+            legalMoves.back().promotionPiece = Piece::QUEEN;
+            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::KNIGHT));
+            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::BISHOP));
+            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::ROOK));
           }
-
-          legalMovesCount++;
         }
       }
     }
@@ -874,7 +856,7 @@ namespace Chess
 
   int Board::getGameStatus(int color)
   {
-    Move *legalMoves = getLegalMoves(color);
+    std::vector<Move> legalMoves = getLegalMoves(color);
 
     if (legalMoves[0].from == 0 && legalMoves[0].to == 0)
     {
@@ -919,9 +901,9 @@ namespace Chess
 
     int games = 0;
 
-    Move *legalMoves = getLegalMoves(sideToMove);
+    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
-    int legalMovesCount = countLegalMoves(legalMoves);
+    int legalMovesCount = legalMoves.size();
 
     if (depth == 1)
       return legalMovesCount;
@@ -959,9 +941,9 @@ namespace Chess
 
   Move Board::generateRandomMove()
   {
-    Move *legalMoves = getLegalMoves(sideToMove);
+    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
-    int legalMovesCount = countLegalMoves(legalMoves);
+    int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
       return Move(0, 0, 0, 0, 0, 0, 0);
@@ -1224,9 +1206,9 @@ namespace Chess
     if (depth == 0)
       return getStaticEvaluation();
 
-    Move *legalMoves = getLegalMoves(sideToMove);
+    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
-    int legalMovesCount = countLegalMoves(legalMoves);
+    int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
     {
@@ -1267,9 +1249,9 @@ namespace Chess
 
   Move Board::generateOneDeepMove()
   {
-    Move *legalMoves = getLegalMoves(sideToMove);
+    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
-    int legalMovesCount = countLegalMoves(legalMoves);
+    int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
       return Move(0, 0, 0, 0, 0, 0, 0);
@@ -1300,14 +1282,9 @@ namespace Chess
     if (depth == 0)
       return generateOneDeepMove();
 
-    Move *legalMoves = (Move *)malloc(sizeof(Move) * 256);
-    legalMoves = heuristicSortMoves(getLegalMoves(sideToMove));
+    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
-    // std::cout << legalMoves[0].toString() << std::endl;
-
-    // Move *sortedLegalMoves = legalMoves;
-
-    int legalMovesCount = countLegalMoves(legalMoves);
+    int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
       return Move(0, 0, 0, 0, 0, 0, 0);
@@ -1342,14 +1319,12 @@ namespace Chess
 
     Move bestMove = legalMoves[bestMoveIndex];
 
-    free(legalMoves);
-
     return bestMove;
   }
 
-  Move *Board::heuristicSortMoves(Move *moves)
+  std::vector<Move> Board::heuristicSortMoves(std::vector<Move> moves)
   {
-    int legalMovesCount = countLegalMoves(moves);
+    int legalMovesCount = moves.size();
 
     int evaluations[legalMovesCount];
 

@@ -88,7 +88,7 @@ namespace Chess
 
   GUIHandler::GUIHandler(RenderWindow &window, std::string fen)
   {
-    this->board = Board(fen);
+    // this->board = Board(fen);
 
     board.initZobrist();
 

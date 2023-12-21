@@ -38,16 +38,16 @@ namespace Chess
     lastMoveIndexStack.pop();
   }
 
-  int *Openings::getChildrenMoves()
+  std::vector<int> Openings::getChildrenMoves()
   {
-    int *childrenMoves = new int[23]{0};
+    std::vector<int> childrenMoves;
     int childrenMovesIndex = 0;
 
     for (int i = lastMoveIndex + 1;; i++)
     {
       if (openingBook[i] >> 25 == moves.size())
       {
-        childrenMoves[childrenMovesIndex] = openingBook[i] & 0xFFF;
+        childrenMoves.push_back(openingBook[i] & 0xFFF);
         childrenMovesIndex++;
       }
       else if (openingBook[i] >> 25 == moves.size() - 1)
@@ -66,17 +66,12 @@ namespace Chess
 
   int Openings::getWeightedRandomMove()
   {
-    int *childrenMoves = getChildrenMoves();
+    std::vector<int> childrenMoves = getChildrenMoves();
 
     int totalWeight = 0;
 
-    for (int i = 0; i < 23; i++)
+    for (int i = 0; i < childrenMoves.size(); i++)
     {
-      if (childrenMoves[i] == 0)
-      {
-        break;
-      }
-
       totalWeight += openingBook[lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
     }
 
@@ -84,13 +79,8 @@ namespace Chess
 
     int currentWeight = 0;
 
-    for (int i = 0; i < 23; i++)
+    for (int i = 0; i < childrenMoves.size(); i++)
     {
-      if (childrenMoves[i] == 0)
-      {
-        break;
-      }
-
       currentWeight += openingBook[lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
 
       if (currentWeight > randomWeight)

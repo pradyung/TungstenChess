@@ -15,6 +15,18 @@ namespace Chess
     enPassantKeys = new ZobristKey[9];
   }
 
+  Zobrist::~Zobrist()
+  {
+    for (int i = 0; i < 64; i++)
+    {
+      delete[] pieceKeys[i];
+    }
+
+    delete[] pieceKeys;
+    delete[] castlingKeys;
+    delete[] enPassantKeys;
+  }
+
   void Zobrist::init()
   {
     std::random_device rd;

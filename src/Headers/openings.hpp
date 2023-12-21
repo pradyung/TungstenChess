@@ -22,7 +22,7 @@ namespace Chess
     bool addMove(int move);
     void removeLastMove();
 
-    int *getChildrenMoves();
+    std::vector<int> getChildrenMoves();
 
     int getNextMove();
 

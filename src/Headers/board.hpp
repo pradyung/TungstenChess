@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 #include "move.hpp"
 #include "bitboard.hpp"
@@ -99,8 +100,6 @@ namespace Chess
 
     static bool isOnBoard(int x, int y);
 
-    static int countLegalMoves(Move *moves);
-
     Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false);
 
     Bitboard getPawnMoves(int pieceIndex, bool _ = false, bool onlyCaptures = false);
@@ -126,7 +125,7 @@ namespace Chess
 
     bool isAttacked(int square, int color);
 
-    Move *getLegalMoves(int color);
+    std::vector<Move> getLegalMoves(int color);
     Bitboard getLegalPieceMovesBitboard(int pieceIndex);
 
     Bitboard getAttackedSquaresBitboard(int color);
@@ -157,7 +156,7 @@ namespace Chess
 
     int heuristicEvaluation(Move move);
 
-    Move *heuristicSortMoves(Move *moves);
+    std::vector<Move> heuristicSortMoves(std::vector<Move> moves);
 
     std::string getStringRepresentation();
   };
