@@ -13,8 +13,6 @@ namespace Chess
     Piece(char fen);
     Piece(int piece);
 
-    static Piece fromChar(char fen);
-
     int piece;
 
     int getPieceType();

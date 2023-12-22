@@ -32,25 +32,6 @@ namespace Chess
     this->bitboard = bitboard;
   }
 
-  void Bitboard::printBitboard()
-  {
-    for (int i = 0; i < 64; i++)
-    {
-      if (i % 8 == 0)
-        std::cout << std::endl;
-
-      if (hasBit(i))
-      {
-        std::cout << "1 ";
-      }
-      else
-      {
-        std::cout << ". ";
-      }
-    }
-    std::cout << std::endl;
-  }
-
   void Bitboard::addBit(int index)
   {
     bitboard |= (1ULL << index);

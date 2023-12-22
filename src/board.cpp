@@ -129,20 +129,6 @@ namespace Chess
     delete[] intBoard;
   }
 
-  void Board::printBoard()
-  {
-    for (int i = 0; i < 64; i++)
-    {
-      if (i % 8 == 0)
-      {
-        std::cout << std::endl;
-      }
-
-      std::cout << board[i].getPieceChar() << " ";
-    }
-    std::cout << std::endl;
-  }
-
   void Board::updatePiece(int pieceIndex, int piece)
   {
     zobristKey ^= zobrist.pieceKeys[pieceIndex][board[pieceIndex].piece];

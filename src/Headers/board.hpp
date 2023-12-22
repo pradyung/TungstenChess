@@ -25,26 +25,16 @@ namespace Chess
 
     Piece board[64];
 
-    Bitboard whitePawnsBitboard;
-    Bitboard whiteKnightsBitboard;
-    Bitboard whiteBishopsBitboard;
-    Bitboard whiteRooksBitboard;
-    Bitboard whiteQueensBitboard;
-
-    Bitboard blackPawnsBitboard;
-    Bitboard blackKnightsBitboard;
-    Bitboard blackBishopsBitboard;
-    Bitboard blackRooksBitboard;
-    Bitboard blackQueensBitboard;
+    Bitboard *bitboards[Piece::PIECE_NUMBER];
 
     int whiteKingIndex;
     int blackKingIndex;
 
     enum GameStatus
     {
-      NO_MATE = 0,
-      STALEMATE = 1,
-      LOSE = 2
+      NO_MATE,
+      STALEMATE,
+      LOSE
     };
 
     void initZobrist();
@@ -96,9 +86,17 @@ namespace Chess
 
     int debug;
 
-    Bitboard *bitboards[Piece::PIECE_NUMBER];
+    Bitboard whitePawnsBitboard;
+    Bitboard whiteKnightsBitboard;
+    Bitboard whiteBishopsBitboard;
+    Bitboard whiteRooksBitboard;
+    Bitboard whiteQueensBitboard;
 
-    void printBoard();
+    Bitboard blackPawnsBitboard;
+    Bitboard blackKnightsBitboard;
+    Bitboard blackBishopsBitboard;
+    Bitboard blackRooksBitboard;
+    Bitboard blackQueensBitboard;
 
     void updatePiece(int pieceIndex, int piece);
     void removeCastlingRights(int rights);

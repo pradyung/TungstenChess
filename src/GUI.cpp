@@ -377,23 +377,23 @@ namespace Chess
         continue;
       }
 
-      if (board.whitePawnsBitboard.hasBit(i))
+      if (board.bitboards[Piece::WHITE_PAWN]->hasBit(i))
       {
         window->draw(whitePawns[i]);
       }
-      else if (board.whiteKnightsBitboard.hasBit(i))
+      else if (board.bitboards[Piece::WHITE_KNIGHT]->hasBit(i))
       {
         window->draw(whiteKnights[i]);
       }
-      else if (board.whiteBishopsBitboard.hasBit(i))
+      else if (board.bitboards[Piece::WHITE_BISHOP]->hasBit(i))
       {
         window->draw(whiteBishops[i]);
       }
-      else if (board.whiteRooksBitboard.hasBit(i))
+      else if (board.bitboards[Piece::WHITE_ROOK]->hasBit(i))
       {
         window->draw(whiteRooks[i]);
       }
-      else if (board.whiteQueensBitboard.hasBit(i))
+      else if (board.bitboards[Piece::WHITE_QUEEN]->hasBit(i))
       {
         window->draw(whiteQueens[i]);
       }
@@ -402,23 +402,23 @@ namespace Chess
         window->draw(whiteKings[i]);
       }
 
-      else if (board.blackPawnsBitboard.hasBit(i))
+      else if (board.bitboards[Piece::BLACK_PAWN]->hasBit(i))
       {
         window->draw(blackPawns[i]);
       }
-      else if (board.blackKnightsBitboard.hasBit(i))
+      else if (board.bitboards[Piece::BLACK_KNIGHT]->hasBit(i))
       {
         window->draw(blackKnights[i]);
       }
-      else if (board.blackBishopsBitboard.hasBit(i))
+      else if (board.bitboards[Piece::BLACK_BISHOP]->hasBit(i))
       {
         window->draw(blackBishops[i]);
       }
-      else if (board.blackRooksBitboard.hasBit(i))
+      else if (board.bitboards[Piece::BLACK_ROOK]->hasBit(i))
       {
         window->draw(blackRooks[i]);
       }
-      else if (board.blackQueensBitboard.hasBit(i))
+      else if (board.bitboards[Piece::BLACK_QUEEN]->hasBit(i))
       {
         window->draw(blackQueens[i]);
       }

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <string>
-#include "piece.hpp"
 #include "board.hpp"
 #include "images.hpp"
 

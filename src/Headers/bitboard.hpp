@@ -10,8 +10,6 @@ namespace Chess
     Bitboard();
     Bitboard(unsigned long long bitboard);
 
-    void printBitboard();
-
     void addBit(int index);
     void removeBit(int index);
 
