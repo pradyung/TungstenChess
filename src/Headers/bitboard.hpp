@@ -7,11 +7,6 @@ namespace Chess
   class Bitboard
   {
   public:
-    static const unsigned long long fileMasks[8];
-    static const unsigned long long rankMasks[8];
-
-    static const unsigned long long MAX_BITBOARD = 0xFFFFFFFFFFFFFFFF;
-
     Bitboard();
     Bitboard(unsigned long long bitboard);
 
@@ -19,8 +14,6 @@ namespace Chess
 
     void addBit(int index);
     void removeBit(int index);
-
-    bool popBit();
 
     bool isEmpty();
 
@@ -39,5 +32,11 @@ namespace Chess
     Bitboard rank(int rank);
 
     operator bool() const { return bitboard != 0; }
+
+  private:
+    static const unsigned long long fileMasks[8];
+    static const unsigned long long rankMasks[8];
+
+    static const unsigned long long MAX_BITBOARD = 0xFFFFFFFFFFFFFFFF;
   };
 }

@@ -61,16 +61,6 @@ namespace Chess
     bitboard &= ~(1ULL << index);
   }
 
-  bool Bitboard::popBit()
-  {
-    if (bitboard == 0)
-      return false;
-
-    int index = __builtin_ctzll(bitboard);
-    bitboard &= ~(1ULL << index);
-    return true;
-  }
-
   Bitboard Bitboard::operator|(Bitboard other)
   {
     return Bitboard(bitboard | other.bitboard);

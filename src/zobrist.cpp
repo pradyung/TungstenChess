@@ -72,10 +72,6 @@ namespace Chess
     if (sideToMove == Piece::WHITE)
       hash ^= sideKey;
 
-    previousBoard = board;
-    previousCastlingRights = castlingRights;
-    previousEnPassantFile = enPassantFile;
-
     return hash;
   }
 }

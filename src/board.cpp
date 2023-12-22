@@ -303,6 +303,11 @@ namespace Chess
       enPassantFile = to % 8;
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
     }
+
+    if (!speculative)
+    {
+      std::cout << "Zobrist key: " << zobristKey << std::endl;
+    }
   }
 
   void Board::unmakeMove(Move move)

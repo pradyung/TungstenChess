@@ -45,8 +45,6 @@ namespace Chess
     int adjustedY = y - HEIGHT_PADDING;
 
     return (adjustedY / SQUARE_SIZE) * 8 + (adjustedX / SQUARE_SIZE);
-
-    // return (y / SQUARE_SIZE) * 8 + (x / SQUARE_SIZE);
   }
 
   int GUIHandler::getPromotionPiece(int x, int y)
@@ -88,8 +86,6 @@ namespace Chess
 
   GUIHandler::GUIHandler(RenderWindow &window, std::string fen)
   {
-    // this->board = Board(fen);
-
     board.initZobrist();
 
     this->window = &window;

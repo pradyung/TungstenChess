@@ -21,8 +21,6 @@ namespace Chess
 
     int flags;
 
-    bool speculative;
-
     enum Flags
     {
       NORMAL = 0,
@@ -34,7 +32,7 @@ namespace Chess
       QSIDE_CASTLE = 32
     };
 
-    std::string toString();
     int toInt();
+    std::string toString();
   };
 }

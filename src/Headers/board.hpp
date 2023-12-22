@@ -20,13 +20,46 @@ namespace Chess
 
     int sideToMove;
 
+    int enPassantFile;
+    int castlingRights;
+
+    Piece board[64];
+
+    Bitboard whitePawnsBitboard;
+    Bitboard whiteKnightsBitboard;
+    Bitboard whiteBishopsBitboard;
+    Bitboard whiteRooksBitboard;
+    Bitboard whiteQueensBitboard;
+
+    Bitboard blackPawnsBitboard;
+    Bitboard blackKnightsBitboard;
+    Bitboard blackBishopsBitboard;
+    Bitboard blackRooksBitboard;
+    Bitboard blackQueensBitboard;
+
     int whiteKingIndex;
     int blackKingIndex;
 
-    int enPassantFile;
+    enum GameStatus
+    {
+      NO_MATE = 0,
+      STALEMATE = 1,
+      LOSE = 2
+    };
 
-    int castlingRights;
+    void initZobrist();
 
+    Bitboard getLegalPieceMovesBitboard(int pieceIndex);
+
+    void makeMove(Move move, bool speculative = true);
+
+    bool isInCheck(int color);
+
+    int getGameStatus(int color);
+
+    Move generateBotMove();
+
+  private:
     bool whiteHasCastled;
     bool blackHasCastled;
 
@@ -46,13 +79,6 @@ namespace Chess
       BLACK_QUEENSIDE = 8
     };
 
-    enum GameStatus
-    {
-      NO_MATE = 0,
-      STALEMATE = 1,
-      LOSE = 2
-    };
-
     enum EvaluationBonus
     {
       BISHOP_PAIR_BONUS = 100,
@@ -70,30 +96,13 @@ namespace Chess
 
     int debug;
 
-    Bitboard whitePawnsBitboard;
-    Bitboard whiteKnightsBitboard;
-    Bitboard whiteBishopsBitboard;
-    Bitboard whiteRooksBitboard;
-    Bitboard whiteQueensBitboard;
-
-    Bitboard blackPawnsBitboard;
-    Bitboard blackKnightsBitboard;
-    Bitboard blackBishopsBitboard;
-    Bitboard blackRooksBitboard;
-    Bitboard blackQueensBitboard;
-
     Bitboard *bitboards[Piece::PIECE_NUMBER];
-
-    Piece board[64];
-
-    void initZobrist();
 
     void printBoard();
 
     void updatePiece(int pieceIndex, int piece);
     void removeCastlingRights(int rights);
 
-    void makeMove(Move move, bool speculative = true);
     void unmakeMove(Move move);
 
     bool pieceCanMove(int pieceIndex, int to);
@@ -121,16 +130,11 @@ namespace Chess
     void addPieceToBitboard(int pieceIndex);
     void removePieceFromBitboard(int pieceIndex);
 
-    bool isInCheck(int color);
-
     bool isAttacked(int square, int color);
 
     std::vector<Move> getLegalMoves(int color);
-    Bitboard getLegalPieceMovesBitboard(int pieceIndex);
 
     Bitboard getAttackedSquaresBitboard(int color);
-
-    int getGameStatus(int color);
 
     int countGames(int depth, bool verbose = true);
 
@@ -141,8 +145,6 @@ namespace Chess
     Move generateOneDeepMove();
 
     Move generateBestMove(int depth, int alpha = -1000000, int beta = 1000000);
-
-    Move generateBotMove();
 
     int getStaticEvaluation();
 

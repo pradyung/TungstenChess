@@ -1,0 +1,23 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>20</x><y>110</y><w>280</w><h>270</h></coordinates><panel_attributes>GUIHandler
+--
+- static int SQUARE_SIZE
+- static int WIDTH_PADDING
+- static int HEIGHT_PADDING
+--
+- Board board
+
+- RenderWindow *window
+
+- Texture squares[5]
+- Texture piecesTextures[Piece::Piece_NUMBER]
+
+- Sprite boardSquares[64]
+- Sprite pieces[64]
+- Sprite redHighlightsSprites[64]
+- Sprite yellowHighlightsSprites[64]
+- Sprite grayHighlightsSprites[64]
+- Sprite promotionPieces[4]
+
+- Bitboard redHighlightsBitboard
+- Bitboard yellowHighlightsBitboard
+- Bitboard grayHighlightsBitboard</panel_attributes><additional_attributes></additional_attributes></element></diagram>

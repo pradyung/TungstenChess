@@ -12,19 +12,18 @@ namespace Chess
   public:
     Openings();
 
+    bool addMove(int move);
+
+    int getNextMove();
+
+  private:
     OpeningBook openingBook;
 
     std::vector<int> moves;
 
     int lastMoveIndex;
-    std::stack<int> lastMoveIndexStack;
-
-    bool addMove(int move);
-    void removeLastMove();
 
     std::vector<int> getChildrenMoves();
-
-    int getNextMove();
 
     int getWeightedRandomMove();
   };

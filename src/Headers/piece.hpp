@@ -23,8 +23,6 @@ namespace Chess
 
     bool isEmpty();
 
-    static const int PIECE_VALUES[7];
-
     enum PieceTypes
     {
       EMPTY = 0,
@@ -64,6 +62,8 @@ namespace Chess
       PIECE_TYPE_NUMBER = 7,
       PIECE_NUMBER = 23
     };
+
+    static const int PIECE_VALUES[7];
 
     static const int PIECE_INDICES[12];
 

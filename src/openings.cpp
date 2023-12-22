@@ -6,8 +6,6 @@ namespace Chess
   {
     moves = std::vector<int>();
     lastMoveIndex = -1;
-    lastMoveIndexStack = std::stack<int>();
-    lastMoveIndexStack.push(-1);
   }
 
   bool Openings::addMove(int move)
@@ -21,7 +19,6 @@ namespace Chess
       if ((openingBook[i] & 0xFFF) == move && openingBook[i] >> 25 == moves.size())
       {
         lastMoveIndex = i;
-        lastMoveIndexStack.push(i);
         break;
       }
     }
@@ -29,13 +26,6 @@ namespace Chess
     moves.push_back(move);
 
     return true;
-  }
-
-  void Openings::removeLastMove()
-  {
-    moves.pop_back();
-    lastMoveIndex = lastMoveIndexStack.top();
-    lastMoveIndexStack.pop();
   }
 
   std::vector<int> Openings::getChildrenMoves()

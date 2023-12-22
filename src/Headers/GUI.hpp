@@ -18,10 +18,12 @@ namespace Chess
     static const int WIDTH_PADDING = 0;
     static const int HEIGHT_PADDING = 0;
 
-    Board board;
-
-    GUIHandler(RenderWindow &window, Board board);
     GUIHandler(RenderWindow &window, std::string fen);
+
+    void runMainLoop();
+
+  private:
+    Board board;
 
     RenderWindow *window;
 
@@ -39,9 +41,14 @@ namespace Chess
     Sprite yellowHighlightsSprites[64];
     Sprite grayHighlightsSprites[64];
 
-    Sprite promotionPieces[4];
+    enum Highlights
+    {
+      YELLOW_HIGHLIGHT = 2,
+      RED_HIGHLIGHT = 3,
+      GRAY_HIGHLIGHT = 4
+    };
 
-    void runMainLoop();
+    Sprite promotionPieces[4];
 
     void loadSquareTextures();
     void loadPieceTextures();
@@ -57,21 +64,9 @@ namespace Chess
     void makeMove(Move move);
     void makeBotMove();
 
-    enum Highlights
-    {
-      YELLOW_HIGHLIGHT = 2,
-      RED_HIGHLIGHT = 3,
-      GRAY_HIGHLIGHT = 4
-    };
-
-    void updateGUI();
-
     void drawBoardSquares();
-
     void drawPieces();
-
     void drawHighlights();
-
     void drawPromotionPieces();
 
     Sprite whitePawns[64];
@@ -89,7 +84,6 @@ namespace Chess
     Sprite blackKings[64];
 
     Sprite draggingPieceSprite;
-
     int draggingPieceIndex = -1;
 
     bool awaitingPromotion = false;
