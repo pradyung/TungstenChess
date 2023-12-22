@@ -13,22 +13,7 @@ namespace Chess
     castlingKeys = new ZobristKey[16];
 
     enPassantKeys = new ZobristKey[9];
-  }
 
-  Zobrist::~Zobrist()
-  {
-    for (int i = 0; i < 64; i++)
-    {
-      delete[] pieceKeys[i];
-    }
-
-    delete[] pieceKeys;
-    delete[] castlingKeys;
-    delete[] enPassantKeys;
-  }
-
-  void Zobrist::init()
-  {
     std::random_device rd;
     std::mt19937_64 gen(rd());
     std::uniform_int_distribution<ZobristKey> dis(0, 0xFFFFFFFFFFFFFFFF);
@@ -52,6 +37,18 @@ namespace Chess
     }
 
     sideKey = dis(gen);
+  }
+
+  Zobrist::~Zobrist()
+  {
+    for (int i = 0; i < 64; i++)
+    {
+      delete[] pieceKeys[i];
+    }
+
+    delete[] pieceKeys;
+    delete[] castlingKeys;
+    delete[] enPassantKeys;
   }
 
   ZobristKey Zobrist::getInitialHash(int board[64], int castlingRights, int enPassantFile, int sideToMove)

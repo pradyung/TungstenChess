@@ -86,8 +86,6 @@ namespace Chess
 
   GUIHandler::GUIHandler(RenderWindow &window, std::string fen)
   {
-    board.initZobrist();
-
     this->window = &window;
 
     loadSquareTextures();

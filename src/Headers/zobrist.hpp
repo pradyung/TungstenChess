@@ -19,8 +19,6 @@ namespace Chess
     ZobristKey *enPassantKeys;
     ZobristKey sideKey;
 
-    void init();
-
     ZobristKey getInitialHash(int board[64], int castlingRights, int enPassantFile, int sideToMove);
   };
 }

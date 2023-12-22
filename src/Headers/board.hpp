@@ -10,6 +10,7 @@
 #include "piece_eval_tables.hpp"
 #include "openings.hpp"
 #include "zobrist.hpp"
+#include "transposition_table.hpp"
 
 namespace Chess
 {
@@ -37,8 +38,6 @@ namespace Chess
       LOSE
     };
 
-    void initZobrist();
-
     Bitboard getLegalPieceMovesBitboard(int pieceIndex);
 
     void makeMove(Move move, bool speculative = true);
@@ -60,6 +59,8 @@ namespace Chess
 
     Zobrist zobrist;
     ZobristKey zobristKey;
+
+    TranspositionTable transpositionTable;
 
     enum CastlingRights
     {

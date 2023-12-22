@@ -116,11 +116,6 @@ namespace Chess
           castlingRights |= BLACK_QUEENSIDE;
       }
     }
-  }
-
-  void Board::initZobrist()
-  {
-    zobrist.init();
 
     int *intBoard = Piece::generateIntArray(board);
 
@@ -288,11 +283,6 @@ namespace Chess
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
       enPassantFile = to % 8;
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
-    }
-
-    if (!speculative)
-    {
-      std::cout << "Zobrist key: " << zobristKey << std::endl;
     }
   }
 
@@ -973,10 +963,10 @@ namespace Chess
 
     int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
 
-    if (sideToMove == Piece::WHITE)
-      return staticEvaluation;
-    else
-      return -staticEvaluation;
+    if (sideToMove == Piece::BLACK)
+      staticEvaluation = -staticEvaluation;
+
+    return staticEvaluation;
   }
 
   int Board::getMaterialEvaluation()
