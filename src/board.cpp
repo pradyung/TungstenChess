@@ -233,7 +233,7 @@ namespace Chess
       updatePiece(to, movePieceColor | promotionPiece);
 
       bitboards[movePiece]->removeBit(to);
-      bitboards[promotionPiece]->addBit(to);
+      bitboards[movePieceColor | promotionPiece]->addBit(to);
     }
 
     if (move.flags & Move::KSIDE_CASTLE)
@@ -790,7 +790,7 @@ namespace Chess
     {
       if (legalMovesBitboard.hasBit(j))
       {
-        Move move = Move(pieceIndex, j, board[pieceIndex].piece, board[j].piece, enPassantFile, castlingRights);
+        Move move = Move(pieceIndex, j, board[pieceIndex].piece, board[j].piece, enPassantFile, castlingRights, Piece::QUEEN);
 
         makeMove(move);
 
@@ -839,7 +839,7 @@ namespace Chess
   {
     std::vector<Move> legalMoves = getLegalMoves(color);
 
-    if (legalMoves[0].from == 0 && legalMoves[0].to == 0)
+    if (legalMoves.size() == 0)
     {
       if (isInCheck(color))
       {
@@ -1189,6 +1189,8 @@ namespace Chess
 
     std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
+    legalMoves = heuristicSortMoves(legalMoves);
+
     int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
@@ -1265,6 +1267,8 @@ namespace Chess
 
     std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
+    legalMoves = heuristicSortMoves(legalMoves);
+
     int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
@@ -1336,12 +1340,12 @@ namespace Chess
 
     if (move.flags & Move::CAPTURE)
     {
-      evaluation += Piece::PIECE_VALUES[move.capturedPiece];
+      evaluation += Piece::PIECE_VALUES[move.capturedPiece & 7];
     }
 
     if (move.flags & Move::PROMOTION)
     {
-      evaluation += Piece::PIECE_VALUES[move.promotionPiece] - Piece::PIECE_VALUES[move.piece];
+      evaluation += Piece::PIECE_VALUES[move.promotionPiece & 7] - Piece::PIECE_VALUES[move.piece & 7];
     }
 
     if (move.flags & Move::KSIDE_CASTLE)
