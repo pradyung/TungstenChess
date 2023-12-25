@@ -88,8 +88,6 @@ namespace Chess
       KING_SAFETY_PAWN_SHIELD_BONUS = 50,
     };
 
-    int debug;
-
     void updatePiece(int pieceIndex, int piece);
     void removeCastlingRights(int rights);
 

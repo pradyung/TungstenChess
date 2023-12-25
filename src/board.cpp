@@ -855,8 +855,6 @@ namespace Chess
 
   int Board::getStaticEvaluation()
   {
-    debug++;
-
     int gameStatus = getGameStatus(sideToMove);
 
     if (gameStatus != NO_MATE)
