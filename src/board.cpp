@@ -117,7 +117,11 @@ namespace Chess
     zobristKey ^= zobrist.pieceKeys[pieceIndex][board[pieceIndex].piece];
     zobristKey ^= zobrist.pieceKeys[pieceIndex][piece];
 
+    removePieceFromBitboard(pieceIndex);
+
     board[pieceIndex] = Piece(piece);
+
+    addPieceToBitboard(pieceIndex);
   }
 
   void Board::removeCastlingRights(int rights)
@@ -146,14 +150,8 @@ namespace Chess
     int capturedPiece = move.capturedPiece;
     int promotionPiece = move.promotionPiece & 7;
 
-    if (capturedPiece != EMPTY)
-      removePieceFromBitboard(to);
-    removePieceFromBitboard(from);
-
     updatePiece(to, board[from].piece);
     updatePiece(from, EMPTY);
-
-    addPieceToBitboard(to);
 
     int movePieceType = movePiece & 7;
     int movePieceColor = movePiece & 24;
@@ -201,29 +199,21 @@ namespace Chess
         removeCastlingRights(BLACK_KINGSIDE);
     }
 
-    if (move.flags & Move::CAPTURE)
-      bitboards[capturedPiece]->removeBit(to);
-
     if (move.flags & Move::EP_CAPTURE)
     {
       if (movePiece & WHITE)
       {
         updatePiece(to + 8, EMPTY);
-        bitboards[BLACK_PAWN]->removeBit(to + 8);
       }
       else if (movePiece & BLACK)
       {
         updatePiece(to - 8, EMPTY);
-        bitboards[WHITE_PAWN]->removeBit(to - 8);
       }
     }
 
     if (move.flags & Move::PROMOTION)
     {
       updatePiece(to, movePieceColor | promotionPiece);
-
-      bitboards[movePiece]->removeBit(to);
-      bitboards[movePieceColor | promotionPiece]->addBit(to);
     }
 
     if (move.flags & Move::KSIDE_CASTLE)
@@ -233,16 +223,10 @@ namespace Chess
 
       if (movePiece == WHITE_KING)
       {
-        bitboards[WHITE_ROOK]->removeBit(63);
-        bitboards[WHITE_ROOK]->addBit(61);
-
         whiteHasCastled = true;
       }
       else if (movePiece == BLACK_KING)
       {
-        bitboards[BLACK_ROOK]->removeBit(7);
-        bitboards[BLACK_ROOK]->addBit(5);
-
         blackHasCastled = true;
       }
     }
@@ -254,16 +238,10 @@ namespace Chess
 
       if (movePiece == WHITE_KING)
       {
-        bitboards[WHITE_ROOK]->removeBit(56);
-        bitboards[WHITE_ROOK]->addBit(59);
-
         whiteHasCastled = true;
       }
       else if (movePiece == BLACK_KING)
       {
-        bitboards[BLACK_ROOK]->removeBit(0);
-        bitboards[BLACK_ROOK]->addBit(3);
-
         blackHasCastled = true;
       }
     }
@@ -292,22 +270,8 @@ namespace Chess
     int capturedPiece = move.capturedPiece;
     int promotionPiece = move.promotionPiece;
 
-    removePieceFromBitboard(to);
-
-    if (move.flags & Move::CAPTURE)
-    {
-      updatePiece(to, capturedPiece);
-
-      addPieceToBitboard(to);
-    }
-    else
-    {
-      updatePiece(to, EMPTY);
-    }
-
+    updatePiece(to, capturedPiece);
     updatePiece(from, movePiece);
-
-    addPieceToBitboard(from);
 
     if (move.flags & Move::KSIDE_CASTLE)
     {
@@ -316,16 +280,10 @@ namespace Chess
 
       if (movePiece == WHITE_KING)
       {
-        bitboards[WHITE_ROOK]->removeBit(61);
-        bitboards[WHITE_ROOK]->addBit(63);
-
         whiteHasCastled = false;
       }
       else if (movePiece == BLACK_KING)
       {
-        bitboards[BLACK_ROOK]->removeBit(5);
-        bitboards[BLACK_ROOK]->addBit(7);
-
         blackHasCastled = false;
       }
     }
@@ -337,16 +295,10 @@ namespace Chess
 
       if (movePiece == WHITE_KING)
       {
-        bitboards[WHITE_ROOK]->removeBit(59);
-        bitboards[WHITE_ROOK]->addBit(56);
-
         whiteHasCastled = false;
       }
       else if (movePiece == BLACK_KING)
       {
-        bitboards[BLACK_ROOK]->removeBit(3);
-        bitboards[BLACK_ROOK]->addBit(0);
-
         blackHasCastled = false;
       }
     }
@@ -384,12 +336,6 @@ namespace Chess
         updatePiece(to - 8, WHITE_PAWN);
         bitboards[WHITE_PAWN]->addBit(to - 8);
       }
-    }
-
-    if (move.flags & Move::PROMOTION)
-    {
-      bitboards[movePiece]->removeBit(to);
-      bitboards[movePieceColor | promotionPiece]->removeBit(to);
     }
   }
 
@@ -692,12 +638,18 @@ namespace Chess
     if (board[pieceIndex].getPieceType() == KING)
       return;
 
+    if (board[pieceIndex].isEmpty())
+      return;
+
     bitboards[board[pieceIndex].piece]->addBit(pieceIndex);
   }
 
   void Board::removePieceFromBitboard(int pieceIndex)
   {
     if (board[pieceIndex].getPieceType() == KING)
+      return;
+
+    if (board[pieceIndex].isEmpty())
       return;
 
     bitboards[board[pieceIndex].piece]->removeBit(pieceIndex);
