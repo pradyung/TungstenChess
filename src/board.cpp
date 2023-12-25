@@ -898,7 +898,7 @@ namespace Chess
         return move;
     }
 
-    return generateBestMove(3);
+    return generateBestMove(4);
   }
 
   int Board::getStaticEvaluation()

@@ -132,7 +132,7 @@ namespace Chess
           {
             int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            if (board.sideToMove != board.board[index].getPieceColor())
+            if (board.sideToMove != board.board[index].getPieceColor() && !awaitingPromotion)
               continue;
 
             if (awaitingPromotion)
