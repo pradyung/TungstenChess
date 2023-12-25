@@ -199,7 +199,7 @@ namespace Chess
         removeCastlingRights(BLACK_KINGSIDE);
     }
 
-    if (move.flags & Move::EP_CAPTURE)
+    if (move.flags & EP_CAPTURE)
     {
       if (movePiece & WHITE)
       {
@@ -211,12 +211,12 @@ namespace Chess
       }
     }
 
-    if (move.flags & Move::PROMOTION)
+    if (move.flags & PROMOTION)
     {
       updatePiece(to, movePieceColor | promotionPiece);
     }
 
-    if (move.flags & Move::KSIDE_CASTLE)
+    if (move.flags & KSIDE_CASTLE)
     {
       updatePiece(to - 1, movePieceColor | ROOK);
       updatePiece(to + 1, EMPTY);
@@ -231,7 +231,7 @@ namespace Chess
       }
     }
 
-    if (move.flags & Move::QSIDE_CASTLE)
+    if (move.flags & QSIDE_CASTLE)
     {
       updatePiece(to + 1, movePieceColor | ROOK);
       updatePiece(to - 2, EMPTY);
@@ -246,7 +246,7 @@ namespace Chess
       }
     }
 
-    if (move.flags & Move::PAWN_DOUBLE)
+    if (move.flags & PAWN_DOUBLE)
     {
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
       enPassantFile = to % 8;
@@ -273,7 +273,7 @@ namespace Chess
     updatePiece(to, capturedPiece);
     updatePiece(from, movePiece);
 
-    if (move.flags & Move::KSIDE_CASTLE)
+    if (move.flags & KSIDE_CASTLE)
     {
       updatePiece(to + 1, movePiece & 24 | ROOK);
       updatePiece(to - 1, EMPTY);
@@ -288,7 +288,7 @@ namespace Chess
       }
     }
 
-    else if (move.flags & Move::QSIDE_CASTLE)
+    else if (move.flags & QSIDE_CASTLE)
     {
       updatePiece(to - 2, movePiece & 24 | ROOK);
       updatePiece(to + 1, EMPTY);
@@ -324,7 +324,7 @@ namespace Chess
       blackKingIndex = from;
     }
 
-    if (move.flags & Move::EP_CAPTURE)
+    if (move.flags & EP_CAPTURE)
     {
       if (movePiece & WHITE)
       {
@@ -672,7 +672,7 @@ namespace Chess
         {
           legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights));
 
-          if (legalMoves.back().flags & Move::PROMOTION)
+          if (legalMoves.back().flags & PROMOTION)
           {
             legalMoves.back().promotionPiece = QUEEN;
             legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, KNIGHT));
@@ -1244,27 +1244,27 @@ namespace Chess
   {
     int evaluation = 0;
 
-    if (move.flags & Move::CAPTURE)
+    if (move.flags & CAPTURE)
     {
       evaluation += Piece::PIECE_VALUES[move.capturedPiece & 7];
     }
 
-    if (move.flags & Move::PROMOTION)
+    if (move.flags & PROMOTION)
     {
       evaluation += Piece::PIECE_VALUES[move.promotionPiece & 7] - Piece::PIECE_VALUES[move.piece & 7];
     }
 
-    if (move.flags & Move::KSIDE_CASTLE)
+    if (move.flags & KSIDE_CASTLE)
     {
       evaluation += 50;
     }
 
-    if (move.flags & Move::QSIDE_CASTLE)
+    if (move.flags & QSIDE_CASTLE)
     {
       evaluation += 50;
     }
 
-    if (move.flags & Move::EP_CAPTURE)
+    if (move.flags & EP_CAPTURE)
     {
       evaluation += 100;
     }

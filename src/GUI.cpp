@@ -182,7 +182,7 @@ namespace Chess
             {
               Move move(draggingPieceIndex, index, board.board[draggingPieceIndex].piece, board.board[index].piece, board.enPassantFile, board.castlingRights);
 
-              if (!(move.flags & Move::PROMOTION))
+              if (!(move.flags & PROMOTION))
               {
                 makeMove(move);
               }

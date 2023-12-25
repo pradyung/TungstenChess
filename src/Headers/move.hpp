@@ -4,6 +4,17 @@
 
 namespace Chess
 {
+  enum Flags
+  {
+    NORMAL = 0,
+    CAPTURE = 1,
+    PAWN_DOUBLE = 2,
+    EP_CAPTURE = 4,
+    PROMOTION = 8,
+    KSIDE_CASTLE = 16,
+    QSIDE_CASTLE = 32
+  };
+
   class Move
   {
   public:
@@ -22,17 +33,6 @@ namespace Chess
     int flags;
 
     int computedEvaluation;
-
-    enum Flags
-    {
-      NORMAL = 0,
-      CAPTURE = 1,
-      PAWN_DOUBLE = 2,
-      EP_CAPTURE = 4,
-      PROMOTION = 8,
-      KSIDE_CASTLE = 16,
-      QSIDE_CASTLE = 32
-    };
 
     int toInt();
     std::string toString();
