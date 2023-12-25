@@ -743,40 +743,8 @@ namespace Chess
 
   int Board::getGameStatus(int color)
   {
-    std::vector<Move> legalMoves = getLegalMoves(color);
-
-    if (legalMoves.size() == 0)
-    {
-      if (isInCheck(color))
-      {
-        return LOSE;
-      }
-      else
-      {
-        return STALEMATE;
-      }
-    }
-
-    // insufficient material
-    int whitePawns = bitboards[WHITE_PAWN]->countBits();
-    int whiteKnights = bitboards[WHITE_KNIGHT]->countBits();
-    int whiteBishops = bitboards[WHITE_BISHOP]->countBits();
-    int whiteRooks = bitboards[WHITE_ROOK]->countBits();
-    int whiteQueens = bitboards[WHITE_QUEEN]->countBits();
-    int whitePieces = whitePawns + whiteKnights + whiteBishops + whiteRooks + whiteQueens;
-
-    int blackPawns = bitboards[BLACK_PAWN]->countBits();
-    int blackKnights = bitboards[BLACK_KNIGHT]->countBits();
-    int blackBishops = bitboards[BLACK_BISHOP]->countBits();
-    int blackRooks = bitboards[BLACK_ROOK]->countBits();
-    int blackQueens = bitboards[BLACK_QUEEN]->countBits();
-    int blackPieces = blackPawns + blackKnights + blackBishops + blackRooks + blackQueens;
-
-    if (whitePawns + blackPawns == 0)
-    {
-      if (whiteKnights + whiteBishops + whiteRooks + whiteQueens == 0 && blackKnights + blackBishops + blackRooks + blackQueens == 0)
-        return STALEMATE;
-    }
+    if (getLegalMoves(color).size() == 0)
+      return isInCheck(color) ? LOSE : STALEMATE;
 
     return NO_MATE;
   }
