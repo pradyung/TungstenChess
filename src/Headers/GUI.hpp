@@ -10,14 +10,17 @@ using namespace sf;
 
 namespace Chess
 {
+  enum ScreenConstants
+  {
+    SQUARE_SIZE = 80,
+    WIDTH_PADDING = 0,
+    HEIGHT_PADDING = 0
+  };
+
   class GUIHandler
   {
   public:
-    static const int SQUARE_SIZE = 80;
-    static const int WIDTH_PADDING = 0;
-    static const int HEIGHT_PADDING = 0;
-
-    GUIHandler(RenderWindow &window, std::string fen);
+    GUIHandler(RenderWindow &window);
 
     void runMainLoop();
 

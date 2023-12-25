@@ -84,7 +84,7 @@ namespace Chess
     return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE) + Vector2f(WIDTH_PADDING, HEIGHT_PADDING);
   }
 
-  GUIHandler::GUIHandler(RenderWindow &window, std::string fen)
+  GUIHandler::GUIHandler(RenderWindow &window)
   {
     this->window = &window;
 

@@ -135,6 +135,8 @@ namespace Chess
 
     zobristKey ^= zobrist.sideKey;
 
+    movesHistory.push(move);
+
     if (!speculative && inOpeningBook)
       inOpeningBook = openings.addMove(move.toInt());
 
@@ -282,6 +284,8 @@ namespace Chess
 
     zobristKey ^= zobrist.sideKey;
 
+    movesHistory.pop();
+
     int from = move.from;
     int to = move.to;
     int movePiece = move.piece;
@@ -385,7 +389,7 @@ namespace Chess
     if (move.flags & Move::PROMOTION)
     {
       bitboards[movePiece]->removeBit(to);
-      bitboards[promotionPiece]->removeBit(to);
+      bitboards[movePieceColor | promotionPiece]->removeBit(to);
     }
   }
 
@@ -1207,6 +1211,8 @@ namespace Chess
       }
     }
 
+    legalMoves[bestMoveIndex].computedEvaluation = bestMoveEvaluation;
+
     return legalMoves[bestMoveIndex];
   }
 
@@ -1252,9 +1258,9 @@ namespace Chess
       }
     }
 
-    Move bestMove = legalMoves[bestMoveIndex];
+    legalMoves[bestMoveIndex].computedEvaluation = bestMoveEvaluation;
 
-    return bestMove;
+    return legalMoves[bestMoveIndex];
   }
 
   std::vector<Move> Board::heuristicSortMoves(std::vector<Move> moves)

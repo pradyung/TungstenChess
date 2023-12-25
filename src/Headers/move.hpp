@@ -21,6 +21,8 @@ namespace Chess
 
     int flags;
 
+    int computedEvaluation;
+
     enum Flags
     {
       NORMAL = 0,

@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <stack>
 
 #include "move.hpp"
 #include "bitboard.hpp"
@@ -53,6 +54,8 @@ namespace Chess
     bool blackHasCastled;
 
     int halfMoves;
+
+    std::stack<Move> movesHistory;
 
     Openings openings;
     bool inOpeningBook = true;

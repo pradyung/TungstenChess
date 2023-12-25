@@ -4,9 +4,9 @@ using namespace Chess;
 
 int main()
 {
-  RenderWindow window(VideoMode(GUIHandler::SQUARE_SIZE * 8 + GUIHandler::WIDTH_PADDING * 2, GUIHandler::SQUARE_SIZE * 8 + GUIHandler::HEIGHT_PADDING * 2), "Chess", sf::Style::Titlebar | sf::Style::Close);
+  RenderWindow window(VideoMode(SQUARE_SIZE * 8 + WIDTH_PADDING * 2, SQUARE_SIZE * 8 + HEIGHT_PADDING * 2), "Chess", sf::Style::Titlebar | sf::Style::Close);
 
-  GUIHandler gui(window, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  GUIHandler gui(window);
 
   gui.runMainLoop();
 
