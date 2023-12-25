@@ -27,7 +27,7 @@ namespace Chess
     RenderWindow *window;
 
     Texture squares[5];
-    Texture piecesTextures[Piece::PIECE_NUMBER];
+    Texture piecesTextures[PIECE_NUMBER];
 
     Sprite boardSquares[64];
     Sprite pieces[64];

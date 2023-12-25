@@ -26,7 +26,7 @@ namespace Chess
 
     Piece board[64];
 
-    Bitboard *bitboards[Piece::PIECE_NUMBER];
+    Bitboard *bitboards[PIECE_NUMBER];
 
     int whiteKingIndex;
     int blackKingIndex;
@@ -87,18 +87,6 @@ namespace Chess
 
     int debug;
 
-    Bitboard whitePawnsBitboard;
-    Bitboard whiteKnightsBitboard;
-    Bitboard whiteBishopsBitboard;
-    Bitboard whiteRooksBitboard;
-    Bitboard whiteQueensBitboard;
-
-    Bitboard blackPawnsBitboard;
-    Bitboard blackKnightsBitboard;
-    Bitboard blackBishopsBitboard;
-    Bitboard blackRooksBitboard;
-    Bitboard blackQueensBitboard;
-
     void updatePiece(int pieceIndex, int piece);
     void removeCastlingRights(int rights);
 
@@ -117,7 +105,7 @@ namespace Chess
     Bitboard getQueenMoves(int pieceIndex, bool _ = false, bool __ = false);
     Bitboard getKingMoves(int pieceIndex, bool includeCastling = true, bool __ = false);
 
-    Bitboard (Chess::Board::*getPieceMoves[Piece::PIECE_TYPE_NUMBER])(int, bool, bool) = {
+    Bitboard (Chess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, bool, bool) = {
         nullptr,
         &Chess::Board::getPawnMoves,
         &Chess::Board::getKnightMoves,

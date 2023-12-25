@@ -54,21 +54,21 @@ namespace Chess
     switch (index)
     {
     case 10:
-      return Piece::WHITE_QUEEN;
+      return WHITE_QUEEN;
     case 11:
-      return Piece::WHITE_ROOK;
+      return WHITE_ROOK;
     case 12:
-      return Piece::WHITE_BISHOP;
+      return WHITE_BISHOP;
     case 13:
-      return Piece::WHITE_KNIGHT;
+      return WHITE_KNIGHT;
     case 50:
-      return Piece::BLACK_QUEEN;
+      return BLACK_QUEEN;
     case 51:
-      return Piece::BLACK_ROOK;
+      return BLACK_ROOK;
     case 52:
-      return Piece::BLACK_BISHOP;
+      return BLACK_BISHOP;
     case 53:
-      return Piece::BLACK_KNIGHT;
+      return BLACK_KNIGHT;
     default:
       return -1;
     }
@@ -106,7 +106,7 @@ namespace Chess
     {
       Event event;
 
-      if (board.sideToMove == Piece::BLACK && !gameOver)
+      if (board.sideToMove == BLACK && !gameOver)
       {
         makeBotMove();
 
@@ -259,21 +259,21 @@ namespace Chess
 
   void GUIHandler::loadPieceTextures()
   {
-    piecesTextures[Piece::WHITE_PAWN].loadFromMemory(images.WHITE_PAWN, images.WHITE_PAWN_SIZE);
-    piecesTextures[Piece::WHITE_KNIGHT].loadFromMemory(images.WHITE_KNIGHT, images.WHITE_KNIGHT_SIZE);
-    piecesTextures[Piece::WHITE_BISHOP].loadFromMemory(images.WHITE_BISHOP, images.WHITE_BISHOP_SIZE);
-    piecesTextures[Piece::WHITE_ROOK].loadFromMemory(images.WHITE_ROOK, images.WHITE_ROOK_SIZE);
-    piecesTextures[Piece::WHITE_QUEEN].loadFromMemory(images.WHITE_QUEEN, images.WHITE_QUEEN_SIZE);
-    piecesTextures[Piece::WHITE_KING].loadFromMemory(images.WHITE_KING, images.WHITE_KING_SIZE);
+    piecesTextures[WHITE_PAWN].loadFromMemory(images.WHITE_PAWN, images.WHITE_PAWN_SIZE);
+    piecesTextures[WHITE_KNIGHT].loadFromMemory(images.WHITE_KNIGHT, images.WHITE_KNIGHT_SIZE);
+    piecesTextures[WHITE_BISHOP].loadFromMemory(images.WHITE_BISHOP, images.WHITE_BISHOP_SIZE);
+    piecesTextures[WHITE_ROOK].loadFromMemory(images.WHITE_ROOK, images.WHITE_ROOK_SIZE);
+    piecesTextures[WHITE_QUEEN].loadFromMemory(images.WHITE_QUEEN, images.WHITE_QUEEN_SIZE);
+    piecesTextures[WHITE_KING].loadFromMemory(images.WHITE_KING, images.WHITE_KING_SIZE);
 
-    piecesTextures[Piece::BLACK_PAWN].loadFromMemory(images.BLACK_PAWN, images.BLACK_PAWN_SIZE);
-    piecesTextures[Piece::BLACK_KNIGHT].loadFromMemory(images.BLACK_KNIGHT, images.BLACK_KNIGHT_SIZE);
-    piecesTextures[Piece::BLACK_BISHOP].loadFromMemory(images.BLACK_BISHOP, images.BLACK_BISHOP_SIZE);
-    piecesTextures[Piece::BLACK_ROOK].loadFromMemory(images.BLACK_ROOK, images.BLACK_ROOK_SIZE);
-    piecesTextures[Piece::BLACK_QUEEN].loadFromMemory(images.BLACK_QUEEN, images.BLACK_QUEEN_SIZE);
-    piecesTextures[Piece::BLACK_KING].loadFromMemory(images.BLACK_KING, images.BLACK_KING_SIZE);
+    piecesTextures[BLACK_PAWN].loadFromMemory(images.BLACK_PAWN, images.BLACK_PAWN_SIZE);
+    piecesTextures[BLACK_KNIGHT].loadFromMemory(images.BLACK_KNIGHT, images.BLACK_KNIGHT_SIZE);
+    piecesTextures[BLACK_BISHOP].loadFromMemory(images.BLACK_BISHOP, images.BLACK_BISHOP_SIZE);
+    piecesTextures[BLACK_ROOK].loadFromMemory(images.BLACK_ROOK, images.BLACK_ROOK_SIZE);
+    piecesTextures[BLACK_QUEEN].loadFromMemory(images.BLACK_QUEEN, images.BLACK_QUEEN_SIZE);
+    piecesTextures[BLACK_KING].loadFromMemory(images.BLACK_KING, images.BLACK_KING_SIZE);
 
-    for (int i = 0; i < (Piece::BLACK | Piece::KING) + 1; i++)
+    for (int i = 0; i < (BLACK | KING) + 1; i++)
     {
       piecesTextures[i].setSmooth(true);
     }
@@ -283,19 +283,19 @@ namespace Chess
   {
     for (int i = 0; i < 64; i++)
     {
-      whitePawns[i].setTexture(piecesTextures[Piece::WHITE_PAWN]);
-      whiteKnights[i].setTexture(piecesTextures[Piece::WHITE_KNIGHT]);
-      whiteBishops[i].setTexture(piecesTextures[Piece::WHITE_BISHOP]);
-      whiteRooks[i].setTexture(piecesTextures[Piece::WHITE_ROOK]);
-      whiteQueens[i].setTexture(piecesTextures[Piece::WHITE_QUEEN]);
-      whiteKings[i].setTexture(piecesTextures[Piece::WHITE_KING]);
+      whitePawns[i].setTexture(piecesTextures[WHITE_PAWN]);
+      whiteKnights[i].setTexture(piecesTextures[WHITE_KNIGHT]);
+      whiteBishops[i].setTexture(piecesTextures[WHITE_BISHOP]);
+      whiteRooks[i].setTexture(piecesTextures[WHITE_ROOK]);
+      whiteQueens[i].setTexture(piecesTextures[WHITE_QUEEN]);
+      whiteKings[i].setTexture(piecesTextures[WHITE_KING]);
 
-      blackPawns[i].setTexture(piecesTextures[Piece::BLACK_PAWN]);
-      blackKnights[i].setTexture(piecesTextures[Piece::BLACK_KNIGHT]);
-      blackBishops[i].setTexture(piecesTextures[Piece::BLACK_BISHOP]);
-      blackRooks[i].setTexture(piecesTextures[Piece::BLACK_ROOK]);
-      blackQueens[i].setTexture(piecesTextures[Piece::BLACK_QUEEN]);
-      blackKings[i].setTexture(piecesTextures[Piece::BLACK_KING]);
+      blackPawns[i].setTexture(piecesTextures[BLACK_PAWN]);
+      blackKnights[i].setTexture(piecesTextures[BLACK_KNIGHT]);
+      blackBishops[i].setTexture(piecesTextures[BLACK_BISHOP]);
+      blackRooks[i].setTexture(piecesTextures[BLACK_ROOK]);
+      blackQueens[i].setTexture(piecesTextures[BLACK_QUEEN]);
+      blackKings[i].setTexture(piecesTextures[BLACK_KING]);
 
       whitePawns[i].setPosition(getSquareCoordinates(i));
       whiteKnights[i].setPosition(getSquareCoordinates(i));
@@ -331,15 +331,15 @@ namespace Chess
 
   void GUIHandler::loadPromotionPieces()
   {
-    whitePromotionPieces[0].setTexture(piecesTextures[Piece::WHITE_QUEEN]);
-    whitePromotionPieces[1].setTexture(piecesTextures[Piece::WHITE_ROOK]);
-    whitePromotionPieces[2].setTexture(piecesTextures[Piece::WHITE_BISHOP]);
-    whitePromotionPieces[3].setTexture(piecesTextures[Piece::WHITE_KNIGHT]);
+    whitePromotionPieces[0].setTexture(piecesTextures[WHITE_QUEEN]);
+    whitePromotionPieces[1].setTexture(piecesTextures[WHITE_ROOK]);
+    whitePromotionPieces[2].setTexture(piecesTextures[WHITE_BISHOP]);
+    whitePromotionPieces[3].setTexture(piecesTextures[WHITE_KNIGHT]);
 
-    blackPromotionPieces[0].setTexture(piecesTextures[Piece::BLACK_QUEEN]);
-    blackPromotionPieces[1].setTexture(piecesTextures[Piece::BLACK_ROOK]);
-    blackPromotionPieces[2].setTexture(piecesTextures[Piece::BLACK_BISHOP]);
-    blackPromotionPieces[3].setTexture(piecesTextures[Piece::BLACK_KNIGHT]);
+    blackPromotionPieces[0].setTexture(piecesTextures[BLACK_QUEEN]);
+    blackPromotionPieces[1].setTexture(piecesTextures[BLACK_ROOK]);
+    blackPromotionPieces[2].setTexture(piecesTextures[BLACK_BISHOP]);
+    blackPromotionPieces[3].setTexture(piecesTextures[BLACK_KNIGHT]);
 
     whitePromotionPieces[0].setPosition(getSquareCoordinates(2, 1));
     whitePromotionPieces[1].setPosition(getSquareCoordinates(3, 1));
@@ -375,23 +375,23 @@ namespace Chess
         continue;
       }
 
-      if (board.bitboards[Piece::WHITE_PAWN]->hasBit(i))
+      if (board.bitboards[WHITE_PAWN]->hasBit(i))
       {
         window->draw(whitePawns[i]);
       }
-      else if (board.bitboards[Piece::WHITE_KNIGHT]->hasBit(i))
+      else if (board.bitboards[WHITE_KNIGHT]->hasBit(i))
       {
         window->draw(whiteKnights[i]);
       }
-      else if (board.bitboards[Piece::WHITE_BISHOP]->hasBit(i))
+      else if (board.bitboards[WHITE_BISHOP]->hasBit(i))
       {
         window->draw(whiteBishops[i]);
       }
-      else if (board.bitboards[Piece::WHITE_ROOK]->hasBit(i))
+      else if (board.bitboards[WHITE_ROOK]->hasBit(i))
       {
         window->draw(whiteRooks[i]);
       }
-      else if (board.bitboards[Piece::WHITE_QUEEN]->hasBit(i))
+      else if (board.bitboards[WHITE_QUEEN]->hasBit(i))
       {
         window->draw(whiteQueens[i]);
       }
@@ -400,23 +400,23 @@ namespace Chess
         window->draw(whiteKings[i]);
       }
 
-      else if (board.bitboards[Piece::BLACK_PAWN]->hasBit(i))
+      else if (board.bitboards[BLACK_PAWN]->hasBit(i))
       {
         window->draw(blackPawns[i]);
       }
-      else if (board.bitboards[Piece::BLACK_KNIGHT]->hasBit(i))
+      else if (board.bitboards[BLACK_KNIGHT]->hasBit(i))
       {
         window->draw(blackKnights[i]);
       }
-      else if (board.bitboards[Piece::BLACK_BISHOP]->hasBit(i))
+      else if (board.bitboards[BLACK_BISHOP]->hasBit(i))
       {
         window->draw(blackBishops[i]);
       }
-      else if (board.bitboards[Piece::BLACK_ROOK]->hasBit(i))
+      else if (board.bitboards[BLACK_ROOK]->hasBit(i))
       {
         window->draw(blackRooks[i]);
       }
-      else if (board.bitboards[Piece::BLACK_QUEEN]->hasBit(i))
+      else if (board.bitboards[BLACK_QUEEN]->hasBit(i))
       {
         window->draw(blackQueens[i]);
       }
@@ -457,7 +457,7 @@ namespace Chess
   {
     for (int i = 0; i < 4; i++)
     {
-      if (board.sideToMove == Piece::WHITE)
+      if (board.sideToMove == WHITE)
       {
         window->draw(whitePromotionPieces[i]);
       }
@@ -502,7 +502,7 @@ namespace Chess
 
     if (board.isInCheck(board.sideToMove))
     {
-      redHighlightsBitboard.addBit(board.sideToMove == Piece::WHITE ? board.whiteKingIndex : board.blackKingIndex);
+      redHighlightsBitboard.addBit(board.sideToMove == WHITE ? board.whiteKingIndex : board.blackKingIndex);
     }
 
     int gameStatus = board.getGameStatus(board.sideToMove);

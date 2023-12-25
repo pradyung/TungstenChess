@@ -8,7 +8,7 @@ namespace Chess
   {
   public:
     Move();
-    Move(int from, int to, int movePiece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = Piece::EMPTY);
+    Move(int from, int to, int movePiece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = EMPTY);
 
     int from;
     int to;

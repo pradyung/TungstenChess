@@ -31,36 +31,36 @@ namespace Chess
     int movePieceType = movePiece & 7;
     int movePieceColor = movePiece & 24;
 
-    if (movePieceType == Piece::KING && from - to == -2)
+    if (movePieceType == KING && from - to == -2)
     {
       this->flags |= KSIDE_CASTLE;
       return;
     }
 
-    if (movePieceType == Piece::KING && from - to == 2)
+    if (movePieceType == KING && from - to == 2)
     {
       this->flags |= QSIDE_CASTLE;
       return;
     }
 
-    if (movePieceType == Piece::PAWN && (from - to == 16 || from - to == -16))
+    if (movePieceType == PAWN && (from - to == 16 || from - to == -16))
     {
       this->flags |= PAWN_DOUBLE;
       return;
     }
 
-    if (movePieceType == Piece::PAWN && capturedPiece == Piece::EMPTY && (to - from) % 8)
+    if (movePieceType == PAWN && capturedPiece == EMPTY && (to - from) % 8)
     {
       this->flags |= EP_CAPTURE;
       return;
     }
 
-    if (capturedPiece != Piece::EMPTY)
+    if (capturedPiece != EMPTY)
     {
       this->flags |= CAPTURE;
     }
 
-    if (movePieceType == Piece::PAWN && (to <= 7 || to >= 56))
+    if (movePieceType == PAWN && (to <= 7 || to >= 56))
     {
       this->flags |= PROMOTION;
     }
@@ -86,16 +86,16 @@ namespace Chess
     {
       switch (promotionPiece)
       {
-      case Piece::QUEEN:
+      case QUEEN:
         result += "q";
         break;
-      case Piece::ROOK:
+      case ROOK:
         result += "r";
         break;
-      case Piece::BISHOP:
+      case BISHOP:
         result += "b";
         break;
-      case Piece::KNIGHT:
+      case KNIGHT:
         result += "n";
         break;
       }

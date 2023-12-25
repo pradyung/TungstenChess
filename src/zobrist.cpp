@@ -7,7 +7,7 @@ namespace Chess
     pieceKeys = new ZobristKey *[64];
     for (int i = 0; i < 64; i++)
     {
-      pieceKeys[i] = new ZobristKey[Piece::PIECE_NUMBER];
+      pieceKeys[i] = new ZobristKey[PIECE_NUMBER];
     }
 
     castlingKeys = new ZobristKey[16];
@@ -57,7 +57,7 @@ namespace Chess
 
     for (int i = 0; i < 64; i++)
     {
-      if (board[i] != Piece::EMPTY)
+      if (board[i] != EMPTY)
       {
         hash ^= pieceKeys[i][board[i]];
       }
@@ -66,7 +66,7 @@ namespace Chess
     hash ^= castlingKeys[castlingRights];
     hash ^= enPassantKeys[enPassantFile];
 
-    if (sideToMove == Piece::WHITE)
+    if (sideToMove == WHITE)
       hash ^= sideKey;
 
     return hash;

@@ -19,35 +19,23 @@ namespace Chess
       fenParts[fenPartIndex] += fen[i];
     }
 
-    whitePawnsBitboard = Bitboard();
-    whiteKnightsBitboard = Bitboard();
-    whiteBishopsBitboard = Bitboard();
-    whiteRooksBitboard = Bitboard();
-    whiteQueensBitboard = Bitboard();
+    bitboards[WHITE_PAWN] = new Bitboard();
+    bitboards[WHITE_KNIGHT] = new Bitboard();
+    bitboards[WHITE_BISHOP] = new Bitboard();
+    bitboards[WHITE_ROOK] = new Bitboard();
+    bitboards[WHITE_QUEEN] = new Bitboard();
 
-    blackPawnsBitboard = Bitboard();
-    blackKnightsBitboard = Bitboard();
-    blackBishopsBitboard = Bitboard();
-    blackRooksBitboard = Bitboard();
-    blackQueensBitboard = Bitboard();
-
-    bitboards[Piece::WHITE_PAWN] = &whitePawnsBitboard;
-    bitboards[Piece::WHITE_KNIGHT] = &whiteKnightsBitboard;
-    bitboards[Piece::WHITE_BISHOP] = &whiteBishopsBitboard;
-    bitboards[Piece::WHITE_ROOK] = &whiteRooksBitboard;
-    bitboards[Piece::WHITE_QUEEN] = &whiteQueensBitboard;
-
-    bitboards[Piece::BLACK_PAWN] = &blackPawnsBitboard;
-    bitboards[Piece::BLACK_KNIGHT] = &blackKnightsBitboard;
-    bitboards[Piece::BLACK_BISHOP] = &blackBishopsBitboard;
-    bitboards[Piece::BLACK_ROOK] = &blackRooksBitboard;
-    bitboards[Piece::BLACK_QUEEN] = &blackQueensBitboard;
+    bitboards[BLACK_PAWN] = new Bitboard();
+    bitboards[BLACK_KNIGHT] = new Bitboard();
+    bitboards[BLACK_BISHOP] = new Bitboard();
+    bitboards[BLACK_ROOK] = new Bitboard();
+    bitboards[BLACK_QUEEN] = new Bitboard();
 
     enPassantFile = -1;
 
     castlingRights = 0;
 
-    sideToMove = Piece::WHITE;
+    sideToMove = WHITE;
 
     int pieceIndex = 0;
     for (int i = 0; i < fenParts[0].length(); i++)
@@ -70,32 +58,32 @@ namespace Chess
           blackKingIndex = pieceIndex;
 
         if (fen[i] == 'P')
-          whitePawnsBitboard.addBit(pieceIndex);
+          bitboards[WHITE_PAWN]->addBit(pieceIndex);
         else if (fen[i] == 'N')
-          whiteKnightsBitboard.addBit(pieceIndex);
+          bitboards[WHITE_KNIGHT]->addBit(pieceIndex);
         else if (fen[i] == 'B')
-          whiteBishopsBitboard.addBit(pieceIndex);
+          bitboards[WHITE_BISHOP]->addBit(pieceIndex);
         else if (fen[i] == 'R')
-          whiteRooksBitboard.addBit(pieceIndex);
+          bitboards[WHITE_ROOK]->addBit(pieceIndex);
         else if (fen[i] == 'Q')
-          whiteQueensBitboard.addBit(pieceIndex);
+          bitboards[WHITE_QUEEN]->addBit(pieceIndex);
 
         else if (fen[i] == 'p')
-          blackPawnsBitboard.addBit(pieceIndex);
+          bitboards[BLACK_PAWN]->addBit(pieceIndex);
         else if (fen[i] == 'n')
-          blackKnightsBitboard.addBit(pieceIndex);
+          bitboards[BLACK_KNIGHT]->addBit(pieceIndex);
         else if (fen[i] == 'b')
-          blackBishopsBitboard.addBit(pieceIndex);
+          bitboards[BLACK_BISHOP]->addBit(pieceIndex);
         else if (fen[i] == 'r')
-          blackRooksBitboard.addBit(pieceIndex);
+          bitboards[BLACK_ROOK]->addBit(pieceIndex);
         else if (fen[i] == 'q')
-          blackQueensBitboard.addBit(pieceIndex);
+          bitboards[BLACK_QUEEN]->addBit(pieceIndex);
 
         pieceIndex++;
       }
     }
 
-    sideToMove = fenParts[1] == "w" ? Piece::WHITE : Piece::BLACK;
+    sideToMove = fenParts[1] == "w" ? WHITE : BLACK;
 
     if (fenParts[3] != "-")
     {
@@ -156,12 +144,12 @@ namespace Chess
     int capturedPiece = move.capturedPiece;
     int promotionPiece = move.promotionPiece & 7;
 
-    if (capturedPiece != Piece::EMPTY)
+    if (capturedPiece != EMPTY)
       removePieceFromBitboard(to);
     removePieceFromBitboard(from);
 
     updatePiece(to, board[from].piece);
-    updatePiece(from, Piece::EMPTY);
+    updatePiece(from, EMPTY);
 
     addPieceToBitboard(to);
 
@@ -170,25 +158,25 @@ namespace Chess
 
     enPassantFile = -1;
 
-    if (movePiece == Piece::WHITE_KING)
+    if (movePiece == WHITE_KING)
     {
       whiteKingIndex = to;
       removeCastlingRights(WHITE_KINGSIDE | WHITE_QUEENSIDE);
     }
-    else if (movePiece == Piece::BLACK_KING)
+    else if (movePiece == BLACK_KING)
     {
       blackKingIndex = to;
       removeCastlingRights(BLACK_KINGSIDE | BLACK_QUEENSIDE);
     }
 
-    if (movePiece == Piece::WHITE_ROOK)
+    if (movePiece == WHITE_ROOK)
     {
       if (from == 56)
         removeCastlingRights(WHITE_QUEENSIDE);
       else if (from == 63)
         removeCastlingRights(WHITE_KINGSIDE);
     }
-    else if (movePiece == Piece::BLACK_ROOK)
+    else if (movePiece == BLACK_ROOK)
     {
       if (from == 0)
         removeCastlingRights(BLACK_QUEENSIDE);
@@ -196,14 +184,14 @@ namespace Chess
         removeCastlingRights(BLACK_KINGSIDE);
     }
 
-    if (capturedPiece == Piece::WHITE_ROOK)
+    if (capturedPiece == WHITE_ROOK)
     {
       if (to == 56)
         removeCastlingRights(WHITE_QUEENSIDE);
       else if (to == 63)
         removeCastlingRights(WHITE_KINGSIDE);
     }
-    else if (capturedPiece == Piece::BLACK_ROOK)
+    else if (capturedPiece == BLACK_ROOK)
     {
       if (to == 0)
         removeCastlingRights(BLACK_QUEENSIDE);
@@ -216,15 +204,15 @@ namespace Chess
 
     if (move.flags & Move::EP_CAPTURE)
     {
-      if (movePiece & Piece::WHITE)
+      if (movePiece & WHITE)
       {
-        updatePiece(to + 8, Piece::EMPTY);
-        blackPawnsBitboard.removeBit(to + 8);
+        updatePiece(to + 8, EMPTY);
+        bitboards[BLACK_PAWN]->removeBit(to + 8);
       }
-      else if (movePiece & Piece::BLACK)
+      else if (movePiece & BLACK)
       {
-        updatePiece(to - 8, Piece::EMPTY);
-        whitePawnsBitboard.removeBit(to - 8);
+        updatePiece(to - 8, EMPTY);
+        bitboards[WHITE_PAWN]->removeBit(to - 8);
       }
     }
 
@@ -238,20 +226,20 @@ namespace Chess
 
     if (move.flags & Move::KSIDE_CASTLE)
     {
-      updatePiece(to - 1, movePieceColor | Piece::ROOK);
-      updatePiece(to + 1, Piece::EMPTY);
+      updatePiece(to - 1, movePieceColor | ROOK);
+      updatePiece(to + 1, EMPTY);
 
-      if (movePiece == Piece::WHITE_KING)
+      if (movePiece == WHITE_KING)
       {
-        whiteRooksBitboard.removeBit(63);
-        whiteRooksBitboard.addBit(61);
+        bitboards[WHITE_ROOK]->removeBit(63);
+        bitboards[WHITE_ROOK]->addBit(61);
 
         whiteHasCastled = true;
       }
-      else if (movePiece == Piece::BLACK_KING)
+      else if (movePiece == BLACK_KING)
       {
-        blackRooksBitboard.removeBit(7);
-        blackRooksBitboard.addBit(5);
+        bitboards[BLACK_ROOK]->removeBit(7);
+        bitboards[BLACK_ROOK]->addBit(5);
 
         blackHasCastled = true;
       }
@@ -259,20 +247,20 @@ namespace Chess
 
     if (move.flags & Move::QSIDE_CASTLE)
     {
-      updatePiece(to + 1, movePieceColor | Piece::ROOK);
-      updatePiece(to - 2, Piece::EMPTY);
+      updatePiece(to + 1, movePieceColor | ROOK);
+      updatePiece(to - 2, EMPTY);
 
-      if (movePiece == Piece::WHITE_KING)
+      if (movePiece == WHITE_KING)
       {
-        whiteRooksBitboard.removeBit(56);
-        whiteRooksBitboard.addBit(59);
+        bitboards[WHITE_ROOK]->removeBit(56);
+        bitboards[WHITE_ROOK]->addBit(59);
 
         whiteHasCastled = true;
       }
-      else if (movePiece == Piece::BLACK_KING)
+      else if (movePiece == BLACK_KING)
       {
-        blackRooksBitboard.removeBit(0);
-        blackRooksBitboard.addBit(3);
+        bitboards[BLACK_ROOK]->removeBit(0);
+        bitboards[BLACK_ROOK]->addBit(3);
 
         blackHasCastled = true;
       }
@@ -310,7 +298,7 @@ namespace Chess
     }
     else
     {
-      updatePiece(to, Piece::EMPTY);
+      updatePiece(to, EMPTY);
     }
 
     updatePiece(from, movePiece);
@@ -319,20 +307,20 @@ namespace Chess
 
     if (move.flags & Move::KSIDE_CASTLE)
     {
-      updatePiece(to + 1, movePiece & 24 | Piece::ROOK);
-      updatePiece(to - 1, Piece::EMPTY);
+      updatePiece(to + 1, movePiece & 24 | ROOK);
+      updatePiece(to - 1, EMPTY);
 
-      if (movePiece == Piece::WHITE_KING)
+      if (movePiece == WHITE_KING)
       {
-        whiteRooksBitboard.removeBit(61);
-        whiteRooksBitboard.addBit(63);
+        bitboards[WHITE_ROOK]->removeBit(61);
+        bitboards[WHITE_ROOK]->addBit(63);
 
         whiteHasCastled = false;
       }
-      else if (movePiece == Piece::BLACK_KING)
+      else if (movePiece == BLACK_KING)
       {
-        blackRooksBitboard.removeBit(5);
-        blackRooksBitboard.addBit(7);
+        bitboards[BLACK_ROOK]->removeBit(5);
+        bitboards[BLACK_ROOK]->addBit(7);
 
         blackHasCastled = false;
       }
@@ -340,20 +328,20 @@ namespace Chess
 
     else if (move.flags & Move::QSIDE_CASTLE)
     {
-      updatePiece(to - 2, movePiece & 24 | Piece::ROOK);
-      updatePiece(to + 1, Piece::EMPTY);
+      updatePiece(to - 2, movePiece & 24 | ROOK);
+      updatePiece(to + 1, EMPTY);
 
-      if (movePiece == Piece::WHITE_KING)
+      if (movePiece == WHITE_KING)
       {
-        whiteRooksBitboard.removeBit(59);
-        whiteRooksBitboard.addBit(56);
+        bitboards[WHITE_ROOK]->removeBit(59);
+        bitboards[WHITE_ROOK]->addBit(56);
 
         whiteHasCastled = false;
       }
-      else if (movePiece == Piece::BLACK_KING)
+      else if (movePiece == BLACK_KING)
       {
-        blackRooksBitboard.removeBit(3);
-        blackRooksBitboard.addBit(0);
+        bitboards[BLACK_ROOK]->removeBit(3);
+        bitboards[BLACK_ROOK]->addBit(0);
 
         blackHasCastled = false;
       }
@@ -371,26 +359,26 @@ namespace Chess
     zobristKey ^= zobrist.castlingKeys[castlingRights];
     zobristKey ^= zobrist.enPassantKeys[enPassantFile];
 
-    if (movePiece == Piece::WHITE_KING)
+    if (movePiece == WHITE_KING)
     {
       whiteKingIndex = from;
     }
-    else if (movePiece == Piece::BLACK_KING)
+    else if (movePiece == BLACK_KING)
     {
       blackKingIndex = from;
     }
 
     if (move.flags & Move::EP_CAPTURE)
     {
-      if (movePiece & Piece::WHITE)
+      if (movePiece & WHITE)
       {
-        updatePiece(to + 8, Piece::BLACK_PAWN);
-        blackPawnsBitboard.addBit(to + 8);
+        updatePiece(to + 8, BLACK_PAWN);
+        bitboards[BLACK_PAWN]->addBit(to + 8);
       }
-      else if (movePiece & Piece::BLACK)
+      else if (movePiece & BLACK)
       {
-        updatePiece(to - 8, Piece::WHITE_PAWN);
-        whitePawnsBitboard.addBit(to - 8);
+        updatePiece(to - 8, WHITE_PAWN);
+        bitboards[WHITE_PAWN]->addBit(to - 8);
       }
     }
 
@@ -426,7 +414,7 @@ namespace Chess
 
     int piece = board[pieceIndex].piece;
 
-    if (piece == Piece::WHITE_PAWN)
+    if (piece == WHITE_PAWN)
     {
       if (board[pieceIndex - 8].isEmpty() && !onlyCaptures)
       {
@@ -437,11 +425,11 @@ namespace Chess
         }
       }
 
-      if (pieceIndex % 8 != 0 && ((!board[pieceIndex - 9].isEmpty() && board[pieceIndex - 9].getPieceColor() == Piece::BLACK) || onlyCaptures))
+      if (pieceIndex % 8 != 0 && ((!board[pieceIndex - 9].isEmpty() && board[pieceIndex - 9].getPieceColor() == BLACK) || onlyCaptures))
       {
         movesBitboard.addBit(pieceIndex - 9);
       }
-      if (pieceIndex % 8 != 7 && ((!board[pieceIndex - 7].isEmpty() && board[pieceIndex - 7].getPieceColor() == Piece::BLACK) || onlyCaptures))
+      if (pieceIndex % 8 != 7 && ((!board[pieceIndex - 7].isEmpty() && board[pieceIndex - 7].getPieceColor() == BLACK) || onlyCaptures))
       {
         movesBitboard.addBit(pieceIndex - 7);
       }
@@ -459,7 +447,7 @@ namespace Chess
         }
       }
     }
-    else if (piece == Piece::BLACK_PAWN)
+    else if (piece == BLACK_PAWN)
     {
       if (board[pieceIndex + 8].isEmpty() && !onlyCaptures)
       {
@@ -470,11 +458,11 @@ namespace Chess
         }
       }
 
-      if (pieceIndex % 8 != 0 && ((!board[pieceIndex + 7].isEmpty() && board[pieceIndex + 7].getPieceColor() == Piece::WHITE) || onlyCaptures))
+      if (pieceIndex % 8 != 0 && ((!board[pieceIndex + 7].isEmpty() && board[pieceIndex + 7].getPieceColor() == WHITE) || onlyCaptures))
       {
         movesBitboard.addBit(pieceIndex + 7);
       }
-      if (pieceIndex % 8 != 7 && ((!board[pieceIndex + 9].isEmpty() && board[pieceIndex + 9].getPieceColor() == Piece::WHITE) || onlyCaptures))
+      if (pieceIndex % 8 != 7 && ((!board[pieceIndex + 9].isEmpty() && board[pieceIndex + 9].getPieceColor() == WHITE) || onlyCaptures))
       {
         movesBitboard.addBit(pieceIndex + 9);
       }
@@ -500,13 +488,13 @@ namespace Chess
   {
     Bitboard friendlyPiecesBitboard = Bitboard();
 
-    if (board[pieceIndex].getPieceColor() == Piece::WHITE)
+    if (board[pieceIndex].getPieceColor() == WHITE)
     {
-      friendlyPiecesBitboard = whitePawnsBitboard | whiteKnightsBitboard | whiteBishopsBitboard | whiteRooksBitboard | whiteQueensBitboard | Bitboard(1ULL << whiteKingIndex);
+      friendlyPiecesBitboard = *bitboards[WHITE_PAWN] | *bitboards[WHITE_KNIGHT] | *bitboards[WHITE_BISHOP] | *bitboards[WHITE_ROOK] | *bitboards[WHITE_QUEEN] | Bitboard(1ULL << whiteKingIndex);
     }
     else
     {
-      friendlyPiecesBitboard = blackPawnsBitboard | blackKnightsBitboard | blackBishopsBitboard | blackRooksBitboard | blackQueensBitboard | Bitboard(1ULL << blackKingIndex);
+      friendlyPiecesBitboard = *bitboards[BLACK_PAWN] | *bitboards[BLACK_KNIGHT] | *bitboards[BLACK_BISHOP] | *bitboards[BLACK_ROOK] | *bitboards[BLACK_QUEEN] | Bitboard(1ULL << blackKingIndex);
     }
 
     Bitboard movesBitboard = Bitboard(MovesLookup::KNIGHT_MOVES[pieceIndex] & ~friendlyPiecesBitboard.bitboard);
@@ -641,13 +629,13 @@ namespace Chess
 
     Bitboard friendlyPiecesBitboard = Bitboard();
 
-    if (board[pieceIndex].getPieceColor() == Piece::WHITE)
+    if (board[pieceIndex].getPieceColor() == WHITE)
     {
-      friendlyPiecesBitboard = whitePawnsBitboard | whiteKnightsBitboard | whiteBishopsBitboard | whiteRooksBitboard | whiteQueensBitboard;
+      friendlyPiecesBitboard = *bitboards[WHITE_PAWN] | *bitboards[WHITE_KNIGHT] | *bitboards[WHITE_BISHOP] | *bitboards[WHITE_ROOK] | *bitboards[WHITE_QUEEN];
     }
-    else if (board[pieceIndex].getPieceColor() == Piece::BLACK)
+    else if (board[pieceIndex].getPieceColor() == BLACK)
     {
-      friendlyPiecesBitboard = blackPawnsBitboard | blackKnightsBitboard | blackBishopsBitboard | blackRooksBitboard | blackQueensBitboard;
+      friendlyPiecesBitboard = *bitboards[BLACK_PAWN] | *bitboards[BLACK_KNIGHT] | *bitboards[BLACK_BISHOP] | *bitboards[BLACK_ROOK] | *bitboards[BLACK_QUEEN];
     }
 
     movesBitboard = Bitboard(MovesLookup::KING_MOVES[pieceIndex] & ~friendlyPiecesBitboard.bitboard);
@@ -656,35 +644,35 @@ namespace Chess
 
     if (includeCastling && castlingRights)
     {
-      if (piece == Piece::WHITE_KING)
+      if (piece == WHITE_KING)
       {
         if (castlingRights & WHITE_KINGSIDE)
         {
-          if (board[61].isEmpty() && board[62].isEmpty() && !isInCheck(Piece::WHITE) && !isAttacked(61, Piece::BLACK))
+          if (board[61].isEmpty() && board[62].isEmpty() && !isInCheck(WHITE) && !isAttacked(61, BLACK))
           {
             movesBitboard.addBit(62);
           }
         }
         if (castlingRights & WHITE_QUEENSIDE)
         {
-          if (board[59].isEmpty() && board[58].isEmpty() && board[57].isEmpty() && !isInCheck(Piece::WHITE) && !isAttacked(59, Piece::BLACK))
+          if (board[59].isEmpty() && board[58].isEmpty() && board[57].isEmpty() && !isInCheck(WHITE) && !isAttacked(59, BLACK))
           {
             movesBitboard.addBit(58);
           }
         }
       }
-      else if (piece == Piece::BLACK_KING)
+      else if (piece == BLACK_KING)
       {
         if (castlingRights & BLACK_KINGSIDE)
         {
-          if (board[5].isEmpty() && board[6].isEmpty() && !isInCheck(Piece::BLACK) && !isAttacked(5, Piece::WHITE))
+          if (board[5].isEmpty() && board[6].isEmpty() && !isInCheck(BLACK) && !isAttacked(5, WHITE))
           {
             movesBitboard.addBit(6);
           }
         }
         if (castlingRights & BLACK_QUEENSIDE)
         {
-          if (board[3].isEmpty() && board[2].isEmpty() && board[1].isEmpty() && !isInCheck(Piece::BLACK) && !isAttacked(3, Piece::WHITE))
+          if (board[3].isEmpty() && board[2].isEmpty() && board[1].isEmpty() && !isInCheck(BLACK) && !isAttacked(3, WHITE))
           {
             movesBitboard.addBit(2);
           }
@@ -697,56 +685,18 @@ namespace Chess
 
   void Board::addPieceToBitboard(int pieceIndex)
   {
-    int piece = board[pieceIndex].piece;
+    if (board[pieceIndex].getPieceType() == KING)
+      return;
 
-    if (piece == Piece::WHITE_PAWN)
-      whitePawnsBitboard.addBit(pieceIndex);
-    else if (piece == Piece::WHITE_KNIGHT)
-      whiteKnightsBitboard.addBit(pieceIndex);
-    else if (piece == Piece::WHITE_BISHOP)
-      whiteBishopsBitboard.addBit(pieceIndex);
-    else if (piece == Piece::WHITE_ROOK)
-      whiteRooksBitboard.addBit(pieceIndex);
-    else if (piece == Piece::WHITE_QUEEN)
-      whiteQueensBitboard.addBit(pieceIndex);
-
-    else if (piece == Piece::BLACK_PAWN)
-      blackPawnsBitboard.addBit(pieceIndex);
-    else if (piece == Piece::BLACK_KNIGHT)
-      blackKnightsBitboard.addBit(pieceIndex);
-    else if (piece == Piece::BLACK_BISHOP)
-      blackBishopsBitboard.addBit(pieceIndex);
-    else if (piece == Piece::BLACK_ROOK)
-      blackRooksBitboard.addBit(pieceIndex);
-    else if (piece == Piece::BLACK_QUEEN)
-      blackQueensBitboard.addBit(pieceIndex);
+    bitboards[board[pieceIndex].piece]->addBit(pieceIndex);
   }
 
   void Board::removePieceFromBitboard(int pieceIndex)
   {
-    int piece = board[pieceIndex].piece;
+    if (board[pieceIndex].getPieceType() == KING)
+      return;
 
-    if (piece == Piece::WHITE_PAWN)
-      whitePawnsBitboard.removeBit(pieceIndex);
-    else if (piece == Piece::WHITE_KNIGHT)
-      whiteKnightsBitboard.removeBit(pieceIndex);
-    else if (piece == Piece::WHITE_BISHOP)
-      whiteBishopsBitboard.removeBit(pieceIndex);
-    else if (piece == Piece::WHITE_ROOK)
-      whiteRooksBitboard.removeBit(pieceIndex);
-    else if (piece == Piece::WHITE_QUEEN)
-      whiteQueensBitboard.removeBit(pieceIndex);
-
-    else if (piece == Piece::BLACK_PAWN)
-      blackPawnsBitboard.removeBit(pieceIndex);
-    else if (piece == Piece::BLACK_KNIGHT)
-      blackKnightsBitboard.removeBit(pieceIndex);
-    else if (piece == Piece::BLACK_BISHOP)
-      blackBishopsBitboard.removeBit(pieceIndex);
-    else if (piece == Piece::BLACK_ROOK)
-      blackRooksBitboard.removeBit(pieceIndex);
-    else if (piece == Piece::BLACK_QUEEN)
-      blackQueensBitboard.removeBit(pieceIndex);
+    bitboards[board[pieceIndex].piece]->removeBit(pieceIndex);
   }
 
   std::vector<Move> Board::getLegalMoves(int color)
@@ -768,10 +718,10 @@ namespace Chess
 
           if (legalMoves.back().flags & Move::PROMOTION)
           {
-            legalMoves.back().promotionPiece = Piece::QUEEN;
-            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::KNIGHT));
-            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::BISHOP));
-            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, Piece::ROOK));
+            legalMoves.back().promotionPiece = QUEEN;
+            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, KNIGHT));
+            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, BISHOP));
+            legalMoves.push_back(Move(i, j, board[i].piece, board[j].piece, enPassantFile, castlingRights, ROOK));
           }
         }
       }
@@ -790,7 +740,7 @@ namespace Chess
     {
       if (legalMovesBitboard.hasBit(j))
       {
-        Move move = Move(pieceIndex, j, board[pieceIndex].piece, board[j].piece, enPassantFile, castlingRights, Piece::QUEEN);
+        Move move = Move(pieceIndex, j, board[pieceIndex].piece, board[j].piece, enPassantFile, castlingRights, QUEEN);
 
         makeMove(move);
 
@@ -825,7 +775,7 @@ namespace Chess
 
   bool Board::isInCheck(int color)
   {
-    return isAttacked(color == Piece::WHITE ? whiteKingIndex : blackKingIndex, color ^ 24);
+    return isAttacked(color == WHITE ? whiteKingIndex : blackKingIndex, color ^ 24);
   }
 
   bool Board::isAttacked(int square, int color)
@@ -852,18 +802,18 @@ namespace Chess
     }
 
     // insufficient material
-    int whitePawns = whitePawnsBitboard.countBits();
-    int whiteKnights = whiteKnightsBitboard.countBits();
-    int whiteBishops = whiteBishopsBitboard.countBits();
-    int whiteRooks = whiteRooksBitboard.countBits();
-    int whiteQueens = whiteQueensBitboard.countBits();
+    int whitePawns = bitboards[WHITE_PAWN]->countBits();
+    int whiteKnights = bitboards[WHITE_KNIGHT]->countBits();
+    int whiteBishops = bitboards[WHITE_BISHOP]->countBits();
+    int whiteRooks = bitboards[WHITE_ROOK]->countBits();
+    int whiteQueens = bitboards[WHITE_QUEEN]->countBits();
     int whitePieces = whitePawns + whiteKnights + whiteBishops + whiteRooks + whiteQueens;
 
-    int blackPawns = blackPawnsBitboard.countBits();
-    int blackKnights = blackKnightsBitboard.countBits();
-    int blackBishops = blackBishopsBitboard.countBits();
-    int blackRooks = blackRooksBitboard.countBits();
-    int blackQueens = blackQueensBitboard.countBits();
+    int blackPawns = bitboards[BLACK_PAWN]->countBits();
+    int blackKnights = bitboards[BLACK_KNIGHT]->countBits();
+    int blackBishops = bitboards[BLACK_BISHOP]->countBits();
+    int blackRooks = bitboards[BLACK_ROOK]->countBits();
+    int blackQueens = bitboards[BLACK_QUEEN]->countBits();
     int blackPieces = blackPawns + blackKnights + blackBishops + blackRooks + blackQueens;
 
     if (whitePawns + blackPawns == 0)
@@ -956,14 +906,14 @@ namespace Chess
     if (gameStatus != NO_MATE)
     {
       if (gameStatus == LOSE)
-        return sideToMove == Piece::WHITE ? 1000000 : -1000000;
+        return sideToMove == WHITE ? 1000000 : -1000000;
       else
         return 0;
     }
 
     int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
 
-    if (sideToMove == Piece::BLACK)
+    if (sideToMove == BLACK)
       staticEvaluation = -staticEvaluation;
 
     return staticEvaluation;
@@ -974,17 +924,17 @@ namespace Chess
 
     int materialEvaluation = 0;
 
-    materialEvaluation += whitePawnsBitboard.countBits() * Piece::PIECE_VALUES[Piece::PAWN];
-    materialEvaluation += whiteKnightsBitboard.countBits() * Piece::PIECE_VALUES[Piece::KNIGHT];
-    materialEvaluation += whiteBishopsBitboard.countBits() * Piece::PIECE_VALUES[Piece::BISHOP];
-    materialEvaluation += whiteRooksBitboard.countBits() * Piece::PIECE_VALUES[Piece::ROOK];
-    materialEvaluation += whiteQueensBitboard.countBits() * Piece::PIECE_VALUES[Piece::QUEEN];
+    materialEvaluation += bitboards[WHITE_PAWN]->countBits() * Piece::PIECE_VALUES[PAWN];
+    materialEvaluation += bitboards[WHITE_KNIGHT]->countBits() * Piece::PIECE_VALUES[KNIGHT];
+    materialEvaluation += bitboards[WHITE_BISHOP]->countBits() * Piece::PIECE_VALUES[BISHOP];
+    materialEvaluation += bitboards[WHITE_ROOK]->countBits() * Piece::PIECE_VALUES[ROOK];
+    materialEvaluation += bitboards[WHITE_QUEEN]->countBits() * Piece::PIECE_VALUES[QUEEN];
 
-    materialEvaluation -= blackPawnsBitboard.countBits() * Piece::PIECE_VALUES[Piece::PAWN];
-    materialEvaluation -= blackKnightsBitboard.countBits() * Piece::PIECE_VALUES[Piece::KNIGHT];
-    materialEvaluation -= blackBishopsBitboard.countBits() * Piece::PIECE_VALUES[Piece::BISHOP];
-    materialEvaluation -= blackRooksBitboard.countBits() * Piece::PIECE_VALUES[Piece::ROOK];
-    materialEvaluation -= blackQueensBitboard.countBits() * Piece::PIECE_VALUES[Piece::QUEEN];
+    materialEvaluation -= bitboards[BLACK_PAWN]->countBits() * Piece::PIECE_VALUES[PAWN];
+    materialEvaluation -= bitboards[BLACK_KNIGHT]->countBits() * Piece::PIECE_VALUES[KNIGHT];
+    materialEvaluation -= bitboards[BLACK_BISHOP]->countBits() * Piece::PIECE_VALUES[BISHOP];
+    materialEvaluation -= bitboards[BLACK_ROOK]->countBits() * Piece::PIECE_VALUES[ROOK];
+    materialEvaluation -= bitboards[BLACK_QUEEN]->countBits() * Piece::PIECE_VALUES[QUEEN];
 
     return materialEvaluation;
   }
@@ -997,42 +947,42 @@ namespace Chess
     {
       switch (board[i].piece)
       {
-      case Piece::WHITE_PAWN:
+      case WHITE_PAWN:
         positionalEvaluation += PieceEvalTables::PAWN_EVAL_TABLE[i];
         break;
-      case Piece::WHITE_KNIGHT:
+      case WHITE_KNIGHT:
         positionalEvaluation += PieceEvalTables::KNIGHT_EVAL_TABLE[i];
         break;
-      case Piece::WHITE_BISHOP:
+      case WHITE_BISHOP:
         positionalEvaluation += PieceEvalTables::BISHOP_EVAL_TABLE[i];
         break;
-      case Piece::WHITE_ROOK:
+      case WHITE_ROOK:
         positionalEvaluation += PieceEvalTables::ROOK_EVAL_TABLE[i];
         break;
-      case Piece::WHITE_QUEEN:
+      case WHITE_QUEEN:
         positionalEvaluation += PieceEvalTables::QUEEN_EVAL_TABLE[i];
         break;
-      case Piece::BLACK_PAWN:
+      case BLACK_PAWN:
         positionalEvaluation -= PieceEvalTables::PAWN_EVAL_TABLE[63 - i];
         break;
-      case Piece::BLACK_KNIGHT:
+      case BLACK_KNIGHT:
         positionalEvaluation -= PieceEvalTables::KNIGHT_EVAL_TABLE[63 - i];
         break;
-      case Piece::BLACK_BISHOP:
+      case BLACK_BISHOP:
         positionalEvaluation -= PieceEvalTables::BISHOP_EVAL_TABLE[63 - i];
         break;
-      case Piece::BLACK_ROOK:
+      case BLACK_ROOK:
         positionalEvaluation -= PieceEvalTables::ROOK_EVAL_TABLE[63 - i];
         break;
-      case Piece::BLACK_QUEEN:
+      case BLACK_QUEEN:
         positionalEvaluation -= PieceEvalTables::QUEEN_EVAL_TABLE[63 - i];
         break;
       }
 
-      if (board[i].piece == Piece::WHITE_KING)
+      if (board[i].piece == WHITE_KING)
       {
-        Bitboard enemyPieces = blackPawnsBitboard | blackKnightsBitboard | blackBishopsBitboard | blackRooksBitboard | blackQueensBitboard;
-        Bitboard friendlyPieces = whiteKnightsBitboard | whiteBishopsBitboard | whiteRooksBitboard | whiteQueensBitboard;
+        Bitboard enemyPieces = *bitboards[BLACK_PAWN] | *bitboards[BLACK_KNIGHT] | *bitboards[BLACK_BISHOP] | *bitboards[BLACK_ROOK] | *bitboards[BLACK_QUEEN];
+        Bitboard friendlyPieces = *bitboards[WHITE_KNIGHT] | *bitboards[WHITE_BISHOP] | *bitboards[WHITE_ROOK] | *bitboards[WHITE_QUEEN];
 
         float endgameScore = enemyPieces.countBits() / 16.0;
 
@@ -1046,7 +996,7 @@ namespace Chess
 
           for (int j = 0; j < 64; j++)
           {
-            if (board[j].piece == Piece::BLACK_KING)
+            if (board[j].piece == BLACK_KING)
             {
               kingsDistance = abs(i % 8 - j % 8) + abs(i / 8 - j / 8);
               break;
@@ -1056,10 +1006,10 @@ namespace Chess
           positionalEvaluation += PieceEvalTables::KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
       }
-      else if (board[i].piece == Piece::BLACK_KING)
+      else if (board[i].piece == BLACK_KING)
       {
-        Bitboard enemyPieces = whitePawnsBitboard | whiteKnightsBitboard | whiteBishopsBitboard | whiteRooksBitboard | whiteQueensBitboard;
-        Bitboard friendlyPieces = blackKnightsBitboard | blackBishopsBitboard | blackRooksBitboard | blackQueensBitboard;
+        Bitboard enemyPieces = *bitboards[WHITE_PAWN] | *bitboards[WHITE_KNIGHT] | *bitboards[WHITE_BISHOP] | *bitboards[WHITE_ROOK] | *bitboards[WHITE_QUEEN];
+        Bitboard friendlyPieces = *bitboards[BLACK_KNIGHT] | *bitboards[BLACK_BISHOP] | *bitboards[BLACK_ROOK] | *bitboards[BLACK_QUEEN];
 
         float endgameScore = enemyPieces.countBits() / 16.0;
 
@@ -1073,7 +1023,7 @@ namespace Chess
 
           for (int j = 0; j < 64; j++)
           {
-            if (board[j].piece == Piece::WHITE_KING)
+            if (board[j].piece == WHITE_KING)
             {
               kingsDistance = abs(i % 8 - j % 8) + abs(i / 8 - j / 8);
               break;
@@ -1092,9 +1042,9 @@ namespace Chess
   {
     int evaluationBonus = 0;
 
-    if (whiteBishopsBitboard.countBits() >= 2)
+    if (bitboards[WHITE_BISHOP]->countBits() >= 2)
       evaluationBonus += BISHOP_PAIR_BONUS;
-    if (blackBishopsBitboard.countBits() >= 2)
+    if (bitboards[BLACK_BISHOP]->countBits() >= 2)
       evaluationBonus -= BISHOP_PAIR_BONUS;
 
     if (castlingRights & WHITE_KINGSIDE)
@@ -1118,23 +1068,23 @@ namespace Chess
 
       if (rank == 0)
       {
-        if (whitePawnsBitboard.file(file).countBits() > 1)
+        if (bitboards[WHITE_PAWN]->file(file).countBits() > 1)
           evaluationBonus -= DOUBLED_PAWN_PENALTY;
-        if (blackPawnsBitboard.file(file).countBits() > 1)
+        if (bitboards[BLACK_PAWN]->file(file).countBits() > 1)
           evaluationBonus += DOUBLED_PAWN_PENALTY;
 
-        if (whitePawnsBitboard.file(file))
+        if (bitboards[WHITE_PAWN]->file(file))
         {
-          if (blackPawnsBitboard.file(file - 1).isEmpty() && blackPawnsBitboard.file(file + 1).isEmpty())
+          if (bitboards[BLACK_PAWN]->file(file - 1).isEmpty() && bitboards[BLACK_PAWN]->file(file + 1).isEmpty())
             evaluationBonus += PASSED_PAWN_BONUS;
-          if (whitePawnsBitboard.file(file - 1).isEmpty() && whitePawnsBitboard.file(file + 1).isEmpty())
+          if (bitboards[WHITE_PAWN]->file(file - 1).isEmpty() && bitboards[WHITE_PAWN]->file(file + 1).isEmpty())
             evaluationBonus -= ISOLATED_PAWN_PENALTY;
         }
-        if (blackPawnsBitboard.file(file))
+        if (bitboards[BLACK_PAWN]->file(file))
         {
-          if (whitePawnsBitboard.file(file - 1).isEmpty() && whitePawnsBitboard.file(file + 1).isEmpty())
+          if (bitboards[WHITE_PAWN]->file(file - 1).isEmpty() && bitboards[WHITE_PAWN]->file(file + 1).isEmpty())
             evaluationBonus -= PASSED_PAWN_BONUS;
-          if (blackPawnsBitboard.file(file - 1).isEmpty() && blackPawnsBitboard.file(file + 1).isEmpty())
+          if (bitboards[BLACK_PAWN]->file(file - 1).isEmpty() && bitboards[BLACK_PAWN]->file(file + 1).isEmpty())
             evaluationBonus += ISOLATED_PAWN_PENALTY;
         }
       }
@@ -1142,38 +1092,38 @@ namespace Chess
       if (board[i].isEmpty())
         continue;
 
-      if (board[i].piece == Piece::WHITE_ROOK)
+      if (board[i].piece == WHITE_ROOK)
       {
-        Bitboard pawns = whitePawnsBitboard | blackPawnsBitboard;
+        Bitboard pawns = *bitboards[WHITE_PAWN] | *bitboards[BLACK_PAWN];
 
         if (pawns.file(file).isEmpty())
           evaluationBonus += ROOK_ON_OPEN_FILE_BONUS;
-        else if (blackPawnsBitboard.file(file).isEmpty())
+        else if (bitboards[BLACK_PAWN]->file(file).isEmpty())
           evaluationBonus += ROOK_ON_SEMI_OPEN_FILE_BONUS;
 
         continue;
       }
-      if (board[i].piece == Piece::BLACK_ROOK)
+      if (board[i].piece == BLACK_ROOK)
       {
-        Bitboard pawns = whitePawnsBitboard | blackPawnsBitboard;
+        Bitboard pawns = *bitboards[WHITE_PAWN] | *bitboards[BLACK_PAWN];
 
         if (pawns.file(file).isEmpty())
           evaluationBonus -= ROOK_ON_OPEN_FILE_BONUS;
-        else if (whitePawnsBitboard.file(file).isEmpty())
+        else if (bitboards[WHITE_PAWN]->file(file).isEmpty())
           evaluationBonus -= ROOK_ON_SEMI_OPEN_FILE_BONUS;
 
         continue;
       }
 
-      if (board[i].piece == Piece::WHITE_KNIGHT)
+      if (board[i].piece == WHITE_KNIGHT)
       {
-        if (file > 0 && file < 7 && blackPawnsBitboard.file(file - 1).isEmpty() && blackPawnsBitboard.file(file + 1).isEmpty())
+        if (file > 0 && file < 7 && bitboards[BLACK_PAWN]->file(file - 1).isEmpty() && bitboards[BLACK_PAWN]->file(file + 1).isEmpty())
           evaluationBonus += KNIGHT_OUTPOST_BONUS;
         continue;
       }
-      if (board[i].piece == Piece::BLACK_KNIGHT)
+      if (board[i].piece == BLACK_KNIGHT)
       {
-        if (file > 0 && file < 7 && whitePawnsBitboard.file(file - 1).isEmpty() && whitePawnsBitboard.file(file + 1).isEmpty())
+        if (file > 0 && file < 7 && bitboards[WHITE_PAWN]->file(file - 1).isEmpty() && bitboards[WHITE_PAWN]->file(file + 1).isEmpty())
           evaluationBonus -= KNIGHT_OUTPOST_BONUS;
         continue;
       }
