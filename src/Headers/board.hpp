@@ -146,6 +146,8 @@ namespace Chess
 
     int negamax(int depth, int alpha, int beta);
 
+    int quiesce(int alpha, int beta);
+
     int heuristicEvaluation(Move move);
 
     std::vector<Move> heuristicSortMoves(std::vector<Move> moves);

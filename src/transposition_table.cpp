@@ -4,15 +4,15 @@ namespace Chess
 {
   TranspositionTable::TranspositionTable()
   {
-    table = std::map<unsigned long long, int>();
+    table = std::map<ZobristKey, int>();
   }
 
-  void TranspositionTable::store(unsigned long long key, int depth, int score)
+  void TranspositionTable::store(ZobristKey key, int depth, int score)
   {
     table[key] = (score << 4) | depth;
   }
 
-  bool TranspositionTable::probe(unsigned long long key, int depth, int *score)
+  bool TranspositionTable::probe(ZobristKey key, int depth, int *score)
   {
     if (table.find(key) == table.end())
     {

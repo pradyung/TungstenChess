@@ -2,7 +2,7 @@
 
 namespace Chess
 {
-  const unsigned long long Bitboard::fileMasks[8] = {
+  const BitboardInt Bitboard::fileMasks[8] = {
       0x8080808080808080ULL,
       0x4040404040404040ULL,
       0x2020202020202020ULL,
@@ -12,7 +12,7 @@ namespace Chess
       0x0202020202020202ULL,
       0x0101010101010101ULL};
 
-  const unsigned long long Bitboard::rankMasks[8] = {
+  const BitboardInt Bitboard::rankMasks[8] = {
       0xFF00000000000000ULL,
       0x00FF000000000000ULL,
       0x0000FF0000000000ULL,
@@ -27,7 +27,7 @@ namespace Chess
     this->bitboard = 0;
   }
 
-  Bitboard::Bitboard(unsigned long long bitboard)
+  Bitboard::Bitboard(BitboardInt bitboard)
   {
     this->bitboard = bitboard;
   }
@@ -47,7 +47,7 @@ namespace Chess
     return Bitboard(bitboard | other.bitboard);
   }
 
-  Bitboard Bitboard::operator|(unsigned long long other)
+  Bitboard Bitboard::operator|(BitboardInt other)
   {
     return Bitboard(bitboard | other);
   }
@@ -57,7 +57,7 @@ namespace Chess
     return Bitboard(bitboard & other.bitboard);
   }
 
-  Bitboard Bitboard::operator&(unsigned long long other)
+  Bitboard Bitboard::operator&(BitboardInt other)
   {
     return Bitboard(bitboard & other);
   }

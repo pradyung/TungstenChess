@@ -4,11 +4,13 @@
 
 namespace Chess
 {
+  typedef unsigned long long BitboardInt;
+
   class Bitboard
   {
   public:
     Bitboard();
-    Bitboard(unsigned long long bitboard);
+    Bitboard(BitboardInt bitboard);
 
     void addBit(int index);
     void removeBit(int index);
@@ -16,11 +18,11 @@ namespace Chess
     bool isEmpty();
 
     Bitboard operator|(Bitboard other);
-    Bitboard operator|(unsigned long long other);
+    Bitboard operator|(BitboardInt other);
     Bitboard operator&(Bitboard other);
-    Bitboard operator&(unsigned long long other);
+    Bitboard operator&(BitboardInt other);
 
-    unsigned long long bitboard;
+    BitboardInt bitboard;
 
     bool hasBit(int index);
 
@@ -32,9 +34,9 @@ namespace Chess
     operator bool() const { return bitboard != 0; }
 
   private:
-    static const unsigned long long fileMasks[8];
-    static const unsigned long long rankMasks[8];
+    static const BitboardInt fileMasks[8];
+    static const BitboardInt rankMasks[8];
 
-    static const unsigned long long MAX_BITBOARD = 0xFFFFFFFFFFFFFFFF;
+    static const BitboardInt MAX_BITBOARD = 0xFFFFFFFFFFFFFFFF;
   };
 }

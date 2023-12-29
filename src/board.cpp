@@ -830,7 +830,7 @@ namespace Chess
     if (inOpeningBook)
       return generateMoveFromInt(openings.getNextMove());
 
-    return generateBestMove(4);
+    return generateBestMove(3);
   }
 
   int Board::getStaticEvaluation()
@@ -1069,7 +1069,7 @@ namespace Chess
   int Board::negamax(int depth, int alpha, int beta)
   {
     if (depth == 0)
-      return getStaticEvaluation();
+      return quiesce(alpha, beta);
 
     std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
@@ -1100,8 +1100,53 @@ namespace Chess
 
       if (alpha >= beta)
       {
-        break;
+        return beta;
       }
+    }
+
+    return alpha;
+  }
+
+  int Board::quiesce(int alpha, int beta)
+  {
+    int standPat = getStaticEvaluation();
+
+    if (standPat >= beta)
+      return beta;
+
+    if (alpha < standPat)
+      alpha = standPat;
+
+    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
+
+    legalMoves = heuristicSortMoves(legalMoves);
+
+    int legalMovesCount = legalMoves.size();
+
+    if (legalMovesCount == 0)
+    {
+      if (isInCheck(sideToMove))
+        return -1000000;
+      else
+        return 0;
+    }
+
+    for (int i = 0; i < legalMovesCount; i++)
+    {
+      if (!(legalMoves[i].flags & CAPTURE))
+        continue;
+
+      makeMove(legalMoves[i]);
+
+      int evaluation = -quiesce(-beta, -alpha);
+
+      unmakeMove(legalMoves[i]);
+
+      if (evaluation >= beta)
+        return beta;
+
+      if (evaluation > alpha)
+        alpha = evaluation;
     }
 
     return alpha;

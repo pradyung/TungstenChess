@@ -2,12 +2,14 @@
 
 #include <string>
 
+#include "bitboard.hpp"
+
 namespace Chess
 {
   class MovesLookup
   {
   public:
-    static unsigned long long KNIGHT_MOVES[64];
-    static unsigned long long KING_MOVES[64];
+    static BitboardInt KNIGHT_MOVES[64];
+    static BitboardInt KING_MOVES[64];
   };
 }

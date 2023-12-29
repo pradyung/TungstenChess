@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include "zobrist.hpp"
+
 namespace Chess
 {
   class TranspositionTable
@@ -9,12 +11,12 @@ namespace Chess
   public:
     TranspositionTable();
 
-    void store(unsigned long long key, int depth, int score);
-    bool probe(unsigned long long key, int depth, int *score);
+    void store(ZobristKey key, int depth, int score);
+    bool probe(ZobristKey key, int depth, int *score);
 
     void clear();
 
   private:
-    std::map<unsigned long long, int> table;
+    std::map<ZobristKey, int> table;
   };
 }
