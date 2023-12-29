@@ -64,7 +64,5 @@ namespace Chess
     static const int PIECE_VALUES[7];
 
     static const int PIECE_INDICES[12];
-
-    static int *generateIntArray(Piece board[64]);
   };
 }

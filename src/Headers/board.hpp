@@ -88,6 +88,8 @@ namespace Chess
       KING_SAFETY_PAWN_SHIELD_BONUS = 50,
     };
 
+    ZobristKey getInitialZobristKey();
+
     void updatePiece(int pieceIndex, int piece);
     void removeCastlingRights(int rights);
 

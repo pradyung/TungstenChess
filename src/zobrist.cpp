@@ -50,25 +50,4 @@ namespace Chess
     delete[] castlingKeys;
     delete[] enPassantKeys;
   }
-
-  ZobristKey Zobrist::getInitialHash(int board[64], int castlingRights, int enPassantFile, int sideToMove)
-  {
-    ZobristKey hash = 0;
-
-    for (int i = 0; i < 64; i++)
-    {
-      if (board[i] != EMPTY)
-      {
-        hash ^= pieceKeys[i][board[i]];
-      }
-    }
-
-    hash ^= castlingKeys[castlingRights];
-    hash ^= enPassantKeys[enPassantFile];
-
-    if (sideToMove == WHITE)
-      hash ^= sideKey;
-
-    return hash;
-  }
 }

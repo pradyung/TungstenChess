@@ -105,11 +105,28 @@ namespace Chess
       }
     }
 
-    int *intBoard = Piece::generateIntArray(board);
+    zobristKey = getInitialZobristKey();
+  }
 
-    zobristKey = zobrist.getInitialHash(intBoard, castlingRights, enPassantFile, sideToMove);
+  ZobristKey Board::getInitialZobristKey()
+  {
+    ZobristKey hash = 0;
 
-    delete[] intBoard;
+    for (int i = 0; i < 64; i++)
+    {
+      if (!board[i].isEmpty())
+      {
+        hash ^= zobrist.pieceKeys[i][board[i].piece];
+      }
+    }
+
+    hash ^= zobrist.castlingKeys[castlingRights];
+    hash ^= zobrist.enPassantKeys[enPassantFile];
+
+    if (sideToMove == WHITE)
+      hash ^= zobrist.sideKey;
+
+    return hash;
   }
 
   void Board::updatePiece(int pieceIndex, int piece)
