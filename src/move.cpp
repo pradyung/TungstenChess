@@ -9,7 +9,7 @@ namespace Chess
     this->piece = 0;
     this->capturedPiece = 0;
 
-    this->enPassantFile = -1;
+    this->enPassantFile = NO_EN_PASSANT;
     this->castlingRights = 15;
 
     this->flags = NORMAL;

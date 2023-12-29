@@ -4,6 +4,8 @@
 
 namespace Chess
 {
+  const int NO_EN_PASSANT = 8;
+
   enum Flags
   {
     NORMAL = 0,

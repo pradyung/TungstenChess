@@ -31,7 +31,7 @@ namespace Chess
     bitboards[BLACK_ROOK] = new Bitboard();
     bitboards[BLACK_QUEEN] = new Bitboard();
 
-    enPassantFile = -1;
+    enPassantFile = NO_EN_PASSANT;
 
     castlingRights = 0;
 
@@ -156,7 +156,7 @@ namespace Chess
     int movePieceType = movePiece & 7;
     int movePieceColor = movePiece & 24;
 
-    enPassantFile = -1;
+    enPassantFile = NO_EN_PASSANT;
 
     if (movePiece == WHITE_KING)
     {
@@ -384,7 +384,7 @@ namespace Chess
         movesBitboard.addBit(pieceIndex - 7);
       }
 
-      if (enPassantFile != -1)
+      if (enPassantFile != NO_EN_PASSANT)
       {
         if (pieceIndex % 8 != 0 && pieceIndex / 8 == 3 && (pieceIndex - 9) % 8 == enPassantFile)
         {
@@ -417,7 +417,7 @@ namespace Chess
         movesBitboard.addBit(pieceIndex + 9);
       }
 
-      if (enPassantFile != -1)
+      if (enPassantFile != NO_EN_PASSANT)
       {
         if (pieceIndex % 8 != 0 && pieceIndex / 8 == 4 && (pieceIndex + 7) % 8 == enPassantFile)
         {
@@ -811,12 +811,7 @@ namespace Chess
   Move Board::generateBotMove()
   {
     if (inOpeningBook)
-    {
-      Move move = generateMoveFromInt(openings.getNextMove());
-
-      if (move.from != 0 && move.to != 0)
-        return move;
-    }
+      return generateMoveFromInt(openings.getNextMove());
 
     return generateBestMove(4);
   }
@@ -1073,8 +1068,6 @@ namespace Chess
         return 0;
     }
 
-    int bestMoveEvaluation = -1000000;
-
     for (int i = 0; i < legalMovesCount; i++)
     {
       makeMove(legalMoves[i]);
@@ -1082,11 +1075,6 @@ namespace Chess
       int evaluation = -negamax(depth - 1, -beta, -alpha);
 
       unmakeMove(legalMoves[i]);
-
-      if (evaluation > bestMoveEvaluation)
-      {
-        bestMoveEvaluation = evaluation;
-      }
 
       if (evaluation > alpha)
       {
@@ -1099,7 +1087,7 @@ namespace Chess
       }
     }
 
-    return bestMoveEvaluation;
+    return alpha;
   }
 
   Move Board::generateOneDeepMove()
