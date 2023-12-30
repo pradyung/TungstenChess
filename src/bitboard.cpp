@@ -42,26 +42,6 @@ namespace Chess
     bitboard &= ~(1ULL << index);
   }
 
-  Bitboard Bitboard::operator|(Bitboard other)
-  {
-    return Bitboard(bitboard | other.bitboard);
-  }
-
-  Bitboard Bitboard::operator|(BitboardInt other)
-  {
-    return Bitboard(bitboard | other);
-  }
-
-  Bitboard Bitboard::operator&(Bitboard other)
-  {
-    return Bitboard(bitboard & other.bitboard);
-  }
-
-  Bitboard Bitboard::operator&(BitboardInt other)
-  {
-    return Bitboard(bitboard & other);
-  }
-
   bool Bitboard::hasBit(int index)
   {
     return bitboard & (1ULL << index);

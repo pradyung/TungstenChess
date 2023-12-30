@@ -40,14 +40,37 @@ namespace Chess
       LOSE
     };
 
+    /**
+     * @brief Returns the bitboard of the squares a piece can move to
+     * @param pieceIndex The index of the piece
+     */
     Bitboard getLegalPieceMovesBitboard(int pieceIndex);
 
+    /**
+     * @brief Makes a move on the board
+     * @param move The move to make
+     * @param speculative Whether the move is speculative (used for move tree search and check detection) - MUST BE SET TO FALSE FOR ACTUAL MOVES
+     */
     void makeMove(Move move, bool speculative = true);
 
+    /**
+     * @brief Checks if a color is in check in the current position
+     * @param color The color to check
+     * @return bool
+     */
     bool isInCheck(int color);
 
+    /**
+     * @brief Returns the game status for the current side - see enum GameStatus
+     * @param color The color to check
+     * @return int - Note: returns NO_MATE even if "color" has won, only returns LOSE if "color" has lost
+     */
     int getGameStatus(int color);
 
+    /**
+     * @brief Generates the best move for the bot
+     * @return Move
+     */
     Move generateBotMove();
 
   private:
