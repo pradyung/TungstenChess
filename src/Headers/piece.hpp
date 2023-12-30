@@ -49,20 +49,45 @@ namespace Chess
   {
   public:
     Piece();
+
+    /**
+     * @param type The type of the piece
+     * @param color The color of the piece
+     */
     Piece(int type, int color);
+
+    /**
+     * @param fen The character representing the piece in FEN notation
+     */
     Piece(char fen);
+
+    /**
+     * @param piece The integer representation of the piece
+     */
     Piece(int piece);
 
     int piece;
 
+    /**
+     * @brief Returns the type of the piece - see enum PieceTypes
+     */
     int getPieceType();
+
+    /**
+     * @brief Returns the color of the piece - see enum PieceColors
+     */
     int getPieceColor();
+
+    /**
+     * @brief Returns the character representing the piece in FEN notation
+     */
     char getPieceChar();
 
+    /**
+     * @brief Returns whether the piece is EMPTY
+     */
     bool isEmpty();
 
     static const int PIECE_VALUES[7];
-
-    static const int PIECE_INDICES[12];
   };
 }

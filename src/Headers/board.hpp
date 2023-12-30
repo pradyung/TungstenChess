@@ -56,7 +56,6 @@ namespace Chess
     /**
      * @brief Checks if a color is in check in the current position
      * @param color The color to check
-     * @return bool
      */
     bool isInCheck(int color);
 
@@ -69,7 +68,6 @@ namespace Chess
 
     /**
      * @brief Generates the best move for the bot
-     * @return Move
      */
     Move generateBotMove();
 

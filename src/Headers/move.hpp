@@ -22,6 +22,16 @@ namespace Chess
   {
   public:
     Move();
+
+    /**
+     * @param from The square the piece is moving from
+     * @param to The square the piece is moving to
+     * @param movePiece The piece that is moving
+     * @param capturedPiece The piece that is being captured, if any
+     * @param enPassantFile The current state of the en passant file, used to restore it when the move is unmade
+     * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
+     * @param promotionPiece The piece that the moving piece is being promoted to, if any
+     */
     Move(int from, int to, int movePiece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = EMPTY);
 
     int from;
@@ -37,7 +47,14 @@ namespace Chess
 
     int computedEvaluation;
 
+    /**
+     * Returns an integer representation of the move
+     */
     int toInt();
+
+    /**
+     * Returns a string representation (UCI) of the move
+     */
     std::string toString();
   };
 }

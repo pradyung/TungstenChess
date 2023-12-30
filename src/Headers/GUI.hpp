@@ -20,8 +20,15 @@ namespace Chess
   class GUIHandler
   {
   public:
+    /**
+     * @brief Construct a new GUIHandler object
+     * @param window The window to render to
+     */
     GUIHandler(RenderWindow &window);
 
+    /**
+     * @brief Runs the main loop of the GUI, including rendering, input handling, and move making
+     */
     void runMainLoop();
 
   private:
