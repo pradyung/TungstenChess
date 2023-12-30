@@ -627,7 +627,7 @@ namespace Chess
     bitboards[board[pieceIndex].piece]->removeBit(pieceIndex);
   }
 
-  std::vector<Move> Board::getLegalMoves(int color)
+  std::vector<Move> Board::getLegalMoves(int color, bool includeCastling)
   {
     std::vector<Move> legalMoves;
 
@@ -636,7 +636,7 @@ namespace Chess
       if (board[i].isEmpty() || board[i].getPieceColor() != color)
         continue;
 
-      Bitboard movesBitboard = getLegalPieceMovesBitboard(i);
+      Bitboard movesBitboard = getLegalPieceMovesBitboard(i, includeCastling);
 
       for (int j = 0; j < 64; j++)
       {
@@ -658,11 +658,11 @@ namespace Chess
     return legalMoves;
   }
 
-  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex)
+  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling)
   {
     Bitboard legalMovesBitboard;
 
-    legalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex);
+    legalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, includeCastling);
 
     for (int j = 0; j < 64; j++)
     {
@@ -1075,7 +1075,7 @@ namespace Chess
     if (alpha < standPat)
       alpha = standPat;
 
-    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
+    std::vector<Move> legalMoves = getLegalMoves(sideToMove, false);
 
     legalMoves = heuristicSortMoves(legalMoves);
 

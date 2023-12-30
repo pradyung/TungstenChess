@@ -44,7 +44,7 @@ namespace Chess
      * @brief Returns the bitboard of the squares a piece can move to
      * @param pieceIndex The index of the piece
      */
-    Bitboard getLegalPieceMovesBitboard(int pieceIndex);
+    Bitboard getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling = true);
 
     /**
      * @brief Makes a move on the board
@@ -153,7 +153,7 @@ namespace Chess
 
     bool isAttacked(int square, int color);
 
-    std::vector<Move> getLegalMoves(int color);
+    std::vector<Move> getLegalMoves(int color, bool includeCastling = true);
 
     Bitboard getAttackedSquaresBitboard(int color);
 

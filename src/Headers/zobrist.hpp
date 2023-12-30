@@ -1,7 +1,7 @@
 #pragma once
 
 #include <random>
-#include <vector>
+#include <array>
 
 typedef unsigned long long ZobristKey;
 
@@ -15,9 +15,9 @@ namespace Chess
      */
     Zobrist();
 
-    std::vector<std::vector<ZobristKey>> pieceKeys;
-    std::vector<ZobristKey> castlingKeys;
-    std::vector<ZobristKey> enPassantKeys;
+    std::array<std::array<ZobristKey, 23>, 64> pieceKeys;
+    std::array<ZobristKey, 16> castlingKeys;
+    std::array<ZobristKey, 9> enPassantKeys;
     ZobristKey sideKey;
 
   private:
