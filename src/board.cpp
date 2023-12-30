@@ -106,6 +106,8 @@ namespace Chess
     }
 
     zobristKey = getInitialZobristKey();
+
+    positionHistory[zobristKey]++;
   }
 
   ZobristKey Board::getInitialZobristKey()
@@ -134,11 +136,25 @@ namespace Chess
     zobristKey ^= zobrist.pieceKeys[pieceIndex][board[pieceIndex].piece];
     zobristKey ^= zobrist.pieceKeys[pieceIndex][piece];
 
+    if ((piece & 7) == KING)
+    {
+      if (piece & WHITE)
+        whiteKingIndex = pieceIndex;
+      else if (piece & BLACK)
+        blackKingIndex = pieceIndex;
+    }
+
     removePieceFromBitboard(pieceIndex);
 
     board[pieceIndex] = Piece(piece);
 
     addPieceToBitboard(pieceIndex);
+  }
+
+  void Board::moveOnePiece(int from, int to)
+  {
+    updatePiece(to, board[from].piece);
+    updatePiece(from, EMPTY);
   }
 
   void Board::removeCastlingRights(int rights)
@@ -148,15 +164,34 @@ namespace Chess
     zobristKey ^= zobrist.castlingKeys[castlingRights];
   }
 
+  void Board::removeCastlingRights(int color, int side)
+  {
+    removeCastlingRights(color == WHITE ? side >> 4 : side >> 2);
+  }
+
+  void Board::updateCastlingRights(int rights)
+  {
+    zobristKey ^= zobrist.castlingKeys[castlingRights];
+    castlingRights |= rights;
+    zobristKey ^= zobrist.castlingKeys[castlingRights];
+  }
+
+  void Board::updateEnPassantFile(int file)
+  {
+    zobristKey ^= zobrist.enPassantKeys[enPassantFile];
+    enPassantFile = file;
+    zobristKey ^= zobrist.enPassantKeys[enPassantFile];
+  }
+
+  void Board::switchSideToMove()
+  {
+    sideToMove ^= 24;
+    zobristKey ^= zobrist.sideKey;
+  }
+
   void Board::makeMove(Move move, bool speculative)
   {
-    halfMoves++;
-
-    sideToMove ^= 24;
-
-    zobristKey ^= zobrist.sideKey;
-
-    movesHistory.push(move);
+    switchSideToMove();
 
     if (!speculative && inOpeningBook)
       inOpeningBook = openings.addMove(move.toInt());
@@ -167,119 +202,51 @@ namespace Chess
     int capturedPiece = move.capturedPiece;
     int promotionPiece = move.promotionPiece & 7;
 
-    updatePiece(to, board[from].piece);
-    updatePiece(from, EMPTY);
-
     int movePieceType = movePiece & 7;
     int movePieceColor = movePiece & 24;
 
+    int capturedPieceType = capturedPiece & 7;
+    int capturedPieceColor = capturedPiece & 24;
+
+    moveOnePiece(from, to);
+
     enPassantFile = NO_EN_PASSANT;
 
-    if (movePiece == WHITE_KING)
-    {
-      whiteKingIndex = to;
-      removeCastlingRights(WHITE_KINGSIDE | WHITE_QUEENSIDE);
-    }
-    else if (movePiece == BLACK_KING)
-    {
-      blackKingIndex = to;
-      removeCastlingRights(BLACK_KINGSIDE | BLACK_QUEENSIDE);
-    }
+    if (movePieceType == KING)
+      removeCastlingRights(movePieceColor, CASTLING);
 
-    if (movePiece == WHITE_ROOK)
-    {
-      if (from == 56)
-        removeCastlingRights(WHITE_QUEENSIDE);
-      else if (from == 63)
-        removeCastlingRights(WHITE_KINGSIDE);
-    }
-    else if (movePiece == BLACK_ROOK)
-    {
-      if (from == 0)
-        removeCastlingRights(BLACK_QUEENSIDE);
-      else if (from == 7)
-        removeCastlingRights(BLACK_KINGSIDE);
-    }
-
-    if (capturedPiece == WHITE_ROOK)
-    {
-      if (to == 56)
-        removeCastlingRights(WHITE_QUEENSIDE);
-      else if (to == 63)
-        removeCastlingRights(WHITE_KINGSIDE);
-    }
-    else if (capturedPiece == BLACK_ROOK)
-    {
-      if (to == 0)
-        removeCastlingRights(BLACK_QUEENSIDE);
-      else if (to == 7)
-        removeCastlingRights(BLACK_KINGSIDE);
-    }
+    if (movePieceType == ROOK && (from == 0 || from == 7 || from == 56 || from == 63))
+      removeCastlingRights(movePieceColor, from % 8 == 0 ? QUEENSIDE : KINGSIDE);
+    if (capturedPieceType == ROOK && (to == 0 || to == 7 || to == 56 || to == 63))
+      removeCastlingRights(capturedPieceColor, to % 8 == 0 ? QUEENSIDE : KINGSIDE);
 
     if (move.flags & EP_CAPTURE)
-    {
-      if (movePiece & WHITE)
-      {
-        updatePiece(to + 8, EMPTY);
-      }
-      else if (movePiece & BLACK)
-      {
-        updatePiece(to - 8, EMPTY);
-      }
-    }
+      updatePiece(to + (movePiece & WHITE ? 8 : -8), EMPTY);
 
     if (move.flags & PROMOTION)
-    {
       updatePiece(to, movePieceColor | promotionPiece);
-    }
 
-    if (move.flags & KSIDE_CASTLE)
+    if (move.flags & CASTLING)
     {
-      updatePiece(to - 1, movePieceColor | ROOK);
-      updatePiece(to + 1, EMPTY);
+      hasCastled |= movePieceColor;
 
-      if (movePiece == WHITE_KING)
-      {
-        whiteHasCastled = true;
-      }
-      else if (movePiece == BLACK_KING)
-      {
-        blackHasCastled = true;
-      }
-    }
-
-    if (move.flags & QSIDE_CASTLE)
-    {
-      updatePiece(to + 1, movePieceColor | ROOK);
-      updatePiece(to - 2, EMPTY);
-
-      if (movePiece == WHITE_KING)
-      {
-        whiteHasCastled = true;
-      }
-      else if (movePiece == BLACK_KING)
-      {
-        blackHasCastled = true;
-      }
+      if (move.flags & KSIDE_CASTLE)
+        moveOnePiece(to - 1, to + 1);
+      else
+        moveOnePiece(to + 1, to - 2);
     }
 
     if (move.flags & PAWN_DOUBLE)
-    {
-      zobristKey ^= zobrist.enPassantKeys[enPassantFile];
-      enPassantFile = to % 8;
-      zobristKey ^= zobrist.enPassantKeys[enPassantFile];
-    }
+      updateEnPassantFile(to % 8);
+
+    positionHistory[zobristKey]++;
   }
 
   void Board::unmakeMove(Move move)
   {
-    halfMoves--;
+    positionHistory[zobristKey]--;
 
-    sideToMove ^= 24;
-
-    zobristKey ^= zobrist.sideKey;
-
-    movesHistory.pop();
+    switchSideToMove();
 
     int from = move.from;
     int to = move.to;
@@ -297,11 +264,11 @@ namespace Chess
 
       if (movePiece == WHITE_KING)
       {
-        whiteHasCastled = false;
+        hasCastled &= ~WHITE;
       }
       else if (movePiece == BLACK_KING)
       {
-        blackHasCastled = false;
+        hasCastled &= ~BLACK;
       }
     }
 
@@ -312,25 +279,19 @@ namespace Chess
 
       if (movePiece == WHITE_KING)
       {
-        whiteHasCastled = false;
+        hasCastled &= ~WHITE;
       }
       else if (movePiece == BLACK_KING)
       {
-        blackHasCastled = false;
+        hasCastled &= ~BLACK;
       }
     }
 
     int movePieceType = movePiece & 7;
     int movePieceColor = movePiece & 24;
 
-    zobristKey ^= zobrist.castlingKeys[castlingRights];
-    zobristKey ^= zobrist.enPassantKeys[enPassantFile];
-
-    enPassantFile = move.enPassantFile;
-    castlingRights = move.castlingRights;
-
-    zobristKey ^= zobrist.castlingKeys[castlingRights];
-    zobristKey ^= zobrist.enPassantKeys[enPassantFile];
+    updateEnPassantFile(move.enPassantFile);
+    updateCastlingRights(move.castlingRights);
 
     if (movePiece == WHITE_KING)
     {
@@ -344,15 +305,9 @@ namespace Chess
     if (move.flags & EP_CAPTURE)
     {
       if (movePiece & WHITE)
-      {
         updatePiece(to + 8, BLACK_PAWN);
-        bitboards[BLACK_PAWN]->addBit(to + 8);
-      }
-      else if (movePiece & BLACK)
-      {
+      else
         updatePiece(to - 8, WHITE_PAWN);
-        bitboards[WHITE_PAWN]->addBit(to - 8);
-      }
     }
   }
 
@@ -763,6 +718,9 @@ namespace Chess
     if (getLegalMoves(color).size() == 0)
       return isInCheck(color) ? LOSE : STALEMATE;
 
+    if (positionHistory[zobristKey] >= 3)
+      return STALEMATE;
+
     return NO_MATE;
   }
 
@@ -990,9 +948,9 @@ namespace Chess
     if (castlingRights & BLACK_QUEENSIDE)
       evaluationBonus -= CAN_CASTLE_BONUS;
 
-    if (whiteHasCastled)
+    if (hasCastled & WHITE)
       evaluationBonus += CASTLED_KING_BONUS;
-    if (blackHasCastled)
+    if (hasCastled & BLACK)
       evaluationBonus -= CASTLED_KING_BONUS;
 
     for (int i = 0; i < 64; i++)

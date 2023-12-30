@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <map>
 
 #include "move.hpp"
 #include "bitboard.hpp"
@@ -50,12 +51,9 @@ namespace Chess
     Move generateBotMove();
 
   private:
-    bool whiteHasCastled;
-    bool blackHasCastled;
+    int hasCastled;
 
-    int halfMoves;
-
-    std::stack<Move> movesHistory;
+    std::map<ZobristKey, int> positionHistory;
 
     Openings openings;
     bool inOpeningBook = true;
@@ -70,7 +68,12 @@ namespace Chess
       WHITE_KINGSIDE = 1,
       WHITE_QUEENSIDE = 2,
       BLACK_KINGSIDE = 4,
-      BLACK_QUEENSIDE = 8
+      BLACK_QUEENSIDE = 8,
+      KINGSIDE = 16,
+      QUEENSIDE = 32,
+      CASTLING = KINGSIDE | QUEENSIDE,
+      WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
+      BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
     };
 
     enum EvaluationBonus
@@ -91,7 +94,14 @@ namespace Chess
     ZobristKey getInitialZobristKey();
 
     void updatePiece(int pieceIndex, int piece);
+    void moveOnePiece(int from, int to);
+
     void removeCastlingRights(int rights);
+    void removeCastlingRights(int color, int side);
+    void updateCastlingRights(int rights);
+
+    void updateEnPassantFile(int file);
+    void switchSideToMove();
 
     void unmakeMove(Move move);
 

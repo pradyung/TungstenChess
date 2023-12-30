@@ -14,7 +14,8 @@ namespace Chess
     EP_CAPTURE = 4,
     PROMOTION = 8,
     KSIDE_CASTLE = 16,
-    QSIDE_CASTLE = 32
+    QSIDE_CASTLE = 32,
+    CASTLING = KSIDE_CASTLE | QSIDE_CASTLE
   };
 
   class Move
