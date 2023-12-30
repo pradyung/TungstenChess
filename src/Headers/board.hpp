@@ -16,6 +16,34 @@
 
 namespace Chess
 {
+  enum CastlingRights
+  {
+    WHITE_KINGSIDE = 1,
+    WHITE_QUEENSIDE = 2,
+    BLACK_KINGSIDE = 4,
+    BLACK_QUEENSIDE = 8,
+    KINGSIDE = 16,
+    QUEENSIDE = 32,
+    CASTLING = KINGSIDE | QUEENSIDE,
+    WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
+    BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
+  };
+
+  enum EvaluationBonus
+  {
+    BISHOP_PAIR_BONUS = 100,
+    CASTLED_KING_BONUS = 50,
+    CAN_CASTLE_BONUS = 25,
+    ROOK_ON_OPEN_FILE_BONUS = 50,
+    ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
+    KNIGHT_OUTPOST_BONUS = 50,
+    PASSED_PAWN_BONUS = 50,
+    DOUBLED_PAWN_PENALTY = 50,
+    ISOLATED_PAWN_PENALTY = 25,
+    BACKWARDS_PAWN_PENALTY = 50,
+    KING_SAFETY_PAWN_SHIELD_BONUS = 50,
+  };
+
   class Board
   {
   public:
@@ -83,34 +111,6 @@ namespace Chess
     ZobristKey zobristKey;
 
     TranspositionTable transpositionTable;
-
-    enum CastlingRights
-    {
-      WHITE_KINGSIDE = 1,
-      WHITE_QUEENSIDE = 2,
-      BLACK_KINGSIDE = 4,
-      BLACK_QUEENSIDE = 8,
-      KINGSIDE = 16,
-      QUEENSIDE = 32,
-      CASTLING = KINGSIDE | QUEENSIDE,
-      WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
-      BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
-    };
-
-    enum EvaluationBonus
-    {
-      BISHOP_PAIR_BONUS = 100,
-      CASTLED_KING_BONUS = 50,
-      CAN_CASTLE_BONUS = 25,
-      ROOK_ON_OPEN_FILE_BONUS = 50,
-      ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
-      KNIGHT_OUTPOST_BONUS = 50,
-      PASSED_PAWN_BONUS = 50,
-      DOUBLED_PAWN_PENALTY = 50,
-      ISOLATED_PAWN_PENALTY = 25,
-      BACKWARDS_PAWN_PENALTY = 50,
-      KING_SAFETY_PAWN_SHIELD_BONUS = 50,
-    };
 
     ZobristKey getInitialZobristKey();
 

@@ -15,7 +15,7 @@ namespace Chess
     PROMOTION = 8,
     KSIDE_CASTLE = 16,
     QSIDE_CASTLE = 32,
-    CASTLING = KSIDE_CASTLE | QSIDE_CASTLE
+    CASTLE = KSIDE_CASTLE | QSIDE_CASTLE
   };
 
   class Move

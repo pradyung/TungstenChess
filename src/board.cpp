@@ -226,7 +226,7 @@ namespace Chess
     if (move.flags & PROMOTION)
       updatePiece(to, movePieceColor | promotionPiece);
 
-    if (move.flags & CASTLING)
+    if (move.flags & CASTLE)
     {
       hasCastled |= movePieceColor;
 
