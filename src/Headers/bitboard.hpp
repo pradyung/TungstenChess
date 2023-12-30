@@ -57,6 +57,26 @@ namespace Chess
      */
     operator bool() const { return bitboard != 0; }
 
+    /**
+     * @brief Overloads the & operator to return the intersection of two bitboards
+     */
+    Bitboard operator&(const Bitboard &other) const { return Bitboard(bitboard & other.bitboard); }
+
+    /**
+     * @brief Overloads the & operator to return the intersection of two bitboards
+     */
+    Bitboard operator&(const BitboardInt &other) const { return Bitboard(bitboard & other); }
+
+    /**
+     * @brief Overloads the | operator to return the union of two bitboards
+     */
+    Bitboard operator|(const Bitboard &other) const { return Bitboard(bitboard | other.bitboard); }
+
+    /**
+     * @brief Overloads the | operator to return the union of two bitboards
+     */
+    Bitboard operator|(const BitboardInt &other) const { return Bitboard(bitboard | other); }
+
   private:
     static const BitboardInt fileMasks[8];
     static const BitboardInt rankMasks[8];
