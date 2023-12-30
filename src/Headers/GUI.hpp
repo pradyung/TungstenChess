@@ -3,6 +3,8 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <thread>
+
 #include "board.hpp"
 #include "images.hpp"
 
@@ -15,6 +17,13 @@ namespace Chess
     SQUARE_SIZE = 80,
     WIDTH_PADDING = 0,
     HEIGHT_PADDING = 0
+  };
+
+  enum Highlights
+  {
+    YELLOW_HIGHLIGHT = 2,
+    RED_HIGHLIGHT = 3,
+    GRAY_HIGHLIGHT = 4
   };
 
   class GUIHandler
@@ -36,47 +45,13 @@ namespace Chess
 
     RenderWindow *window;
 
+    Images images;
+
     Texture squares[5];
     Texture piecesTextures[PIECE_NUMBER];
 
     Sprite boardSquares[64];
     Sprite pieces[64];
-
-    Bitboard redHighlightsBitboard;
-    Bitboard yellowHighlightsBitboard;
-    Bitboard grayHighlightsBitboard;
-
-    Sprite redHighlightsSprites[64];
-    Sprite yellowHighlightsSprites[64];
-    Sprite grayHighlightsSprites[64];
-
-    enum Highlights
-    {
-      YELLOW_HIGHLIGHT = 2,
-      RED_HIGHLIGHT = 3,
-      GRAY_HIGHLIGHT = 4
-    };
-
-    Sprite promotionPieces[4];
-
-    void loadSquareTextures();
-    void loadPieceTextures();
-
-    void loadBoardSquares();
-    void loadPieces();
-
-    void loadPromotionPieces();
-
-    void clearHighlights();
-    void clearHighlights(int highlight);
-
-    void makeMove(Move move);
-    void makeBotMove();
-
-    void drawBoardSquares();
-    void drawPieces();
-    void drawHighlights();
-    void drawPromotionPieces();
 
     Sprite whitePawns[64];
     Sprite whiteKnights[64];
@@ -92,13 +67,50 @@ namespace Chess
     Sprite blackQueens[64];
     Sprite blackKings[64];
 
-    Sprite draggingPieceSprite;
+    Bitboard redHighlightsBitboard;
+    Bitboard yellowHighlightsBitboard;
+    Bitboard grayHighlightsBitboard;
+
+    Sprite redHighlightsSprites[64];
+    Sprite yellowHighlightsSprites[64];
+    Sprite grayHighlightsSprites[64];
+
     int draggingPieceIndex = -1;
+    Sprite draggingPieceSprite;
+
+    Sprite whitePromotionPieces[4];
+    Sprite blackPromotionPieces[4];
 
     bool awaitingPromotion = false;
     Move promotionMove;
 
     bool gameOver = false;
+
+    bool isThinking = false;
+
+    std::thread thinkingThread;
+
+    void loadSquareTextures();
+    void loadPieceTextures();
+
+    void loadBoardSquares();
+    void loadPieces();
+
+    void loadPromotionPieces();
+
+    void clearHighlights();
+    void clearHighlights(int highlight);
+
+    void makeMove(Move move);
+    void makeBotMove();
+
+    void startThinking();
+    void stopThinking();
+
+    void drawBoardSquares();
+    void drawPieces();
+    void drawHighlights();
+    void drawPromotionPieces();
 
     static int getSquareIndex(int x, int y);
 

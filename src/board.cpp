@@ -788,7 +788,7 @@ namespace Chess
     if (inOpeningBook)
       return generateMoveFromInt(openings.getNextMove());
 
-    return generateBestMove(3);
+    return generateBestMove(SEARCH_DEPTH);
   }
 
   int Board::getStaticEvaluation()

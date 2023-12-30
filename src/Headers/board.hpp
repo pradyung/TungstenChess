@@ -16,6 +16,8 @@
 
 namespace Chess
 {
+  const int SEARCH_DEPTH = 3;
+
   enum CastlingRights
   {
     WHITE_KINGSIDE = 1,

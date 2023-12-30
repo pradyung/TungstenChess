@@ -2,43 +2,6 @@
 
 namespace Chess
 {
-  Images images;
-
-  int draggingPieceIndex;
-
-  Texture squares[5];
-
-  Sprite boardSquares[64];
-
-  Sprite whitePawns[64];
-  Sprite whiteKnights[64];
-  Sprite whiteBishops[64];
-  Sprite whiteRooks[64];
-  Sprite whiteQueens[64];
-  Sprite whiteKings[64];
-
-  Sprite blackPawns[64];
-  Sprite blackKnights[64];
-  Sprite blackBishops[64];
-  Sprite blackRooks[64];
-  Sprite blackQueens[64];
-  Sprite blackKings[64];
-
-  Bitboard redHighlightsBitboard;
-  Bitboard yellowHighlightsBitboard;
-  Bitboard grayHighlightsBitboard;
-
-  Sprite redHighlightsSprites[64];
-  Sprite yellowHighlightsSprites[64];
-  Sprite grayHighlightsSprites[64];
-
-  Sprite whitePromotionPieces[4];
-  Sprite blackPromotionPieces[4];
-
-  Sprite draggingPieceSprite;
-
-  bool gameOver;
-
   int GUIHandler::getSquareIndex(int x, int y)
   {
     int adjustedX = x - WIDTH_PADDING;
@@ -108,15 +71,8 @@ namespace Chess
 
       if (board.sideToMove == BLACK && !gameOver)
       {
-        makeBotMove();
-
-        while (window->pollEvent(event))
-        {
-          if (event.type == Event::Closed)
-          {
-            window->close();
-          }
-        }
+        if (!isThinking)
+          startThinking();
       }
 
       while (window->pollEvent(event))
@@ -125,6 +81,9 @@ namespace Chess
         {
           window->close();
         }
+
+        if (isThinking)
+          continue;
 
         if (event.type == Event::MouseButtonPressed)
         {
@@ -172,7 +131,7 @@ namespace Chess
             if (!(grayHighlightsBitboard.hasBit(GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y))))
             {
               draggingPieceIndex = -1;
-              clearHighlights(GUIHandler::GRAY_HIGHLIGHT);
+              clearHighlights(GRAY_HIGHLIGHT);
               continue;
             }
 
@@ -197,6 +156,9 @@ namespace Chess
           }
         }
       }
+
+      if (isThinking)
+        continue;
 
       window->clear();
 
@@ -530,5 +492,21 @@ namespace Chess
     Move move = board.generateBotMove();
 
     makeMove(move);
+
+    stopThinking();
+  }
+
+  void GUIHandler::startThinking()
+  {
+    isThinking = true;
+
+    thinkingThread = std::thread(&GUIHandler::makeBotMove, this);
+
+    thinkingThread.detach();
+  }
+
+  void GUIHandler::stopThinking()
+  {
+    isThinking = false;
   }
 }
