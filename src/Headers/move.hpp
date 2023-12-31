@@ -14,37 +14,36 @@ namespace Chess
     /**
      * @param from The square the piece is moving from
      * @param to The square the piece is moving to
-     * @param movePiece The piece that is moving
+     * @param piece The piece that is moving
      * @param capturedPiece The piece that is being captured, if any
      * @param enPassantFile The current state of the en passant file, used to restore it when the move is unmade
      * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
      * @param promotionPiece The piece that the moving piece is being promoted to, if any
      */
-    Move(int from, int to, int movePiece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = EMPTY)
-        : from(from), to(to), piece(movePiece), capturedPiece(capturedPiece), enPassantFile(enPassantFile), castlingRights(castlingRights), promotionPiece(promotionPiece), flags(NORMAL)
+    Move(int from, int to, int piece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = EMPTY)
+        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), enPassantFile(enPassantFile), castlingRights(castlingRights), promotionPiece(promotionPiece), flags(NORMAL)
     {
-      int movePieceType = movePiece & 7;
-      int movePieceColor = movePiece & 24;
+      int pieceType = piece & 7;
 
-      if (movePieceType == KING && from - to == -2)
+      if (pieceType == KING && from - to == -2)
       {
         this->flags |= KSIDE_CASTLE;
         return;
       }
 
-      if (movePieceType == KING && from - to == 2)
+      if (pieceType == KING && from - to == 2)
       {
         this->flags |= QSIDE_CASTLE;
         return;
       }
 
-      if (movePieceType == PAWN && (from - to == 16 || from - to == -16))
+      if (pieceType == PAWN && (from - to == 16 || from - to == -16))
       {
         this->flags |= PAWN_DOUBLE;
         return;
       }
 
-      if (movePieceType == PAWN && capturedPiece == EMPTY && (to - from) % 8)
+      if (pieceType == PAWN && capturedPiece == EMPTY && (to - from) % 8)
       {
         this->flags |= EP_CAPTURE;
         return;
@@ -55,7 +54,7 @@ namespace Chess
         this->flags |= CAPTURE;
       }
 
-      if (movePieceType == PAWN && (to <= 7 || to >= 56))
+      if (pieceType == PAWN && (to <= 7 || to >= 56))
       {
         this->flags |= PROMOTION;
       }

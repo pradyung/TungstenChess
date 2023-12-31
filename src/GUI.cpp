@@ -69,9 +69,9 @@ namespace Chess
               if (board.sideToMove != board.board[index].getPieceColor())
                 continue;
 
-              draggingPieceIndex = index;
-
               grayHighlightsBitboard = board.getLegalPieceMovesBitboard(index);
+
+              draggingPieceIndex = index;
             }
           }
         }
@@ -288,59 +288,33 @@ namespace Chess
     for (int i = 0; i < 64; i++)
     {
       if (draggingPieceIndex == i || (awaitingPromotion && promotionMove.from == i))
-      {
         continue;
-      }
 
       if (board.bitboards[WHITE_PAWN].hasBit(i))
-      {
         window->draw(whitePawns[i]);
-      }
       else if (board.bitboards[WHITE_KNIGHT].hasBit(i))
-      {
         window->draw(whiteKnights[i]);
-      }
       else if (board.bitboards[WHITE_BISHOP].hasBit(i))
-      {
         window->draw(whiteBishops[i]);
-      }
       else if (board.bitboards[WHITE_ROOK].hasBit(i))
-      {
         window->draw(whiteRooks[i]);
-      }
       else if (board.bitboards[WHITE_QUEEN].hasBit(i))
-      {
         window->draw(whiteQueens[i]);
-      }
-      else if (board.whiteKingIndex == i)
-      {
+      else if (board.kingIndices[WHITE] == i)
         window->draw(whiteKings[i]);
-      }
 
       else if (board.bitboards[BLACK_PAWN].hasBit(i))
-      {
         window->draw(blackPawns[i]);
-      }
       else if (board.bitboards[BLACK_KNIGHT].hasBit(i))
-      {
         window->draw(blackKnights[i]);
-      }
       else if (board.bitboards[BLACK_BISHOP].hasBit(i))
-      {
         window->draw(blackBishops[i]);
-      }
       else if (board.bitboards[BLACK_ROOK].hasBit(i))
-      {
         window->draw(blackRooks[i]);
-      }
       else if (board.bitboards[BLACK_QUEEN].hasBit(i))
-      {
         window->draw(blackQueens[i]);
-      }
-      else if (board.blackKingIndex == i)
-      {
+      else if (board.kingIndices[BLACK] == i)
         window->draw(blackKings[i]);
-      }
     }
 
     if (draggingPieceIndex != -1)
@@ -418,9 +392,7 @@ namespace Chess
     clearHighlights();
 
     if (board.isInCheck(board.sideToMove))
-    {
-      redHighlightsBitboard.addBit(board.sideToMove == WHITE ? board.whiteKingIndex : board.blackKingIndex);
-    }
+      redHighlightsBitboard.addBit(board.kingIndices[board.sideToMove]);
 
     int gameStatus = board.getGameStatus(board.sideToMove);
 

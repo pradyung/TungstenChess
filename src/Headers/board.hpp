@@ -32,8 +32,7 @@ namespace Chess
 
     Bitboard bitboards[PIECE_NUMBER];
 
-    int whiteKingIndex;
-    int blackKingIndex;
+    int kingIndices[BLACK + 1];
 
     /**
      * @brief Returns the bitboard of the squares a piece can move to
@@ -85,7 +84,7 @@ namespace Chess
 
     void updatePiece(int pieceIndex, int piece);
 
-    inline void moveOnePiece(int from, int to)
+    inline void movePiece(int from, int to)
     {
       updatePiece(to, board[from].piece);
       updatePiece(from, EMPTY);
@@ -135,7 +134,7 @@ namespace Chess
 
     inline Bitboard getFriendlyPiecesBitboard(int color)
     {
-      return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << (color == WHITE ? whiteKingIndex : blackKingIndex));
+      return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color]);
     }
 
     inline Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
