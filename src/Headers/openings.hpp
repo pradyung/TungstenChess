@@ -9,7 +9,7 @@ namespace Chess
   class Openings
   {
   public:
-    Openings() : moves(std::vector<int>()), lastMoveIndex(-1) {}
+    Openings() : lastMoveIndex(-1) {}
 
     /**
      * @brief Adds a move to the move history

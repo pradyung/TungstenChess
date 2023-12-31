@@ -211,22 +211,17 @@ namespace Chess
     int capturedPiece = move.capturedPiece;
     int promotionPiece = move.promotionPiece;
 
-    updatePiece(to, capturedPiece);
-    updatePiece(from, piece);
+    unmovePiece(from, to, capturedPiece);
 
     if (move.flags & KSIDE_CASTLE)
     {
-      updatePiece(to + 1, piece & 24 | ROOK);
-      updatePiece(to - 1, EMPTY);
-
+      unmovePiece(to + 1, to - 1);
       hasCastled &= ~(piece & 24);
     }
 
     else if (move.flags & QSIDE_CASTLE)
     {
-      updatePiece(to - 2, piece & 24 | ROOK);
-      updatePiece(to + 1, EMPTY);
-
+      unmovePiece(to - 2, to + 1);
       hasCastled &= ~(piece & 24);
     }
 

@@ -90,6 +90,12 @@ namespace Chess
       updatePiece(from, EMPTY);
     }
 
+    inline void unmovePiece(int from, int to, int capturedPiece = EMPTY)
+    {
+      updatePiece(from, board[to].piece);
+      updatePiece(to, capturedPiece);
+    }
+
     inline void removeCastlingRights(int rights)
     {
       zobristKey ^= zobrist.castlingKeys[castlingRights];
