@@ -58,7 +58,7 @@ namespace Chess
 
     Piece board[64];
 
-    Bitboard *bitboards[PIECE_NUMBER];
+    Bitboard bitboards[PIECE_NUMBER];
 
     int whiteKingIndex;
     int blackKingIndex;

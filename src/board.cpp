@@ -19,17 +19,17 @@ namespace Chess
       fenParts[fenPartIndex] += fen[i];
     }
 
-    bitboards[WHITE_PAWN] = new Bitboard();
-    bitboards[WHITE_KNIGHT] = new Bitboard();
-    bitboards[WHITE_BISHOP] = new Bitboard();
-    bitboards[WHITE_ROOK] = new Bitboard();
-    bitboards[WHITE_QUEEN] = new Bitboard();
+    bitboards[WHITE_PAWN] = Bitboard();
+    bitboards[WHITE_KNIGHT] = Bitboard();
+    bitboards[WHITE_BISHOP] = Bitboard();
+    bitboards[WHITE_ROOK] = Bitboard();
+    bitboards[WHITE_QUEEN] = Bitboard();
 
-    bitboards[BLACK_PAWN] = new Bitboard();
-    bitboards[BLACK_KNIGHT] = new Bitboard();
-    bitboards[BLACK_BISHOP] = new Bitboard();
-    bitboards[BLACK_ROOK] = new Bitboard();
-    bitboards[BLACK_QUEEN] = new Bitboard();
+    bitboards[BLACK_PAWN] = Bitboard();
+    bitboards[BLACK_KNIGHT] = Bitboard();
+    bitboards[BLACK_BISHOP] = Bitboard();
+    bitboards[BLACK_ROOK] = Bitboard();
+    bitboards[BLACK_QUEEN] = Bitboard();
 
     enPassantFile = NO_EN_PASSANT;
 
@@ -58,26 +58,26 @@ namespace Chess
           blackKingIndex = pieceIndex;
 
         if (fen[i] == 'P')
-          bitboards[WHITE_PAWN]->addBit(pieceIndex);
+          bitboards[WHITE_PAWN].addBit(pieceIndex);
         else if (fen[i] == 'N')
-          bitboards[WHITE_KNIGHT]->addBit(pieceIndex);
+          bitboards[WHITE_KNIGHT].addBit(pieceIndex);
         else if (fen[i] == 'B')
-          bitboards[WHITE_BISHOP]->addBit(pieceIndex);
+          bitboards[WHITE_BISHOP].addBit(pieceIndex);
         else if (fen[i] == 'R')
-          bitboards[WHITE_ROOK]->addBit(pieceIndex);
+          bitboards[WHITE_ROOK].addBit(pieceIndex);
         else if (fen[i] == 'Q')
-          bitboards[WHITE_QUEEN]->addBit(pieceIndex);
+          bitboards[WHITE_QUEEN].addBit(pieceIndex);
 
         else if (fen[i] == 'p')
-          bitboards[BLACK_PAWN]->addBit(pieceIndex);
+          bitboards[BLACK_PAWN].addBit(pieceIndex);
         else if (fen[i] == 'n')
-          bitboards[BLACK_KNIGHT]->addBit(pieceIndex);
+          bitboards[BLACK_KNIGHT].addBit(pieceIndex);
         else if (fen[i] == 'b')
-          bitboards[BLACK_BISHOP]->addBit(pieceIndex);
+          bitboards[BLACK_BISHOP].addBit(pieceIndex);
         else if (fen[i] == 'r')
-          bitboards[BLACK_ROOK]->addBit(pieceIndex);
+          bitboards[BLACK_ROOK].addBit(pieceIndex);
         else if (fen[i] == 'q')
-          bitboards[BLACK_QUEEN]->addBit(pieceIndex);
+          bitboards[BLACK_QUEEN].addBit(pieceIndex);
 
         pieceIndex++;
       }
@@ -412,11 +412,11 @@ namespace Chess
 
     if (board[pieceIndex].getPieceColor() == WHITE)
     {
-      friendlyPiecesBitboard = *bitboards[WHITE_PAWN] | *bitboards[WHITE_KNIGHT] | *bitboards[WHITE_BISHOP] | *bitboards[WHITE_ROOK] | *bitboards[WHITE_QUEEN] | Bitboard(1ULL << whiteKingIndex);
+      friendlyPiecesBitboard = bitboards[WHITE_PAWN] | bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN] | Bitboard(1ULL << whiteKingIndex);
     }
     else
     {
-      friendlyPiecesBitboard = *bitboards[BLACK_PAWN] | *bitboards[BLACK_KNIGHT] | *bitboards[BLACK_BISHOP] | *bitboards[BLACK_ROOK] | *bitboards[BLACK_QUEEN] | Bitboard(1ULL << blackKingIndex);
+      friendlyPiecesBitboard = bitboards[BLACK_PAWN] | bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN] | Bitboard(1ULL << blackKingIndex);
     }
 
     Bitboard movesBitboard = Bitboard(MovesLookup::KNIGHT_MOVES[pieceIndex] & ~friendlyPiecesBitboard.bitboard);
@@ -553,11 +553,11 @@ namespace Chess
 
     if (board[pieceIndex].getPieceColor() == WHITE)
     {
-      friendlyPiecesBitboard = *bitboards[WHITE_PAWN] | *bitboards[WHITE_KNIGHT] | *bitboards[WHITE_BISHOP] | *bitboards[WHITE_ROOK] | *bitboards[WHITE_QUEEN];
+      friendlyPiecesBitboard = bitboards[WHITE_PAWN] | bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN];
     }
     else if (board[pieceIndex].getPieceColor() == BLACK)
     {
-      friendlyPiecesBitboard = *bitboards[BLACK_PAWN] | *bitboards[BLACK_KNIGHT] | *bitboards[BLACK_BISHOP] | *bitboards[BLACK_ROOK] | *bitboards[BLACK_QUEEN];
+      friendlyPiecesBitboard = bitboards[BLACK_PAWN] | bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN];
     }
 
     movesBitboard = Bitboard(MovesLookup::KING_MOVES[pieceIndex] & ~friendlyPiecesBitboard.bitboard);
@@ -613,7 +613,7 @@ namespace Chess
     if (board[pieceIndex].isEmpty())
       return;
 
-    bitboards[board[pieceIndex].piece]->addBit(pieceIndex);
+    bitboards[board[pieceIndex].piece].addBit(pieceIndex);
   }
 
   void Board::removePieceFromBitboard(int pieceIndex)
@@ -624,7 +624,7 @@ namespace Chess
     if (board[pieceIndex].isEmpty())
       return;
 
-    bitboards[board[pieceIndex].piece]->removeBit(pieceIndex);
+    bitboards[board[pieceIndex].piece].removeBit(pieceIndex);
   }
 
   std::vector<Move> Board::getLegalMoves(int color, bool includeCastling)
@@ -816,17 +816,17 @@ namespace Chess
 
     int materialEvaluation = 0;
 
-    materialEvaluation += bitboards[WHITE_PAWN]->countBits() * Piece::PIECE_VALUES[PAWN];
-    materialEvaluation += bitboards[WHITE_KNIGHT]->countBits() * Piece::PIECE_VALUES[KNIGHT];
-    materialEvaluation += bitboards[WHITE_BISHOP]->countBits() * Piece::PIECE_VALUES[BISHOP];
-    materialEvaluation += bitboards[WHITE_ROOK]->countBits() * Piece::PIECE_VALUES[ROOK];
-    materialEvaluation += bitboards[WHITE_QUEEN]->countBits() * Piece::PIECE_VALUES[QUEEN];
+    materialEvaluation += bitboards[WHITE_PAWN].countBits() * Piece::PIECE_VALUES[PAWN];
+    materialEvaluation += bitboards[WHITE_KNIGHT].countBits() * Piece::PIECE_VALUES[KNIGHT];
+    materialEvaluation += bitboards[WHITE_BISHOP].countBits() * Piece::PIECE_VALUES[BISHOP];
+    materialEvaluation += bitboards[WHITE_ROOK].countBits() * Piece::PIECE_VALUES[ROOK];
+    materialEvaluation += bitboards[WHITE_QUEEN].countBits() * Piece::PIECE_VALUES[QUEEN];
 
-    materialEvaluation -= bitboards[BLACK_PAWN]->countBits() * Piece::PIECE_VALUES[PAWN];
-    materialEvaluation -= bitboards[BLACK_KNIGHT]->countBits() * Piece::PIECE_VALUES[KNIGHT];
-    materialEvaluation -= bitboards[BLACK_BISHOP]->countBits() * Piece::PIECE_VALUES[BISHOP];
-    materialEvaluation -= bitboards[BLACK_ROOK]->countBits() * Piece::PIECE_VALUES[ROOK];
-    materialEvaluation -= bitboards[BLACK_QUEEN]->countBits() * Piece::PIECE_VALUES[QUEEN];
+    materialEvaluation -= bitboards[BLACK_PAWN].countBits() * Piece::PIECE_VALUES[PAWN];
+    materialEvaluation -= bitboards[BLACK_KNIGHT].countBits() * Piece::PIECE_VALUES[KNIGHT];
+    materialEvaluation -= bitboards[BLACK_BISHOP].countBits() * Piece::PIECE_VALUES[BISHOP];
+    materialEvaluation -= bitboards[BLACK_ROOK].countBits() * Piece::PIECE_VALUES[ROOK];
+    materialEvaluation -= bitboards[BLACK_QUEEN].countBits() * Piece::PIECE_VALUES[QUEEN];
 
     return materialEvaluation;
   }
@@ -873,8 +873,8 @@ namespace Chess
 
       if (board[i].piece == WHITE_KING)
       {
-        Bitboard enemyPieces = *bitboards[BLACK_PAWN] | *bitboards[BLACK_KNIGHT] | *bitboards[BLACK_BISHOP] | *bitboards[BLACK_ROOK] | *bitboards[BLACK_QUEEN];
-        Bitboard friendlyPieces = *bitboards[WHITE_KNIGHT] | *bitboards[WHITE_BISHOP] | *bitboards[WHITE_ROOK] | *bitboards[WHITE_QUEEN];
+        Bitboard enemyPieces = bitboards[BLACK_PAWN] | bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN];
+        Bitboard friendlyPieces = bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN];
 
         float endgameScore = enemyPieces.countBits() / 16.0;
 
@@ -900,8 +900,8 @@ namespace Chess
       }
       else if (board[i].piece == BLACK_KING)
       {
-        Bitboard enemyPieces = *bitboards[WHITE_PAWN] | *bitboards[WHITE_KNIGHT] | *bitboards[WHITE_BISHOP] | *bitboards[WHITE_ROOK] | *bitboards[WHITE_QUEEN];
-        Bitboard friendlyPieces = *bitboards[BLACK_KNIGHT] | *bitboards[BLACK_BISHOP] | *bitboards[BLACK_ROOK] | *bitboards[BLACK_QUEEN];
+        Bitboard enemyPieces = bitboards[WHITE_PAWN] | bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN];
+        Bitboard friendlyPieces = bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN];
 
         float endgameScore = enemyPieces.countBits() / 16.0;
 
@@ -934,9 +934,9 @@ namespace Chess
   {
     int evaluationBonus = 0;
 
-    if (bitboards[WHITE_BISHOP]->countBits() >= 2)
+    if (bitboards[WHITE_BISHOP].countBits() >= 2)
       evaluationBonus += BISHOP_PAIR_BONUS;
-    if (bitboards[BLACK_BISHOP]->countBits() >= 2)
+    if (bitboards[BLACK_BISHOP].countBits() >= 2)
       evaluationBonus -= BISHOP_PAIR_BONUS;
 
     if (castlingRights & WHITE_KINGSIDE)
@@ -960,23 +960,23 @@ namespace Chess
 
       if (rank == 0)
       {
-        if (bitboards[WHITE_PAWN]->file(file).countBits() > 1)
+        if (bitboards[WHITE_PAWN].file(file).countBits() > 1)
           evaluationBonus -= DOUBLED_PAWN_PENALTY;
-        if (bitboards[BLACK_PAWN]->file(file).countBits() > 1)
+        if (bitboards[BLACK_PAWN].file(file).countBits() > 1)
           evaluationBonus += DOUBLED_PAWN_PENALTY;
 
-        if (bitboards[WHITE_PAWN]->file(file))
+        if (bitboards[WHITE_PAWN].file(file))
         {
-          if (bitboards[BLACK_PAWN]->file(file - 1).isEmpty() && bitboards[BLACK_PAWN]->file(file + 1).isEmpty())
+          if (bitboards[BLACK_PAWN].file(file - 1).isEmpty() && bitboards[BLACK_PAWN].file(file + 1).isEmpty())
             evaluationBonus += PASSED_PAWN_BONUS;
-          if (bitboards[WHITE_PAWN]->file(file - 1).isEmpty() && bitboards[WHITE_PAWN]->file(file + 1).isEmpty())
+          if (bitboards[WHITE_PAWN].file(file - 1).isEmpty() && bitboards[WHITE_PAWN].file(file + 1).isEmpty())
             evaluationBonus -= ISOLATED_PAWN_PENALTY;
         }
-        if (bitboards[BLACK_PAWN]->file(file))
+        if (bitboards[BLACK_PAWN].file(file))
         {
-          if (bitboards[WHITE_PAWN]->file(file - 1).isEmpty() && bitboards[WHITE_PAWN]->file(file + 1).isEmpty())
+          if (bitboards[WHITE_PAWN].file(file - 1).isEmpty() && bitboards[WHITE_PAWN].file(file + 1).isEmpty())
             evaluationBonus -= PASSED_PAWN_BONUS;
-          if (bitboards[BLACK_PAWN]->file(file - 1).isEmpty() && bitboards[BLACK_PAWN]->file(file + 1).isEmpty())
+          if (bitboards[BLACK_PAWN].file(file - 1).isEmpty() && bitboards[BLACK_PAWN].file(file + 1).isEmpty())
             evaluationBonus += ISOLATED_PAWN_PENALTY;
         }
       }
@@ -986,22 +986,22 @@ namespace Chess
 
       if (board[i].piece == WHITE_ROOK)
       {
-        Bitboard pawns = *bitboards[WHITE_PAWN] | *bitboards[BLACK_PAWN];
+        Bitboard pawns = bitboards[WHITE_PAWN] | bitboards[BLACK_PAWN];
 
         if (pawns.file(file).isEmpty())
           evaluationBonus += ROOK_ON_OPEN_FILE_BONUS;
-        else if (bitboards[BLACK_PAWN]->file(file).isEmpty())
+        else if (bitboards[BLACK_PAWN].file(file).isEmpty())
           evaluationBonus += ROOK_ON_SEMI_OPEN_FILE_BONUS;
 
         continue;
       }
       if (board[i].piece == BLACK_ROOK)
       {
-        Bitboard pawns = *bitboards[WHITE_PAWN] | *bitboards[BLACK_PAWN];
+        Bitboard pawns = bitboards[WHITE_PAWN] | bitboards[BLACK_PAWN];
 
         if (pawns.file(file).isEmpty())
           evaluationBonus -= ROOK_ON_OPEN_FILE_BONUS;
-        else if (bitboards[WHITE_PAWN]->file(file).isEmpty())
+        else if (bitboards[WHITE_PAWN].file(file).isEmpty())
           evaluationBonus -= ROOK_ON_SEMI_OPEN_FILE_BONUS;
 
         continue;
@@ -1009,13 +1009,13 @@ namespace Chess
 
       if (board[i].piece == WHITE_KNIGHT)
       {
-        if (file > 0 && file < 7 && bitboards[BLACK_PAWN]->file(file - 1).isEmpty() && bitboards[BLACK_PAWN]->file(file + 1).isEmpty())
+        if (file > 0 && file < 7 && bitboards[BLACK_PAWN].file(file - 1).isEmpty() && bitboards[BLACK_PAWN].file(file + 1).isEmpty())
           evaluationBonus += KNIGHT_OUTPOST_BONUS;
         continue;
       }
       if (board[i].piece == BLACK_KNIGHT)
       {
-        if (file > 0 && file < 7 && bitboards[WHITE_PAWN]->file(file - 1).isEmpty() && bitboards[WHITE_PAWN]->file(file + 1).isEmpty())
+        if (file > 0 && file < 7 && bitboards[WHITE_PAWN].file(file - 1).isEmpty() && bitboards[WHITE_PAWN].file(file + 1).isEmpty())
           evaluationBonus -= KNIGHT_OUTPOST_BONUS;
         continue;
       }

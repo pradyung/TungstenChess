@@ -98,7 +98,7 @@ namespace Chess
             {
               int promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
-              if (promotionPiece == -1)
+              if (promotionPiece == -1 || !(promotionPiece & board.sideToMove))
                 continue;
 
               promotionMove.promotionPiece = promotionPiece;
@@ -337,23 +337,23 @@ namespace Chess
         continue;
       }
 
-      if (board.bitboards[WHITE_PAWN]->hasBit(i))
+      if (board.bitboards[WHITE_PAWN].hasBit(i))
       {
         window->draw(whitePawns[i]);
       }
-      else if (board.bitboards[WHITE_KNIGHT]->hasBit(i))
+      else if (board.bitboards[WHITE_KNIGHT].hasBit(i))
       {
         window->draw(whiteKnights[i]);
       }
-      else if (board.bitboards[WHITE_BISHOP]->hasBit(i))
+      else if (board.bitboards[WHITE_BISHOP].hasBit(i))
       {
         window->draw(whiteBishops[i]);
       }
-      else if (board.bitboards[WHITE_ROOK]->hasBit(i))
+      else if (board.bitboards[WHITE_ROOK].hasBit(i))
       {
         window->draw(whiteRooks[i]);
       }
-      else if (board.bitboards[WHITE_QUEEN]->hasBit(i))
+      else if (board.bitboards[WHITE_QUEEN].hasBit(i))
       {
         window->draw(whiteQueens[i]);
       }
@@ -362,23 +362,23 @@ namespace Chess
         window->draw(whiteKings[i]);
       }
 
-      else if (board.bitboards[BLACK_PAWN]->hasBit(i))
+      else if (board.bitboards[BLACK_PAWN].hasBit(i))
       {
         window->draw(blackPawns[i]);
       }
-      else if (board.bitboards[BLACK_KNIGHT]->hasBit(i))
+      else if (board.bitboards[BLACK_KNIGHT].hasBit(i))
       {
         window->draw(blackKnights[i]);
       }
-      else if (board.bitboards[BLACK_BISHOP]->hasBit(i))
+      else if (board.bitboards[BLACK_BISHOP].hasBit(i))
       {
         window->draw(blackBishops[i]);
       }
-      else if (board.bitboards[BLACK_ROOK]->hasBit(i))
+      else if (board.bitboards[BLACK_ROOK].hasBit(i))
       {
         window->draw(blackRooks[i]);
       }
-      else if (board.bitboards[BLACK_QUEEN]->hasBit(i))
+      else if (board.bitboards[BLACK_QUEEN].hasBit(i))
       {
         window->draw(blackQueens[i]);
       }
