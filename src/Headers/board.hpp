@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <iostream>
 #include <vector>
 #include <stack>
 #include <map>
@@ -9,7 +8,6 @@
 #include "move.hpp"
 #include "bitboard.hpp"
 #include "zobrist.hpp"
-#include "transposition_table.hpp"
 #include "openings.hpp"
 #include "Data/move_gen_helpers.hpp"
 #include "Data/piece_eval_tables.hpp"
@@ -18,33 +16,7 @@ namespace Chess
 {
   const int SEARCH_DEPTH = 3;
 
-  enum CastlingRights
-  {
-    WHITE_KINGSIDE = 1,
-    WHITE_QUEENSIDE = 2,
-    BLACK_KINGSIDE = 4,
-    BLACK_QUEENSIDE = 8,
-    KINGSIDE = 16,
-    QUEENSIDE = 32,
-    CASTLING = KINGSIDE | QUEENSIDE,
-    WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
-    BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
-  };
-
-  enum EvaluationBonus
-  {
-    BISHOP_PAIR_BONUS = 100,
-    CASTLED_KING_BONUS = 50,
-    CAN_CASTLE_BONUS = 25,
-    ROOK_ON_OPEN_FILE_BONUS = 50,
-    ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
-    KNIGHT_OUTPOST_BONUS = 50,
-    PASSED_PAWN_BONUS = 50,
-    DOUBLED_PAWN_PENALTY = 50,
-    ISOLATED_PAWN_PENALTY = 25,
-    BACKWARDS_PAWN_PENALTY = 50,
-    KING_SAFETY_PAWN_SHIELD_BONUS = 50,
-  };
+  const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 
   class Board
   {
@@ -62,13 +34,6 @@ namespace Chess
 
     int whiteKingIndex;
     int blackKingIndex;
-
-    enum GameStatus
-    {
-      NO_MATE,
-      STALEMATE,
-      LOSE
-    };
 
     /**
      * @brief Returns the bitboard of the squares a piece can move to
@@ -116,27 +81,85 @@ namespace Chess
     Zobrist zobrist;
     ZobristKey zobristKey;
 
-    TranspositionTable transpositionTable;
-
     ZobristKey getInitialZobristKey();
 
     void updatePiece(int pieceIndex, int piece);
-    void moveOnePiece(int from, int to);
 
-    void removeCastlingRights(int rights);
-    void removeCastlingRights(int color, int side);
-    void updateCastlingRights(int rights);
+    inline void moveOnePiece(int from, int to)
+    {
+      updatePiece(to, board[from].piece);
+      updatePiece(from, EMPTY);
+    }
 
-    void updateEnPassantFile(int file);
-    void switchSideToMove();
+    inline void removeCastlingRights(int rights)
+    {
+      zobristKey ^= zobrist.castlingKeys[castlingRights];
+      castlingRights &= ~rights;
+      zobristKey ^= zobrist.castlingKeys[castlingRights];
+    }
+
+    inline void removeCastlingRights(int color, int side)
+    {
+      removeCastlingRights(color == WHITE ? side >> 4 : side >> 2);
+    }
+
+    inline void updateCastlingRights(int rights)
+    {
+      zobristKey ^= zobrist.castlingKeys[castlingRights];
+      castlingRights |= rights;
+      zobristKey ^= zobrist.castlingKeys[castlingRights];
+    }
+
+    inline void updateEnPassantFile(int file)
+    {
+      zobristKey ^= zobrist.enPassantKeys[enPassantFile];
+      enPassantFile = file;
+      zobristKey ^= zobrist.enPassantKeys[enPassantFile];
+    }
+
+    inline void switchSideToMove()
+    {
+      sideToMove ^= 24;
+      zobristKey ^= zobrist.sideKey;
+    }
+
+    inline bool pieceCanMove(int pieceIndex, int to)
+    {
+      return board[to].isEmpty() || board[to].getPieceColor() != board[pieceIndex].getPieceColor();
+    }
+
+    inline static bool isOnBoard(int x, int y)
+    {
+      return x >= 0 && x <= 7 && y >= 0 && y <= 7;
+    }
+
+    inline Bitboard getFriendlyPiecesBitboard(int color)
+    {
+      return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << (color == WHITE ? whiteKingIndex : blackKingIndex));
+    }
+
+    inline Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
+    {
+      Bitboard movesBitboard = Bitboard();
+
+      movesBitboard = (this->*getPieceMoves[board[pieceIndex].getPieceType()])(pieceIndex, includeCastling, onlyCaptures);
+
+      return movesBitboard;
+    }
+
+    inline void addPieceToBitboard(int pieceIndex)
+    {
+      if (!(board[pieceIndex].getPieceType() == KING || board[pieceIndex].isEmpty()))
+        bitboards[board[pieceIndex].piece].addBit(pieceIndex);
+    }
+
+    inline void removePieceFromBitboard(int pieceIndex)
+    {
+      if (!(board[pieceIndex].getPieceType() == KING || board[pieceIndex].isEmpty()))
+        bitboards[board[pieceIndex].piece].removeBit(pieceIndex);
+    }
 
     void unmakeMove(Move move);
-
-    bool pieceCanMove(int pieceIndex, int to);
-
-    static bool isOnBoard(int x, int y);
-
-    Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false);
 
     Bitboard getPawnMoves(int pieceIndex, bool _ = false, bool onlyCaptures = false);
     Bitboard getKnightMoves(int pieceIndex, bool _ = false, bool __ = false);
@@ -154,20 +177,13 @@ namespace Chess
         &Chess::Board::getQueenMoves,
         &Chess::Board::getKingMoves};
 
-    void addPieceToBitboard(int pieceIndex);
-    void removePieceFromBitboard(int pieceIndex);
-
     bool isAttacked(int square, int color);
 
     std::vector<Move> getLegalMoves(int color, bool includeCastling = true);
 
     Bitboard getAttackedSquaresBitboard(int color);
 
-    int countGames(int depth, bool verbose = true);
-
     Move generateMoveFromInt(int moveInt);
-
-    Move generateRandomMove();
 
     Move generateOneDeepMove();
 
@@ -188,7 +204,5 @@ namespace Chess
     int heuristicEvaluation(Move move);
 
     std::vector<Move> heuristicSortMoves(std::vector<Move> moves);
-
-    std::string getStringRepresentation();
   };
 }

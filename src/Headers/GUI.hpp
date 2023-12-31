@@ -15,8 +15,6 @@ namespace Chess
   enum ScreenConstants
   {
     SQUARE_SIZE = 80,
-    WIDTH_PADDING = 0,
-    HEIGHT_PADDING = 0
   };
 
   enum Highlights
@@ -112,11 +110,36 @@ namespace Chess
     void drawHighlights();
     void drawPromotionPieces();
 
-    static int getSquareIndex(int x, int y);
+    static int getSquareIndex(int x, int y) { return (y / SQUARE_SIZE) * 8 + (x / SQUARE_SIZE); }
 
-    static int getPromotionPiece(int x, int y);
+    static int getPromotionPiece(int x, int y)
+    {
+      int index = getSquareIndex(x, y);
 
-    static Vector2f getSquareCoordinates(int index);
-    static Vector2f getSquareCoordinates(int x, int y);
+      switch (index)
+      {
+      case 10:
+        return WHITE_QUEEN;
+      case 11:
+        return WHITE_ROOK;
+      case 12:
+        return WHITE_BISHOP;
+      case 13:
+        return WHITE_KNIGHT;
+      case 50:
+        return BLACK_QUEEN;
+      case 51:
+        return BLACK_ROOK;
+      case 52:
+        return BLACK_BISHOP;
+      case 53:
+        return BLACK_KNIGHT;
+      default:
+        return -1;
+      }
+    }
+
+    static Vector2f getSquareCoordinates(int index) { return getSquareCoordinates(index % 8, index / 8); }
+    static Vector2f getSquareCoordinates(int x, int y) { return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE); }
   };
 }

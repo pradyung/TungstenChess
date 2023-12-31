@@ -1,27 +1,15 @@
 #pragma once
-#include <string>
+
 #include "piece.hpp"
 
 namespace Chess
 {
   const int NO_EN_PASSANT = 8;
 
-  enum Flags
-  {
-    NORMAL = 0,
-    CAPTURE = 1,
-    PAWN_DOUBLE = 2,
-    EP_CAPTURE = 4,
-    PROMOTION = 8,
-    KSIDE_CASTLE = 16,
-    QSIDE_CASTLE = 32,
-    CASTLE = KSIDE_CASTLE | QSIDE_CASTLE
-  };
-
   class Move
   {
   public:
-    Move();
+    Move() : from(0), to(0), piece(0), capturedPiece(0), enPassantFile(NO_EN_PASSANT), castlingRights(15), flags(NORMAL) {}
 
     /**
      * @param from The square the piece is moving from
@@ -32,7 +20,46 @@ namespace Chess
      * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
      * @param promotionPiece The piece that the moving piece is being promoted to, if any
      */
-    Move(int from, int to, int movePiece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = EMPTY);
+    Move(int from, int to, int movePiece, int capturedPiece, int enPassantFile, int castlingRights, int promotionPiece = EMPTY)
+        : from(from), to(to), piece(movePiece), capturedPiece(capturedPiece), enPassantFile(enPassantFile), castlingRights(castlingRights), promotionPiece(promotionPiece), flags(NORMAL)
+    {
+      int movePieceType = movePiece & 7;
+      int movePieceColor = movePiece & 24;
+
+      if (movePieceType == KING && from - to == -2)
+      {
+        this->flags |= KSIDE_CASTLE;
+        return;
+      }
+
+      if (movePieceType == KING && from - to == 2)
+      {
+        this->flags |= QSIDE_CASTLE;
+        return;
+      }
+
+      if (movePieceType == PAWN && (from - to == 16 || from - to == -16))
+      {
+        this->flags |= PAWN_DOUBLE;
+        return;
+      }
+
+      if (movePieceType == PAWN && capturedPiece == EMPTY && (to - from) % 8)
+      {
+        this->flags |= EP_CAPTURE;
+        return;
+      }
+
+      if (capturedPiece != EMPTY)
+      {
+        this->flags |= CAPTURE;
+      }
+
+      if (movePieceType == PAWN && (to <= 7 || to >= 56))
+      {
+        this->flags |= PROMOTION;
+      }
+    }
 
     int from;
     int to;
@@ -50,11 +77,6 @@ namespace Chess
     /**
      * Returns an integer representation of the move
      */
-    int toInt();
-
-    /**
-     * Returns a string representation (UCI) of the move
-     */
-    std::string toString();
+    int toInt() { return from ^ 0x38 | ((to ^ 0x38) << 6); }
   };
 }

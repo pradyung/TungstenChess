@@ -1,52 +1,7 @@
-#include "../../Headers/GUI.hpp"
+#include "Headers/GUI.hpp"
 
 namespace Chess
 {
-  int GUIHandler::getSquareIndex(int x, int y)
-  {
-    int adjustedX = x - WIDTH_PADDING;
-    int adjustedY = y - HEIGHT_PADDING;
-
-    return (adjustedY / SQUARE_SIZE) * 8 + (adjustedX / SQUARE_SIZE);
-  }
-
-  int GUIHandler::getPromotionPiece(int x, int y)
-  {
-    int index = getSquareIndex(x, y);
-
-    switch (index)
-    {
-    case 10:
-      return WHITE_QUEEN;
-    case 11:
-      return WHITE_ROOK;
-    case 12:
-      return WHITE_BISHOP;
-    case 13:
-      return WHITE_KNIGHT;
-    case 50:
-      return BLACK_QUEEN;
-    case 51:
-      return BLACK_ROOK;
-    case 52:
-      return BLACK_BISHOP;
-    case 53:
-      return BLACK_KNIGHT;
-    default:
-      return -1;
-    }
-  }
-
-  Vector2f GUIHandler::getSquareCoordinates(int index)
-  {
-    return getSquareCoordinates(index % 8, index / 8);
-  }
-
-  Vector2f GUIHandler::getSquareCoordinates(int x, int y)
-  {
-    return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE) + Vector2f(WIDTH_PADDING, HEIGHT_PADDING);
-  }
-
   GUIHandler::GUIHandler(RenderWindow &window)
   {
     this->window = &window;
@@ -473,7 +428,7 @@ namespace Chess
     {
       gameOver = true;
 
-      if (gameStatus == Board::LOSE)
+      if (gameStatus == LOSE)
       {
         std::cout << "Checkmate" << std::endl;
       }

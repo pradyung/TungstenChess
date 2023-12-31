@@ -13,14 +13,28 @@ namespace Chess
     /**
      * @brief Populates the pieceKeys, castlingKeys, enPassantKeys, and sideKey vectors with random keys
      */
-    Zobrist();
+    Zobrist()
+    {
+      std::random_device rd;
+      std::mt19937_64 gen(rd());
+      std::uniform_int_distribution<ZobristKey> dis(0, 0xFFFFFFFFFFFFFFFF);
+
+      for (int i = 0; i < 64; i++)
+        for (int j = 0; j < 23; j++)
+          pieceKeys[i][j] = dis(gen);
+
+      for (int i = 0; i < 16; i++)
+        castlingKeys[i] = dis(gen);
+
+      for (int i = 0; i < 9; i++)
+        enPassantKeys[i] = dis(gen);
+
+      sideKey = dis(gen);
+    }
 
     std::array<std::array<ZobristKey, 23>, 64> pieceKeys;
     std::array<ZobristKey, 16> castlingKeys;
     std::array<ZobristKey, 9> enPassantKeys;
     ZobristKey sideKey;
-
-  private:
-    static const int PIECE_INDICES[12];
   };
 }

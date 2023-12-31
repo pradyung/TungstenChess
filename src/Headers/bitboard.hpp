@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 #include "types.hpp"
 
 namespace Chess
@@ -11,76 +9,69 @@ namespace Chess
   public:
     BitboardInt bitboard;
 
-    Bitboard();
-    Bitboard(BitboardInt bitboard);
+    Bitboard(BitboardInt bitboard = 0) : bitboard(bitboard) {}
 
     /**
      * @brief Adds a bit to the bitboard
      * @param index The index of the bit to add, 0-63
      */
-    void addBit(int index);
+    inline void addBit(int index) { bitboard |= (1ULL << index); }
 
     /**
      * @brief Removes a bit from the bitboard
      * @param index The index of the bit to remove, 0-63
      */
-    void removeBit(int index);
+    inline void removeBit(int index) { bitboard &= ~(1ULL << index); }
 
     /**
      * @brief Checks if the bitboard is empty
      */
-    bool isEmpty();
+    inline bool isEmpty() { return bitboard == 0; }
 
     /**
      * @brief Checks if the bitboard has a bit at the given index
      * @param index The index of the bit to check, 0-63
      */
-    bool hasBit(int index);
+    inline bool hasBit(int index) { return bitboard & (1ULL << index); }
 
     /**
      * @brief Counts the number of bits in the bitboard
      */
-    int countBits();
+    inline int countBits() { return __builtin_popcountll(bitboard); }
 
     /**
      * @brief Returns a bitboard with the bits in the given file
      */
-    Bitboard file(int file);
+    inline Bitboard file(int file) { return *this & (0x8080808080808080ULL >> file); }
 
     /**
      * @brief Returns a bitboard with the bits in the given rank
      */
-    Bitboard rank(int rank);
+    inline Bitboard rank(int rank) { return *this & (0xFFULL << (rank * 8)); }
 
     /**
      * @brief Overloads the bool constructor to check if the bitboard is not empty
      */
-    operator bool() const { return bitboard != 0; }
+    inline operator bool() const { return bitboard != 0; }
 
     /**
      * @brief Overloads the & operator to return the intersection of two bitboards
      */
-    Bitboard operator&(const Bitboard &other) const { return Bitboard(bitboard & other.bitboard); }
+    inline Bitboard operator&(const Bitboard &other) const { return Bitboard(bitboard & other.bitboard); }
 
     /**
      * @brief Overloads the & operator to return the intersection of two bitboards
      */
-    Bitboard operator&(const BitboardInt &other) const { return Bitboard(bitboard & other); }
+    inline Bitboard operator&(const BitboardInt &other) const { return Bitboard(bitboard & other); }
 
     /**
      * @brief Overloads the | operator to return the union of two bitboards
      */
-    Bitboard operator|(const Bitboard &other) const { return Bitboard(bitboard | other.bitboard); }
+    inline Bitboard operator|(const Bitboard &other) const { return Bitboard(bitboard | other.bitboard); }
 
     /**
      * @brief Overloads the | operator to return the union of two bitboards
      */
-    Bitboard operator|(const BitboardInt &other) const { return Bitboard(bitboard | other); }
-
-  private:
-    static const BitboardInt fileMasks[8];
-    static const BitboardInt rankMasks[8];
-
-    static const BitboardInt MAX_BITBOARD = 0xFFFFFFFFFFFFFFFF;
+    inline Bitboard operator|(const BitboardInt &other) const { return Bitboard(bitboard | other); }
   };
 }
