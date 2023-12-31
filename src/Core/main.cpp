@@ -1,4 +1,4 @@
-#include "Headers/GUI.hpp"
+#include "../Headers/GUI.hpp"
 
 using namespace Chess;
 

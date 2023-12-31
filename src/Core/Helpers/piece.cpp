@@ -1,4 +1,4 @@
-#include "Headers/piece.hpp"
+#include "../../Headers/piece.hpp"
 
 namespace Chess
 {

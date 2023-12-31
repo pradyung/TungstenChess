@@ -1,4 +1,4 @@
-#include "Headers/transposition_table.hpp"
+#include "../../Headers/transposition_table.hpp"
 
 namespace Chess
 {
