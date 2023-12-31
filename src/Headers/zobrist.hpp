@@ -3,7 +3,7 @@
 #include <random>
 #include <array>
 
-typedef unsigned long long ZobristKey;
+#include "types.hpp"
 
 namespace Chess
 {

@@ -6,7 +6,7 @@
 #include <thread>
 
 #include "board.hpp"
-#include "images.hpp"
+#include "Data/images.hpp"
 
 using namespace sf;
 

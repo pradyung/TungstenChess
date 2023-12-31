@@ -419,7 +419,7 @@ namespace Chess
       friendlyPiecesBitboard = bitboards[BLACK_PAWN] | bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN] | Bitboard(1ULL << blackKingIndex);
     }
 
-    Bitboard movesBitboard = Bitboard(MovesLookup::KNIGHT_MOVES[pieceIndex] & ~friendlyPiecesBitboard.bitboard);
+    Bitboard movesBitboard = Bitboard(movesLookup.KNIGHT_MOVES[pieceIndex] & ~friendlyPiecesBitboard.bitboard);
 
     return movesBitboard;
   }
@@ -560,7 +560,7 @@ namespace Chess
       friendlyPiecesBitboard = bitboards[BLACK_PAWN] | bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN];
     }
 
-    movesBitboard = Bitboard(MovesLookup::KING_MOVES[pieceIndex] & ~friendlyPiecesBitboard.bitboard);
+    movesBitboard = Bitboard(movesLookup.KING_MOVES[pieceIndex] & ~friendlyPiecesBitboard.bitboard);
 
     int piece = board[pieceIndex].piece;
 
@@ -840,34 +840,34 @@ namespace Chess
       switch (board[i].piece)
       {
       case WHITE_PAWN:
-        positionalEvaluation += PieceEvalTables::PAWN_EVAL_TABLE[i];
+        positionalEvaluation += pieceEvalTables.PAWN_EVAL_TABLE[i];
         break;
       case WHITE_KNIGHT:
-        positionalEvaluation += PieceEvalTables::KNIGHT_EVAL_TABLE[i];
+        positionalEvaluation += pieceEvalTables.KNIGHT_EVAL_TABLE[i];
         break;
       case WHITE_BISHOP:
-        positionalEvaluation += PieceEvalTables::BISHOP_EVAL_TABLE[i];
+        positionalEvaluation += pieceEvalTables.BISHOP_EVAL_TABLE[i];
         break;
       case WHITE_ROOK:
-        positionalEvaluation += PieceEvalTables::ROOK_EVAL_TABLE[i];
+        positionalEvaluation += pieceEvalTables.ROOK_EVAL_TABLE[i];
         break;
       case WHITE_QUEEN:
-        positionalEvaluation += PieceEvalTables::QUEEN_EVAL_TABLE[i];
+        positionalEvaluation += pieceEvalTables.QUEEN_EVAL_TABLE[i];
         break;
       case BLACK_PAWN:
-        positionalEvaluation -= PieceEvalTables::PAWN_EVAL_TABLE[63 - i];
+        positionalEvaluation -= pieceEvalTables.PAWN_EVAL_TABLE[63 - i];
         break;
       case BLACK_KNIGHT:
-        positionalEvaluation -= PieceEvalTables::KNIGHT_EVAL_TABLE[63 - i];
+        positionalEvaluation -= pieceEvalTables.KNIGHT_EVAL_TABLE[63 - i];
         break;
       case BLACK_BISHOP:
-        positionalEvaluation -= PieceEvalTables::BISHOP_EVAL_TABLE[63 - i];
+        positionalEvaluation -= pieceEvalTables.BISHOP_EVAL_TABLE[63 - i];
         break;
       case BLACK_ROOK:
-        positionalEvaluation -= PieceEvalTables::ROOK_EVAL_TABLE[63 - i];
+        positionalEvaluation -= pieceEvalTables.ROOK_EVAL_TABLE[63 - i];
         break;
       case BLACK_QUEEN:
-        positionalEvaluation -= PieceEvalTables::QUEEN_EVAL_TABLE[63 - i];
+        positionalEvaluation -= pieceEvalTables.QUEEN_EVAL_TABLE[63 - i];
         break;
       }
 
@@ -878,9 +878,9 @@ namespace Chess
 
         float endgameScore = enemyPieces.countBits() / 16.0;
 
-        positionalEvaluation += PieceEvalTables::KING_EVAL_TABLE[i] * endgameScore;
+        positionalEvaluation += pieceEvalTables.KING_EVAL_TABLE[i] * endgameScore;
 
-        positionalEvaluation += PieceEvalTables::KING_ENDGAME_EVAL_TABLE[i] * (1 - endgameScore);
+        positionalEvaluation += pieceEvalTables.KING_ENDGAME_EVAL_TABLE[i] * (1 - endgameScore);
 
         if (friendlyPieces.countBits() <= 3 && friendlyPieces.countBits() >= 1)
         {
@@ -895,7 +895,7 @@ namespace Chess
             }
           }
 
-          positionalEvaluation += PieceEvalTables::KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
+          positionalEvaluation += pieceEvalTables.KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
       }
       else if (board[i].piece == BLACK_KING)
@@ -905,9 +905,9 @@ namespace Chess
 
         float endgameScore = enemyPieces.countBits() / 16.0;
 
-        positionalEvaluation -= PieceEvalTables::KING_EVAL_TABLE[63 - i] * endgameScore;
+        positionalEvaluation -= pieceEvalTables.KING_EVAL_TABLE[63 - i] * endgameScore;
 
-        positionalEvaluation -= PieceEvalTables::KING_ENDGAME_EVAL_TABLE[63 - i] * (1 - endgameScore);
+        positionalEvaluation -= pieceEvalTables.KING_ENDGAME_EVAL_TABLE[63 - i] * (1 - endgameScore);
 
         if (friendlyPieces.countBits() <= 3 && friendlyPieces.countBits() >= 1)
         {
@@ -922,7 +922,7 @@ namespace Chess
             }
           }
 
-          positionalEvaluation -= PieceEvalTables::KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
+          positionalEvaluation -= pieceEvalTables.KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
       }
     }

@@ -2,10 +2,10 @@
 
 #include <iostream>
 
+#include "types.hpp"
+
 namespace Chess
 {
-  typedef unsigned long long BitboardInt;
-
   class Bitboard
   {
   public:

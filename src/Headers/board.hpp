@@ -8,11 +8,11 @@
 
 #include "move.hpp"
 #include "bitboard.hpp"
-#include "move_gen_helpers.hpp"
-#include "piece_eval_tables.hpp"
-#include "openings.hpp"
 #include "zobrist.hpp"
 #include "transposition_table.hpp"
+#include "openings.hpp"
+#include "Data/move_gen_helpers.hpp"
+#include "Data/piece_eval_tables.hpp"
 
 namespace Chess
 {
@@ -108,6 +108,10 @@ namespace Chess
 
     Openings openings;
     bool inOpeningBook = true;
+
+    MovesLookup movesLookup;
+
+    PieceEvalTables pieceEvalTables;
 
     Zobrist zobrist;
     ZobristKey zobristKey;

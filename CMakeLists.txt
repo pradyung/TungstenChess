@@ -8,7 +8,7 @@ FetchContent_Declare(SFML
     GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(Chess src/main.cpp src/board.cpp src/bitboard.cpp src/GUI.cpp src/piece.cpp src/move_gen_helpers.cpp src/move.cpp src/piece_eval_tables.cpp src/openings.cpp src/zobrist.cpp src/transposition_table.cpp)
+add_executable(Chess src/main.cpp src/board.cpp src/bitboard.cpp src/GUI.cpp src/piece.cpp src/move.cpp src/openings.cpp src/zobrist.cpp src/transposition_table.cpp)
 target_link_libraries(Chess PRIVATE sfml-graphics)
 target_compile_features(Chess PRIVATE cxx_std_17)
 if (WIN32 AND BUILD_SHARED_LIBS)

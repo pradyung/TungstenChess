@@ -1,9 +1,10 @@
 #pragma once
 
-#include "opening_book.hpp"
 #include <vector>
 #include <iostream>
 #include <stack>
+
+#include "Data/opening_book.hpp"
 
 namespace Chess
 {
