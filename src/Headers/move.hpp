@@ -71,8 +71,6 @@ namespace Chess
 
     int flags;
 
-    int computedEvaluation;
-
     /**
      * Returns an integer representation of the move
      */

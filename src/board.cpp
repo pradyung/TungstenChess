@@ -233,7 +233,7 @@ namespace Chess
     updateEnPassantFile(move.enPassantFile);
     updateCastlingRights(move.castlingRights);
 
-    if (piece & 7 == KING)
+    if ((piece & 7) == KING)
       kingIndices[piece & 24] = from;
 
     if (move.flags & EP_CAPTURE)
@@ -973,8 +973,6 @@ namespace Chess
       }
     }
 
-    legalMoves[bestMoveIndex].computedEvaluation = bestMoveEvaluation;
-
     return legalMoves[bestMoveIndex];
   }
 
@@ -1019,8 +1017,6 @@ namespace Chess
         break;
       }
     }
-
-    legalMoves[bestMoveIndex].computedEvaluation = bestMoveEvaluation;
 
     return legalMoves[bestMoveIndex];
   }
