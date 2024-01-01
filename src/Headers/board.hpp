@@ -32,6 +32,8 @@ namespace Chess
 
     Bitboard bitboards[PIECE_NUMBER];
 
+    ZobristKey zobristKey;
+
     int kingIndices[BLACK + 1];
 
     /**
@@ -45,7 +47,7 @@ namespace Chess
      * @param move The move to make
      * @param speculative Whether the move is speculative (used for move tree search and check detection) - MUST BE SET TO FALSE FOR ACTUAL MOVES
      */
-    void makeMove(Move move, bool speculative = true);
+    void makeMove(Move move, bool speculative = false);
 
     /**
      * @brief Checks if a color is in check in the current position
@@ -59,6 +61,12 @@ namespace Chess
      * @return int - Note: returns NO_MATE even if "color" has won, only returns LOSE if "color" has lost
      */
     int getGameStatus(int color);
+
+    /**
+     * @brief Generates a move from a UCI string
+     * @param uci The UCI string
+     */
+    Move generateMoveFromUCI(std::string uci);
 
     /**
      * @brief Generates the best move for the bot
@@ -78,7 +86,6 @@ namespace Chess
     PieceEvalTables pieceEvalTables;
 
     Zobrist zobrist;
-    ZobristKey zobristKey;
 
     ZobristKey getInitialZobristKey();
 

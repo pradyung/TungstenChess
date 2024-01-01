@@ -83,6 +83,9 @@ namespace Chess
       }
     }
 
+    if (fenParts[0] != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
+      inOpeningBook = false;
+
     sideToMove = fenParts[1] == "w" ? WHITE : BLACK;
 
     if (fenParts[2] != "-")
@@ -528,7 +531,7 @@ namespace Chess
       {
         Move move = Move(pieceIndex, j, board[pieceIndex].piece, board[j].piece, enPassantFile, castlingRights, QUEEN);
 
-        makeMove(move);
+        makeMove(move, true);
 
         if (isInCheck(board[j].getPieceColor()))
         {
@@ -617,10 +620,49 @@ namespace Chess
     return Move(from, to, piece, capturedPiece, enPassantFile, castlingRights);
   }
 
+  Move Board::generateMoveFromUCI(std::string uci)
+  {
+    int from = (uci[0] - 'a') + (8 - uci[1] + '0') * 8;
+    int to = (uci[2] - 'a') + (8 - uci[3] + '0') * 8;
+
+    int piece = board[from].piece;
+    int capturedPiece = board[to].piece;
+
+    int promotionPiece = EMPTY;
+
+    if (uci.length() == 5)
+    {
+      switch (uci[4])
+      {
+      case 'q':
+        promotionPiece = QUEEN;
+        break;
+      case 'r':
+        promotionPiece = ROOK;
+        break;
+      case 'b':
+        promotionPiece = BISHOP;
+        break;
+      case 'n':
+        promotionPiece = KNIGHT;
+        break;
+      }
+    }
+
+    return Move(from, to, piece, capturedPiece, enPassantFile, castlingRights, promotionPiece);
+  }
+
   Move Board::generateBotMove()
   {
     if (inOpeningBook)
-      return generateMoveFromInt(openings.getNextMove());
+    {
+      int moveInt = openings.getNextMove();
+
+      if (moveInt != -1)
+        return generateMoveFromInt(moveInt);
+
+      inOpeningBook = false;
+    }
 
     return generateBestMove(SEARCH_DEPTH);
   }
@@ -879,7 +921,7 @@ namespace Chess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      makeMove(legalMoves[i]);
+      makeMove(legalMoves[i], true);
 
       int evaluation = -negamax(depth - 1, -beta, -alpha);
 
@@ -928,7 +970,7 @@ namespace Chess
       if (!(legalMoves[i].flags & CAPTURE))
         continue;
 
-      makeMove(legalMoves[i]);
+      makeMove(legalMoves[i], true);
 
       int evaluation = -quiesce(-beta, -alpha);
 
@@ -958,7 +1000,7 @@ namespace Chess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      makeMove(legalMoves[i]);
+      makeMove(legalMoves[i], true);
 
       int evaluation = getStaticEvaluation();
 
@@ -993,7 +1035,7 @@ namespace Chess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      makeMove(legalMoves[i]);
+      makeMove(legalMoves[i], true);
 
       int evaluation = -negamax(depth - 1, -beta, -alpha);
 

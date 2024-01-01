@@ -387,7 +387,7 @@ namespace Chess
     if (move.from == move.to)
       return;
 
-    board.makeMove(move, false);
+    board.makeMove(move);
 
     clearHighlights();
 

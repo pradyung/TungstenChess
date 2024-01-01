@@ -75,5 +75,25 @@ namespace Chess
      * Returns an integer representation of the move
      */
     int toInt() { return from ^ 0x38 | ((to ^ 0x38) << 6); }
+
+    /**
+     * Returns a UCI string representation of the move
+     */
+    std::string getUCI()
+    {
+      std::string uci = "";
+
+      uci += 'a' + (from & 7);
+      uci += '8' - (from >> 3);
+      uci += 'a' + (to & 7);
+      uci += '8' - (to >> 3);
+
+      if (promotionPiece != EMPTY)
+      {
+        uci += ".pnbrqk"[promotionPiece & 7];
+      }
+
+      return uci;
+    }
   };
 }

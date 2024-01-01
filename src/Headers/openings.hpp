@@ -73,6 +73,9 @@ namespace Chess
     {
       std::vector<int> childrenMoves = getChildrenMoves();
 
+      if (childrenMoves.size() == 0)
+        return -1;
+
       int totalWeight = 0;
 
       for (int i = 0; i < childrenMoves.size(); i++)

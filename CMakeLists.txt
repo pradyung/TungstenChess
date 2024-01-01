@@ -12,4 +12,7 @@ add_executable(Chess src/main.cpp src/GUI.cpp src/board.cpp)
 target_link_libraries(Chess PRIVATE sfml-graphics)
 target_compile_features(Chess PRIVATE cxx_std_17)
 
+add_executable(ChessUCI src/UCI.cpp src/board.cpp)
+target_compile_features(ChessUCI PRIVATE cxx_std_17)
+
 install(TARGETS Chess)
