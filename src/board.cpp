@@ -85,11 +85,6 @@ namespace Chess
 
     sideToMove = fenParts[1] == "w" ? WHITE : BLACK;
 
-    if (fenParts[3] != "-")
-    {
-      enPassantFile = fenParts[3][0] - 'a';
-    }
-
     if (fenParts[2] != "-")
     {
       for (int i = 0; i < fenParts[2].length(); i++)
@@ -103,6 +98,11 @@ namespace Chess
         else if (fenParts[2][i] == 'q')
           castlingRights |= BLACK_QUEENSIDE;
       }
+    }
+
+    if (fenParts[3] != "-")
+    {
+      enPassantFile = fenParts[3][0] - 'a';
     }
 
     zobristKey = getInitialZobristKey();
@@ -573,7 +573,10 @@ namespace Chess
 
     bool attacked = false;
 
-    if (movesLookup.REVERSE_PAWN_CAPTURE_MOVES[square] & bitboards[(color) | PAWN].bitboard)
+    if (piece & WHITE && movesLookup.REVERSE_BLACK_PAWN_CAPTURE_MOVES[square] & bitboards[BLACK_PAWN].bitboard)
+      attacked = true;
+
+    else if (piece & BLACK && movesLookup.REVERSE_WHITE_PAWN_CAPTURE_MOVES[square] & bitboards[WHITE_PAWN].bitboard)
       attacked = true;
 
     else if (movesLookup.KNIGHT_MOVES[square] & bitboards[(color) | KNIGHT].bitboard)
@@ -585,7 +588,7 @@ namespace Chess
     else if (getBishopMoves(square) & (bitboards[(color) | BISHOP].bitboard | bitboards[(color) | QUEEN].bitboard))
       attacked = true;
 
-    else if (getRookMoves(square) & (bitboards[(color) | ROOK].bitboard | bitboards[(color ^ 24) | QUEEN].bitboard))
+    else if (getRookMoves(square) & (bitboards[(color) | ROOK].bitboard | bitboards[(color) | QUEEN].bitboard))
       attacked = true;
 
     board[square].piece = piece;
