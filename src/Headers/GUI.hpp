@@ -21,7 +21,8 @@ namespace Chess
   {
     YELLOW_HIGHLIGHT = 2,
     RED_HIGHLIGHT = 3,
-    GRAY_HIGHLIGHT = 4
+    GRAY_HIGHLIGHT = 4,
+    YELLOW_OUTLINE = 5
   };
 
   class GUIHandler
@@ -45,7 +46,7 @@ namespace Chess
 
     Images images;
 
-    Texture squares[5];
+    Texture squares[6];
     Texture piecesTextures[PIECE_NUMBER];
 
     Sprite boardSquares[64];
@@ -69,9 +70,12 @@ namespace Chess
     Bitboard yellowHighlightsBitboard;
     Bitboard grayHighlightsBitboard;
 
+    int yellowOutlineIndex = -1;
+
     Sprite redHighlightsSprites[64];
     Sprite yellowHighlightsSprites[64];
     Sprite grayHighlightsSprites[64];
+    Sprite yellowOutlineSprites[64];
 
     int draggingPieceIndex = -1;
     Sprite draggingPieceSprite;

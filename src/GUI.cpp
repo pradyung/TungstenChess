@@ -92,19 +92,16 @@ namespace Chess
 
             int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            if (index != draggingPieceIndex)
-            {
-              Move move(draggingPieceIndex, index, board.board[draggingPieceIndex].piece, board.board[index].piece, board.enPassantFile, board.castlingRights);
+            Move move(draggingPieceIndex, index, board.board[draggingPieceIndex].piece, board.board[index].piece, board.enPassantFile, board.castlingRights);
 
-              if (!(move.flags & PROMOTION))
-              {
-                makeMove(move);
-              }
-              else
-              {
-                awaitingPromotion = true;
-                promotionMove = move;
-              }
+            if (!(move.flags & PROMOTION))
+            {
+              makeMove(move);
+            }
+            else
+            {
+              awaitingPromotion = true;
+              promotionMove = move;
             }
 
             draggingPieceIndex = -1;
@@ -114,6 +111,13 @@ namespace Chess
 
       if (isThinking)
         continue;
+
+      int x = Mouse::getPosition(*window).x;
+      int y = Mouse::getPosition(*window).y;
+      if (x >= 0 && x <= 640 && y >= 0 && y <= 640)
+        yellowOutlineIndex = getSquareIndex(x, y);
+      else
+        yellowOutlineIndex = -1;
 
       window->clear();
 
@@ -140,11 +144,7 @@ namespace Chess
     squares[YELLOW_HIGHLIGHT].loadFromMemory(images.YELLOW_HIGHLIGHT, images.YELLOW_HIGHLIGHT_SIZE);
     squares[RED_HIGHLIGHT].loadFromMemory(images.RED_HIGHLIGHT, images.RED_HIGHLIGHT_SIZE);
     squares[GRAY_HIGHLIGHT].loadFromMemory(images.GRAY_HIGHLIGHT, images.GRAY_HIGHLIGHT_SIZE);
-
-    for (int i = 0; i < 5; i++)
-    {
-      squares[i].setRepeated(true);
-    }
+    squares[YELLOW_OUTLINE].loadFromMemory(images.YELLOW_OUTLINE, images.YELLOW_OUTLINE_SIZE);
   }
 
   void GUIHandler::loadBoardSquares()
@@ -158,16 +158,19 @@ namespace Chess
         redHighlightsSprites[squareIndex].setTexture(squares[RED_HIGHLIGHT]);
         yellowHighlightsSprites[squareIndex].setTexture(squares[YELLOW_HIGHLIGHT]);
         grayHighlightsSprites[squareIndex].setTexture(squares[GRAY_HIGHLIGHT]);
+        yellowOutlineSprites[squareIndex].setTexture(squares[YELLOW_OUTLINE]);
 
         boardSquares[squareIndex].setPosition(getSquareCoordinates(j, i));
         redHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
         yellowHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
         grayHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
+        yellowOutlineSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
 
         boardSquares[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
         redHighlightsSprites[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
         yellowHighlightsSprites[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
         grayHighlightsSprites[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
+        yellowOutlineSprites[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
 
         squareIndex++;
       }
@@ -340,6 +343,11 @@ namespace Chess
       else if (yellowHighlightsBitboard.hasBit(i))
       {
         window->draw(yellowHighlightsSprites[i]);
+      }
+
+      if (yellowOutlineIndex == i)
+      {
+        window->draw(yellowOutlineSprites[i]);
       }
     }
   }
