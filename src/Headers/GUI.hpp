@@ -12,6 +12,8 @@ using namespace sf;
 
 namespace Chess
 {
+  const int PLAYER_COLOR = WHITE;
+
   enum ScreenConstants
   {
     SQUARE_SIZE = 80,
