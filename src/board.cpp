@@ -214,7 +214,7 @@ namespace Chess
     int capturedPiece = move.capturedPiece;
     int promotionPiece = move.promotionPiece;
 
-    unmovePiece(from, to, capturedPiece);
+    unmovePiece(from, to, piece, capturedPiece);
 
     if (move.flags & KSIDE_CASTLE)
     {

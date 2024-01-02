@@ -97,9 +97,9 @@ namespace Chess
       updatePiece(from, EMPTY);
     }
 
-    inline void unmovePiece(int from, int to, int capturedPiece = EMPTY)
+    inline void unmovePiece(int from, int to, int movedPiece = EMPTY, int capturedPiece = EMPTY)
     {
-      updatePiece(from, board[to].piece);
+      updatePiece(from, movedPiece == EMPTY ? board[to].piece : movedPiece);
       updatePiece(to, capturedPiece);
     }
 
