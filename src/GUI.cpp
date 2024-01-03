@@ -59,7 +59,7 @@ namespace Chess
           {
             int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            if (board.sideToMove != board.board[index].getPieceColor() && !awaitingPromotion)
+            if (!(board.sideToMove & board[index]) && !awaitingPromotion)
               continue;
 
             if (awaitingPromotion)
@@ -79,7 +79,7 @@ namespace Chess
             }
             else
             {
-              if (board.sideToMove != board.board[index].getPieceColor())
+              if (!(board.sideToMove & board[index]))
                 continue;
 
               grayHighlightsBitboard = board.getLegalPieceMovesBitboard(index);
@@ -105,7 +105,7 @@ namespace Chess
 
             int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            Move move(draggingPieceIndex, index, board.board[draggingPieceIndex].piece, board.board[index].piece, board.enPassantFile, board.castlingRights);
+            Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.state);
 
             if (!(move.flags & PROMOTION))
             {
@@ -335,7 +335,7 @@ namespace Chess
 
     if (draggingPieceIndex != -1)
     {
-      draggingPieceSprite.setTexture(piecesTextures[board.board[draggingPieceIndex].piece]);
+      draggingPieceSprite.setTexture(piecesTextures[board[draggingPieceIndex]]);
       draggingPieceSprite.setPosition(Mouse::getPosition(*window).x - SQUARE_SIZE / 2, Mouse::getPosition(*window).y - SQUARE_SIZE / 2);
       window->draw(draggingPieceSprite);
     }

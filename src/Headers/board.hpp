@@ -18,6 +18,9 @@ namespace Chess
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 
+  const int EN_PASSANT = 0x0F;
+  const int CASTLING_RIGHTS = 0x70;
+
   class Board
   {
   public:
@@ -25,10 +28,8 @@ namespace Chess
 
     int sideToMove;
 
-    int enPassantFile;
-    int castlingRights;
-
-    Piece board[64];
+    // Last 4 bits are castling rights, next 3 bits are en passant file
+    GameState state;
 
     Bitboard bitboards[PIECE_NUMBER];
 
@@ -73,7 +74,14 @@ namespace Chess
      */
     Move generateBotMove();
 
+    /**
+     * @brief Allows indexing the board like an array
+     */
+    inline Piece operator[](int index) { return board[index]; }
+
   private:
+    Piece board[64];
+
     int hasCastled;
 
     std::map<ZobristKey, int> positionHistory;
@@ -89,25 +97,25 @@ namespace Chess
 
     ZobristKey getInitialZobristKey();
 
-    void updatePiece(int pieceIndex, int piece);
+    void updatePiece(int pieceIndex, Piece piece);
 
     inline void movePiece(int from, int to)
     {
-      updatePiece(to, board[from].piece);
+      updatePiece(to, board[from]);
       updatePiece(from, EMPTY);
     }
 
     inline void unmovePiece(int from, int to, int movedPiece = EMPTY, int capturedPiece = EMPTY)
     {
-      updatePiece(from, movedPiece == EMPTY ? board[to].piece : movedPiece);
+      updatePiece(from, movedPiece == EMPTY ? board[to] : movedPiece);
       updatePiece(to, capturedPiece);
     }
 
     inline void removeCastlingRights(int rights)
     {
-      zobristKey ^= zobrist.castlingKeys[castlingRights];
-      castlingRights &= ~rights;
-      zobristKey ^= zobrist.castlingKeys[castlingRights];
+      zobristKey ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
+      state &= ~rights;
+      zobristKey ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
     }
 
     inline void removeCastlingRights(int color, int side)
@@ -115,18 +123,21 @@ namespace Chess
       removeCastlingRights(color == WHITE ? side >> 4 : side >> 2);
     }
 
-    inline void updateCastlingRights(int rights)
-    {
-      zobristKey ^= zobrist.castlingKeys[castlingRights];
-      castlingRights |= rights;
-      zobristKey ^= zobrist.castlingKeys[castlingRights];
-    }
-
     inline void updateEnPassantFile(int file)
     {
-      zobristKey ^= zobrist.enPassantKeys[enPassantFile];
-      enPassantFile = file;
-      zobristKey ^= zobrist.enPassantKeys[enPassantFile];
+      zobristKey ^= zobrist.enPassantKeys[(state & EN_PASSANT) >> 4];
+      state &= ~EN_PASSANT;
+      state |= file << 4;
+      zobristKey ^= zobrist.enPassantKeys[file];
+    }
+
+    inline void updateState(int newState)
+    {
+      zobristKey ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
+      zobristKey ^= zobrist.enPassantKeys[(state & EN_PASSANT) >> 4];
+      state = newState;
+      zobristKey ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
+      zobristKey ^= zobrist.enPassantKeys[(state & EN_PASSANT) >> 4];
     }
 
     inline void switchSideToMove()
@@ -137,7 +148,7 @@ namespace Chess
 
     inline bool pieceCanMove(int pieceIndex, int to)
     {
-      return board[to].isEmpty() || board[to].getPieceColor() != board[pieceIndex].getPieceColor();
+      return (!board[to]) || (board[to] & 24) != (board[pieceIndex] & 24);
     }
 
     inline static bool isOnBoard(int x, int y)
@@ -154,21 +165,21 @@ namespace Chess
     {
       Bitboard movesBitboard = Bitboard();
 
-      movesBitboard = (this->*getPieceMoves[board[pieceIndex].getPieceType()])(pieceIndex, includeCastling, onlyCaptures);
+      movesBitboard = (this->*getPieceMoves[board[pieceIndex] & 7])(pieceIndex, includeCastling, onlyCaptures);
 
       return movesBitboard;
     }
 
     inline void addPieceToBitboard(int pieceIndex)
     {
-      if (!(board[pieceIndex].getPieceType() == KING || board[pieceIndex].isEmpty()))
-        bitboards[board[pieceIndex].piece].addBit(pieceIndex);
+      if (board[pieceIndex])
+        bitboards[board[pieceIndex]].addBit(pieceIndex);
     }
 
     inline void removePieceFromBitboard(int pieceIndex)
     {
-      if (!(board[pieceIndex].getPieceType() == KING || board[pieceIndex].isEmpty()))
-        bitboards[board[pieceIndex].piece].removeBit(pieceIndex);
+      if (board[pieceIndex])
+        bitboards[board[pieceIndex]].removeBit(pieceIndex);
     }
 
     void unmakeMove(Move move);
@@ -192,8 +203,6 @@ namespace Chess
     bool isAttacked(int square, int color);
 
     std::vector<Move> getLegalMoves(int color, bool includeCastling = true);
-
-    Bitboard getAttackedSquaresBitboard(int color);
 
     Move generateMoveFromInt(int moveInt);
 

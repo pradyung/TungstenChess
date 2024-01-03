@@ -70,7 +70,7 @@ int main()
         }
 
         std::cout << "| "
-                  << " ........PNBRQK..pnbrqk"[board->board[i].piece] << " ";
+                  << " ........PNBRQK..pnbrqk"[(*board)[i]] << " ";
 
         if (i % 8 == 7)
         {

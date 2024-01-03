@@ -1,9 +1,13 @@
 #pragma once
 
+#include <stdint.h>
+
 namespace Chess
 {
   typedef unsigned long long BitboardInt;
   typedef unsigned long long ZobristKey;
+  typedef uint8_t Piece;
+  typedef uint8_t GameState;
 
   enum CastlingRights
   {
