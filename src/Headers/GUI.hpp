@@ -54,19 +54,7 @@ namespace Chess
     Sprite boardSquares[64];
     Sprite pieces[64];
 
-    Sprite whitePawns[64];
-    Sprite whiteKnights[64];
-    Sprite whiteBishops[64];
-    Sprite whiteRooks[64];
-    Sprite whiteQueens[64];
-    Sprite whiteKings[64];
-
-    Sprite blackPawns[64];
-    Sprite blackKnights[64];
-    Sprite blackBishops[64];
-    Sprite blackRooks[64];
-    Sprite blackQueens[64];
-    Sprite blackKings[64];
+    std::array<Sprite, 64> pieceSprites[PIECE_NUMBER];
 
     Bitboard redHighlightsBitboard;
     Bitboard yellowHighlightsBitboard;

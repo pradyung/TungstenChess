@@ -5,8 +5,6 @@ namespace Chess
   class OpeningBook
   {
   public:
-    // OpeningBook() = default;
-
     const int operator[](int index) const
     {
       return book[index];

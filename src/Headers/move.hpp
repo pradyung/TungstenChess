@@ -6,12 +6,10 @@
 
 namespace Chess
 {
-  // const int NO_EN_PASSANT = 8;
-
   class Move
   {
   public:
-    Move() : from(0), to(0), piece(0), capturedPiece(0), state(0b0000'1111), flags(NORMAL) {}
+    Move() : from(0), to(0), piece(0), capturedPiece(0), state(0), flags(NORMAL) {}
 
     /**
      * @param from The square the piece is moving from
@@ -68,8 +66,6 @@ namespace Chess
     int capturedPiece;
     int promotionPiece;
 
-    // int enPassantFile;
-    // int castlingRights;
     GameState state;
 
     int flags;

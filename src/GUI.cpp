@@ -216,47 +216,12 @@ namespace Chess
   {
     for (int i = 0; i < 64; i++)
     {
-      whitePawns[i].setTexture(piecesTextures[WHITE_PAWN]);
-      whiteKnights[i].setTexture(piecesTextures[WHITE_KNIGHT]);
-      whiteBishops[i].setTexture(piecesTextures[WHITE_BISHOP]);
-      whiteRooks[i].setTexture(piecesTextures[WHITE_ROOK]);
-      whiteQueens[i].setTexture(piecesTextures[WHITE_QUEEN]);
-      whiteKings[i].setTexture(piecesTextures[WHITE_KING]);
-
-      blackPawns[i].setTexture(piecesTextures[BLACK_PAWN]);
-      blackKnights[i].setTexture(piecesTextures[BLACK_KNIGHT]);
-      blackBishops[i].setTexture(piecesTextures[BLACK_BISHOP]);
-      blackRooks[i].setTexture(piecesTextures[BLACK_ROOK]);
-      blackQueens[i].setTexture(piecesTextures[BLACK_QUEEN]);
-      blackKings[i].setTexture(piecesTextures[BLACK_KING]);
-
-      whitePawns[i].setPosition(getSquareCoordinates(i));
-      whiteKnights[i].setPosition(getSquareCoordinates(i));
-      whiteBishops[i].setPosition(getSquareCoordinates(i));
-      whiteRooks[i].setPosition(getSquareCoordinates(i));
-      whiteQueens[i].setPosition(getSquareCoordinates(i));
-      whiteKings[i].setPosition(getSquareCoordinates(i));
-
-      blackPawns[i].setPosition(getSquareCoordinates(i));
-      blackKnights[i].setPosition(getSquareCoordinates(i));
-      blackBishops[i].setPosition(getSquareCoordinates(i));
-      blackRooks[i].setPosition(getSquareCoordinates(i));
-      blackQueens[i].setPosition(getSquareCoordinates(i));
-      blackKings[i].setPosition(getSquareCoordinates(i));
-
-      whitePawns[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      whiteKnights[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      whiteBishops[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      whiteRooks[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      whiteQueens[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      whiteKings[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-
-      blackPawns[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      blackKnights[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      blackBishops[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      blackRooks[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      blackQueens[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      blackKings[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
+      for (int j = 0; j < 23; j++)
+      {
+        pieceSprites[j][i].setTexture(piecesTextures[j]);
+        pieceSprites[j][i].setPosition(getSquareCoordinates(i));
+        pieceSprites[j][i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
+      }
 
       draggingPieceSprite.setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
     }
@@ -264,28 +229,14 @@ namespace Chess
 
   void GUIHandler::loadPromotionPieces()
   {
-    whitePromotionPieces[0].setTexture(piecesTextures[WHITE_QUEEN]);
-    whitePromotionPieces[1].setTexture(piecesTextures[WHITE_ROOK]);
-    whitePromotionPieces[2].setTexture(piecesTextures[WHITE_BISHOP]);
-    whitePromotionPieces[3].setTexture(piecesTextures[WHITE_KNIGHT]);
-
-    blackPromotionPieces[0].setTexture(piecesTextures[BLACK_QUEEN]);
-    blackPromotionPieces[1].setTexture(piecesTextures[BLACK_ROOK]);
-    blackPromotionPieces[2].setTexture(piecesTextures[BLACK_BISHOP]);
-    blackPromotionPieces[3].setTexture(piecesTextures[BLACK_KNIGHT]);
-
-    whitePromotionPieces[0].setPosition(getSquareCoordinates(2, 1));
-    whitePromotionPieces[1].setPosition(getSquareCoordinates(3, 1));
-    whitePromotionPieces[2].setPosition(getSquareCoordinates(4, 1));
-    whitePromotionPieces[3].setPosition(getSquareCoordinates(5, 1));
-
-    blackPromotionPieces[0].setPosition(getSquareCoordinates(2, 6));
-    blackPromotionPieces[1].setPosition(getSquareCoordinates(3, 6));
-    blackPromotionPieces[2].setPosition(getSquareCoordinates(4, 6));
-    blackPromotionPieces[3].setPosition(getSquareCoordinates(5, 6));
-
     for (int i = 0; i < 4; i++)
     {
+      whitePromotionPieces[i].setTexture(piecesTextures[WHITE_QUEEN - i]);
+      blackPromotionPieces[i].setTexture(piecesTextures[BLACK_QUEEN - i]);
+
+      whitePromotionPieces[i].setPosition(getSquareCoordinates(10 + i));
+      blackPromotionPieces[i].setPosition(getSquareCoordinates(50 + i));
+
       whitePromotionPieces[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
       blackPromotionPieces[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
     }
@@ -306,31 +257,7 @@ namespace Chess
       if (draggingPieceIndex == i || (awaitingPromotion && promotionMove.from == i))
         continue;
 
-      if (board.bitboards[WHITE_PAWN].hasBit(i))
-        window->draw(whitePawns[i]);
-      else if (board.bitboards[WHITE_KNIGHT].hasBit(i))
-        window->draw(whiteKnights[i]);
-      else if (board.bitboards[WHITE_BISHOP].hasBit(i))
-        window->draw(whiteBishops[i]);
-      else if (board.bitboards[WHITE_ROOK].hasBit(i))
-        window->draw(whiteRooks[i]);
-      else if (board.bitboards[WHITE_QUEEN].hasBit(i))
-        window->draw(whiteQueens[i]);
-      else if (board.kingIndices[WHITE] == i)
-        window->draw(whiteKings[i]);
-
-      else if (board.bitboards[BLACK_PAWN].hasBit(i))
-        window->draw(blackPawns[i]);
-      else if (board.bitboards[BLACK_KNIGHT].hasBit(i))
-        window->draw(blackKnights[i]);
-      else if (board.bitboards[BLACK_BISHOP].hasBit(i))
-        window->draw(blackBishops[i]);
-      else if (board.bitboards[BLACK_ROOK].hasBit(i))
-        window->draw(blackRooks[i]);
-      else if (board.bitboards[BLACK_QUEEN].hasBit(i))
-        window->draw(blackQueens[i]);
-      else if (board.kingIndices[BLACK] == i)
-        window->draw(blackKings[i]);
+      window->draw(pieceSprites[board[i]][i]);
     }
 
     if (draggingPieceIndex != -1)
