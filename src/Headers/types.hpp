@@ -70,7 +70,8 @@ namespace Chess
   enum PieceColors
   {
     WHITE = 8,
-    BLACK = 16
+    BLACK = 16,
+    BOTH = WHITE | BLACK
   };
 
   enum Pieces

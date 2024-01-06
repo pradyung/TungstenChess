@@ -37,7 +37,7 @@ namespace Chess
     {
       Event event;
 
-      if (board.sideToMove == (PLAYER_COLOR ^ 24) && !gameOver)
+      if (!(board.sideToMove & PLAYER_COLOR) && !gameOver)
       {
         if (!isThinking)
           startThinking();

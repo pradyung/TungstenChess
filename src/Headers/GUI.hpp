@@ -12,7 +12,7 @@ using namespace sf;
 
 namespace Chess
 {
-  const int PLAYER_COLOR = WHITE;
+  const int PLAYER_COLOR = EMPTY;
 
   enum ScreenConstants
   {

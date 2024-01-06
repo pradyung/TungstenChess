@@ -18,8 +18,8 @@ namespace Chess
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 
-  const int EN_PASSANT = 0x0F;
-  const int CASTLING_RIGHTS = 0x70;
+  const int EN_PASSANT = 0x70;
+  const int CASTLING_RIGHTS = 0x0F;
 
   class Board
   {
