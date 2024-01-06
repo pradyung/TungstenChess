@@ -8,7 +8,7 @@ The bot has currently only been tested on MacOS, but it will also most likely wo
 
 ## Dependencies
 
-The only dependency you will need to compile and run this project is CMake. You do not need to install SFML, as the makefile will install it locally for you.
+The only dependencies you will need to compile and run this project are CMake and OpenGL. You do not need to install SFML, as the makefile will install it locally for you.
 
 ## Compile Instructions
 
