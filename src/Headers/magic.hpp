@@ -18,6 +18,7 @@ namespace Chess
       initBishopLookupTables(movesLookup);
     }
 
+  private:
     std::vector<BitboardInt> getAllBlockers(int square, BitboardInt mask)
     {
       std::vector<int> setBits = std::vector<int>();
