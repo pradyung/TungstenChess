@@ -9,6 +9,7 @@
 #include "bitboard.hpp"
 #include "zobrist.hpp"
 #include "openings.hpp"
+#include "magic.hpp"
 #include "Data/move_gen_helpers.hpp"
 #include "Data/piece_eval_tables.hpp"
 
@@ -93,6 +94,8 @@ namespace Chess
 
     PieceEvalTables pieceEvalTables;
 
+    MagicMoveGen magicMoveGen;
+
     Zobrist zobrist;
 
     ZobristKey getInitialZobristKey();
@@ -159,6 +162,11 @@ namespace Chess
     inline Bitboard getFriendlyPiecesBitboard(int color)
     {
       return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color]);
+    }
+
+    inline Bitboard getEnemyPiecesBitboard(int color)
+    {
+      return getFriendlyPiecesBitboard(color ^ 24);
     }
 
     inline Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)

@@ -73,5 +73,10 @@ namespace Chess
      * @brief Overloads the | operator to return the union of two bitboards
      */
     inline Bitboard operator|(const BitboardInt &other) const { return Bitboard(bitboard | other); }
+
+    /**
+     * @brief Overloads the ~ operator to return the complement of the bitboard
+     */
+    inline Bitboard operator~() const { return Bitboard(~bitboard); }
   };
 }

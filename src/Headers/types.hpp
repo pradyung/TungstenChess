@@ -5,9 +5,11 @@
 namespace Chess
 {
   typedef unsigned long long BitboardInt;
+  typedef unsigned long long Magic;
   typedef unsigned long long ZobristKey;
   typedef uint8_t Piece;
   typedef uint8_t GameState;
+  typedef uint8_t Shift;
 
   enum CastlingRights
   {

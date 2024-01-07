@@ -2,7 +2,7 @@
 
 namespace Chess
 {
-  Board::Board(std::string fen)
+  Board::Board(std::string fen) : magicMoveGen(MagicMoveGen(movesLookup))
   {
     std::string fenParts[6];
 
@@ -325,115 +325,43 @@ namespace Chess
 
   Bitboard Board::getBishopMoves(int pieceIndex, bool _, bool __)
   {
-    Bitboard movesBitboard = Bitboard();
+    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & 24);
+    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & 24);
 
-    int directions[4] = {-9, -7, 7, 9};
+    BitboardInt maskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard.bitboard;
 
-    for (int i = 0; i < 4; i++)
-    {
-      int direction = directions[i];
+    int magicIndex = (maskedBlockers * movesLookup.BISHOP_MAGICS[pieceIndex]) >> movesLookup.BISHOP_SHIFTS[pieceIndex];
 
-      int to = pieceIndex;
-
-      while (true)
-      {
-        bool isEdge = false;
-
-        switch (direction)
-        {
-        case -9:
-          if (to % 8 == 0 || to / 8 == 0)
-            isEdge = true;
-          break;
-        case -7:
-          if (to % 8 == 7 || to / 8 == 0)
-            isEdge = true;
-          break;
-        case 7:
-          if (to % 8 == 0 || to / 8 == 7)
-            isEdge = true;
-          break;
-        case 9:
-          if (to % 8 == 7 || to / 8 == 7)
-            isEdge = true;
-          break;
-        }
-
-        if (isEdge)
-          break;
-
-        to += direction;
-
-        if (pieceCanMove(pieceIndex, to))
-          movesBitboard.addBit(to);
-        else
-          break;
-
-        if (board[to])
-          break;
-      }
-    }
-
-    return movesBitboard;
+    return Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][magicIndex]) & ~friendlyPiecesBitboard;
   }
 
   Bitboard Board::getRookMoves(int pieceIndex, bool _, bool __)
   {
-    Bitboard movesBitboard = Bitboard();
+    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & 24);
+    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & 24);
 
-    int directions[4] = {-8, -1, 1, 8};
+    BitboardInt maskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard.bitboard;
 
-    for (int i = 0; i < 4; i++)
-    {
-      int direction = directions[i];
+    int magicIndex = (maskedBlockers * movesLookup.ROOK_MAGICS[pieceIndex]) >> movesLookup.ROOK_SHIFTS[pieceIndex];
 
-      int to = pieceIndex;
-
-      while (true)
-      {
-        bool isEdge = false;
-
-        switch (direction)
-        {
-        case -8:
-          if (to / 8 == 0)
-            isEdge = true;
-          break;
-        case -1:
-          if (to % 8 == 0)
-            isEdge = true;
-          break;
-        case 1:
-          if (to % 8 == 7)
-            isEdge = true;
-          break;
-        case 8:
-          if (to / 8 == 7)
-            isEdge = true;
-          break;
-        }
-
-        if (isEdge)
-          break;
-
-        to += direction;
-
-        if (pieceCanMove(pieceIndex, to))
-          movesBitboard.addBit(to);
-        else
-          break;
-
-        if (board[to])
-          break;
-      }
-    }
-
-    return movesBitboard;
+    return Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][magicIndex]) & ~friendlyPiecesBitboard;
   }
 
   Bitboard Board::getQueenMoves(int pieceIndex, bool _, bool __)
   {
-    return getBishopMoves(pieceIndex) | getRookMoves(pieceIndex);
+    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & 24);
+    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & 24);
+
+    BitboardInt bishopMaskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard.bitboard;
+    BitboardInt rookMaskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard.bitboard;
+
+    int bishopMagicIndex = (bishopMaskedBlockers * movesLookup.BISHOP_MAGICS[pieceIndex]) >> movesLookup.BISHOP_SHIFTS[pieceIndex];
+    int rookMagicIndex = (rookMaskedBlockers * movesLookup.ROOK_MAGICS[pieceIndex]) >> movesLookup.ROOK_SHIFTS[pieceIndex];
+
+    Bitboard bishopMoves = Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][bishopMagicIndex]);
+    Bitboard rookMoves = Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][rookMagicIndex]);
+
+    return (bishopMoves | rookMoves) & ~friendlyPiecesBitboard;
   }
 
   Bitboard Board::getKingMoves(int pieceIndex, bool includeCastling, bool __)
