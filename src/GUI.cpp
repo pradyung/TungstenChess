@@ -206,7 +206,7 @@ namespace Chess
     piecesTextures[BLACK_QUEEN].loadFromMemory(images.BLACK_QUEEN, images.BLACK_QUEEN_SIZE);
     piecesTextures[BLACK_KING].loadFromMemory(images.BLACK_KING, images.BLACK_KING_SIZE);
 
-    for (int i = 0; i < (BLACK | KING) + 1; i++)
+    for (int i = 0; i < PIECE_NUMBER; i++)
     {
       piecesTextures[i].setSmooth(true);
     }
@@ -216,7 +216,7 @@ namespace Chess
   {
     for (int i = 0; i < 64; i++)
     {
-      for (int j = 0; j < 23; j++)
+      for (int j = 0; j < PIECE_NUMBER; j++)
       {
         pieceSprites[j][i].setTexture(piecesTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));

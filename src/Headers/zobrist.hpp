@@ -20,7 +20,7 @@ namespace Chess
       std::uniform_int_distribution<ZobristKey> dis(0, 0xFFFFFFFFFFFFFFFF);
 
       for (int i = 0; i < 64; i++)
-        for (int j = 0; j < 23; j++)
+        for (int j = 0; j < PIECE_NUMBER; j++)
           pieceKeys[i][j] = dis(gen);
 
       for (int i = 0; i < 16; i++)
@@ -32,7 +32,7 @@ namespace Chess
       sideKey = dis(gen);
     }
 
-    std::array<std::array<ZobristKey, 23>, 64> pieceKeys;
+    std::array<std::array<ZobristKey, PIECE_NUMBER>, 64> pieceKeys;
     std::array<ZobristKey, 16> castlingKeys;
     std::array<ZobristKey, 9> enPassantKeys;
     ZobristKey sideKey;

@@ -145,18 +145,13 @@ namespace Chess
 
     inline void switchSideToMove()
     {
-      sideToMove ^= 24;
+      sideToMove ^= COLOR;
       zobristKey ^= zobrist.sideKey;
     }
 
     inline bool pieceCanMove(int pieceIndex, int to)
     {
-      return (!board[to]) || (board[to] & 24) != (board[pieceIndex] & 24);
-    }
-
-    inline static bool isOnBoard(int x, int y)
-    {
-      return x >= 0 && x <= 7 && y >= 0 && y <= 7;
+      return (!board[to]) || (board[to] & COLOR) != (board[pieceIndex] & COLOR);
     }
 
     inline Bitboard getFriendlyPiecesBitboard(int color)
@@ -166,14 +161,14 @@ namespace Chess
 
     inline Bitboard getEnemyPiecesBitboard(int color)
     {
-      return getFriendlyPiecesBitboard(color ^ 24);
+      return getFriendlyPiecesBitboard(color ^ COLOR);
     }
 
     inline Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
     {
       Bitboard movesBitboard = Bitboard();
 
-      movesBitboard = (this->*getPieceMoves[board[pieceIndex] & 7])(pieceIndex, includeCastling, onlyCaptures);
+      movesBitboard = (this->*getPieceMoves[board[pieceIndex] & TYPE])(pieceIndex, includeCastling, onlyCaptures);
 
       return movesBitboard;
     }

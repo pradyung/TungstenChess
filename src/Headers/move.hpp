@@ -23,7 +23,7 @@ namespace Chess
     Move(int from, int to, int piece, int capturedPiece, GameState state, int promotionPiece = EMPTY)
         : from(from), to(to), piece(piece), capturedPiece(capturedPiece), state(state), promotionPiece(promotionPiece), flags(NORMAL)
     {
-      int pieceType = piece & 7;
+      int pieceType = piece & TYPE;
 
       if (pieceType == KING && from - to == -2)
       {
@@ -82,14 +82,14 @@ namespace Chess
     {
       std::string uci = "";
 
-      uci += 'a' + (from & 7);
+      uci += 'a' + (from & TYPE);
       uci += '8' - (from >> 3);
-      uci += 'a' + (to & 7);
+      uci += 'a' + (to & TYPE);
       uci += '8' - (to >> 3);
 
       if (promotionPiece != EMPTY)
       {
-        uci += ".pnbrqk"[promotionPiece & 7];
+        uci += ".pnbrqk"[promotionPiece & TYPE];
       }
 
       return uci;
