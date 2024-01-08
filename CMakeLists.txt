@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
 project(Chess LANGUAGES CXX)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 include(FetchContent)
 FetchContent_Declare(SFML
