@@ -15,7 +15,8 @@
 
 namespace Chess
 {
-  const int SEARCH_DEPTH = 3;
+  const int SEARCH_DEPTH = 4;
+  const int MAX_QUIESCE_DEPTH = 5;
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 
@@ -85,7 +86,7 @@ namespace Chess
 
     int hasCastled;
 
-    std::map<ZobristKey, int> positionHistory;
+    std::vector<ZobristKey> positionHistory;
 
     Openings openings;
     bool inOpeningBook = true;
@@ -185,6 +186,17 @@ namespace Chess
         bitboards[board[pieceIndex]].removeBit(pieceIndex);
     }
 
+    inline int countRepetitions(ZobristKey key)
+    {
+      int count = 0;
+
+      for (int i = 0; i < positionHistory.size(); i++)
+        if (positionHistory[i] == key)
+          count++;
+
+      return count;
+    }
+
     void unmakeMove(Move move);
 
     Bitboard getPawnMoves(int pieceIndex, bool _ = false, bool onlyCaptures = false);
@@ -223,7 +235,7 @@ namespace Chess
 
     int negamax(int depth, int alpha, int beta);
 
-    int quiesce(int alpha, int beta);
+    int quiesce(int depth, int alpha, int beta);
 
     int heuristicEvaluation(Move move);
 

@@ -110,7 +110,7 @@ namespace Chess
 
     zobristKey = getInitialZobristKey();
 
-    positionHistory[zobristKey]++;
+    positionHistory.push_back(zobristKey);
   }
 
   ZobristKey Board::getInitialZobristKey()
@@ -199,12 +199,12 @@ namespace Chess
     if (move.flags & PAWN_DOUBLE)
       updateEnPassantFile(to % 8);
 
-    positionHistory[zobristKey]++;
+    positionHistory.push_back(zobristKey);
   }
 
   void Board::unmakeMove(Move move)
   {
-    positionHistory[zobristKey]--;
+    positionHistory.pop_back();
 
     switchSideToMove();
 
@@ -444,28 +444,28 @@ namespace Chess
 
   Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling)
   {
-    Bitboard legalMovesBitboard;
+    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, includeCastling);
 
-    legalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, includeCastling);
+    Bitboard legalMovesBitboard = Bitboard();
 
     for (int j = 0; j < 64; j++)
     {
-      if (legalMovesBitboard.hasBit(j))
+      if (pseudoLegalMovesBitboard.hasBit(j))
       {
         Move move = Move(pieceIndex, j, board[pieceIndex], board[j], state, QUEEN);
 
         makeMove(move, true);
 
-        if (isInCheck(board[j] & COLOR))
+        if (!isInCheck(board[j] & COLOR))
         {
-          legalMovesBitboard.removeBit(j);
+          legalMovesBitboard.addBit(j);
         }
 
         unmakeMove(move);
       }
     }
 
-    return legalMovesBitboard;
+    return pseudoLegalMovesBitboard;
   }
 
   bool Board::isInCheck(int color)
@@ -506,11 +506,11 @@ namespace Chess
 
   int Board::getGameStatus(int color)
   {
+    if (countRepetitions(zobristKey) >= 3)
+      return STALEMATE;
+
     if (getLegalMoves(color).size() == 0)
       return isInCheck(color) ? LOSE : STALEMATE;
-
-    if (positionHistory[zobristKey] >= 3)
-      return STALEMATE;
 
     return NO_MATE;
   }
@@ -809,7 +809,7 @@ namespace Chess
   int Board::negamax(int depth, int alpha, int beta)
   {
     if (depth == 0)
-      return quiesce(alpha, beta);
+      return quiesce(MAX_QUIESCE_DEPTH, alpha, beta);
 
     std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
@@ -847,9 +847,12 @@ namespace Chess
     return alpha;
   }
 
-  int Board::quiesce(int alpha, int beta)
+  int Board::quiesce(int depth, int alpha, int beta)
   {
     int standPat = getStaticEvaluation();
+
+    if (depth == 0)
+      return standPat;
 
     if (standPat >= beta)
       return beta;
@@ -878,7 +881,7 @@ namespace Chess
 
       makeMove(legalMoves[i], true);
 
-      int evaluation = -quiesce(-beta, -alpha);
+      int evaluation = -quiesce(depth - 1, -beta, -alpha);
 
       unmakeMove(legalMoves[i]);
 
