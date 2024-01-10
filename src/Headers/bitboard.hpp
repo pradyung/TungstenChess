@@ -26,28 +26,28 @@ namespace Chess
     /**
      * @brief Checks if the bitboard is empty
      */
-    inline bool isEmpty() { return bitboard == 0; }
+    inline bool isEmpty() const { return bitboard == 0; }
 
     /**
      * @brief Checks if the bitboard has a bit at the given index
      * @param index The index of the bit to check, 0-63
      */
-    inline bool hasBit(int index) { return bitboard & (1ULL << index); }
+    inline bool hasBit(int index) const { return bitboard & (1ULL << index); }
 
     /**
      * @brief Counts the number of bits in the bitboard
      */
-    inline int countBits() { return __builtin_popcountll(bitboard); }
+    inline int countBits() const { return __builtin_popcountll(bitboard); }
 
     /**
      * @brief Returns a bitboard with the bits in the given file
      */
-    inline Bitboard file(int file) { return *this & (0x8080808080808080ULL >> file); }
+    inline Bitboard file(int file) const { return *this & (0x8080808080808080ULL >> file); }
 
     /**
      * @brief Returns a bitboard with the bits in the given rank
      */
-    inline Bitboard rank(int rank) { return *this & (0xFFULL << (rank * 8)); }
+    inline Bitboard rank(int rank) const { return *this & (0xFFULL << (rank * 8)); }
 
     /**
      * @brief Overloads the bool constructor to check if the bitboard is not empty

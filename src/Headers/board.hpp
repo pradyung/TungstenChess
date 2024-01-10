@@ -97,7 +97,7 @@ namespace Chess
 
     Zobrist zobrist;
 
-    ZobristKey getInitialZobristKey();
+    ZobristKey getInitialZobristKey() const;
 
     inline void updatePiece(int pieceIndex, Piece piece)
     {
@@ -157,17 +157,17 @@ namespace Chess
       zobristKey ^= zobrist.sideKey;
     }
 
-    inline bool pieceCanMove(int pieceIndex, int to)
+    inline bool pieceCanMove(int pieceIndex, int to) const
     {
       return (!board[to]) || (board[to] & COLOR) != (board[pieceIndex] & COLOR);
     }
 
-    inline Bitboard getFriendlyPiecesBitboard(int color)
+    inline Bitboard getFriendlyPiecesBitboard(int color) const
     {
       return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color | KING]);
     }
 
-    inline Bitboard getEnemyPiecesBitboard(int color)
+    inline Bitboard getEnemyPiecesBitboard(int color) const
     {
       return getFriendlyPiecesBitboard(color ^ COLOR);
     }
@@ -191,7 +191,7 @@ namespace Chess
       bitboards[board[pieceIndex]].removeBit(pieceIndex);
     }
 
-    inline int countRepetitions(ZobristKey key)
+    inline int countRepetitions(ZobristKey key) const
     {
       int count = 0;
 

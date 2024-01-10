@@ -71,7 +71,7 @@ namespace Chess
     positionHistory.push_back(zobristKey);
   }
 
-  ZobristKey Board::getInitialZobristKey()
+  ZobristKey Board::getInitialZobristKey() const
   {
     ZobristKey hash = 0;
 

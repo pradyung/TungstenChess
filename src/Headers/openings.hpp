@@ -39,7 +39,7 @@ namespace Chess
     /**
      * @brief Gets the next move from the opening book, randomly selected weighted by the frequency of the moves
      */
-    int getNextMove() { return getWeightedRandomMove(); }
+    int getNextMove() const { return getWeightedRandomMove(); }
 
   private:
     OpeningBook openingBook;
@@ -48,7 +48,7 @@ namespace Chess
 
     int lastMoveIndex;
 
-    std::vector<int> getChildrenMoves()
+    std::vector<int> getChildrenMoves() const
     {
       std::vector<int> childrenMoves;
       int childrenMovesIndex = 0;
@@ -69,7 +69,7 @@ namespace Chess
       return childrenMoves;
     }
 
-    int getWeightedRandomMove()
+    int getWeightedRandomMove() const
     {
       std::vector<int> childrenMoves = getChildrenMoves();
 

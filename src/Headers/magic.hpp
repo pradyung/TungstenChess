@@ -25,7 +25,7 @@ namespace Chess
     }
 
   private:
-    std::vector<BitboardInt> getAllBlockers(int square, BitboardInt mask)
+    static std::vector<BitboardInt> getAllBlockers(int square, BitboardInt mask)
     {
       std::vector<int> setBits = std::vector<int>();
 
@@ -49,7 +49,7 @@ namespace Chess
       return blockers;
     }
 
-    std::vector<BitboardInt> getShiftedBlockers(Magic magic, Shift shift, int square, std::vector<BitboardInt> blocks)
+    static std::vector<BitboardInt> getShiftedBlockers(Magic magic, Shift shift, int square, std::vector<BitboardInt> blocks)
     {
       std::vector<BitboardInt> shifts = std::vector<BitboardInt>();
 
@@ -59,7 +59,7 @@ namespace Chess
       return shifts;
     }
 
-    BitboardInt getRookMovesBitboard(int square, BitboardInt blockers)
+    static BitboardInt getRookMovesBitboard(int square, BitboardInt blockers)
     {
       BitboardInt movesBitboard = 0;
 
@@ -87,7 +87,7 @@ namespace Chess
       return movesBitboard & ~(1ULL << square);
     }
 
-    BitboardInt getBishopMovesBitboard(int square, BitboardInt blockers)
+    static BitboardInt getBishopMovesBitboard(int square, BitboardInt blockers)
     {
       BitboardInt movesBitboard = 0;
 
@@ -115,7 +115,7 @@ namespace Chess
       return movesBitboard & ~(1ULL << square);
     }
 
-    std::vector<BitboardInt> getAllMovesBitboards(int square, std::vector<BitboardInt> blockers, bool rook)
+    static std::vector<BitboardInt> getAllMovesBitboards(int square, std::vector<BitboardInt> blockers, bool rook)
     {
       std::vector<BitboardInt> moves = std::vector<BitboardInt>();
 
