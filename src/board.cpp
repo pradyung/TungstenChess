@@ -19,6 +19,8 @@ namespace Chess
       fenParts[fenPartIndex] += fen[i];
     }
 
+    bitboards[EMPTY] = Bitboard();
+
     bitboards[WHITE_PAWN] = Bitboard();
     bitboards[WHITE_KNIGHT] = Bitboard();
     bitboards[WHITE_BISHOP] = Bitboard();
@@ -33,7 +35,8 @@ namespace Chess
     bitboards[BLACK_QUEEN] = Bitboard();
     bitboards[BLACK_KING] = Bitboard();
 
-    state = 0;
+    castlingRights = 0;
+    enPassantFile = -1;
 
     sideToMove = WHITE;
 
@@ -93,19 +96,19 @@ namespace Chess
       for (int i = 0; i < fenParts[2].length(); i++)
       {
         if (fenParts[2][i] == 'K')
-          state |= WHITE_KINGSIDE;
+          castlingRights |= WHITE_KINGSIDE;
         else if (fenParts[2][i] == 'Q')
-          state |= WHITE_QUEENSIDE;
+          castlingRights |= WHITE_QUEENSIDE;
         else if (fenParts[2][i] == 'k')
-          state |= BLACK_KINGSIDE;
+          castlingRights |= BLACK_KINGSIDE;
         else if (fenParts[2][i] == 'q')
-          state |= BLACK_QUEENSIDE;
+          castlingRights |= BLACK_QUEENSIDE;
       }
     }
 
     if (fenParts[3] != "-")
     {
-      state = (fenParts[3][0] - 'a') << 4;
+      enPassantFile = fenParts[3][0] - 'a';
     }
 
     zobristKey = getInitialZobristKey();
@@ -125,8 +128,8 @@ namespace Chess
       }
     }
 
-    hash ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
-    hash ^= zobrist.enPassantKeys[state & EN_PASSANT];
+    hash ^= zobrist.castlingKeys[castlingRights];
+    hash ^= zobrist.enPassantKeys[enPassantFile];
 
     if (sideToMove == WHITE)
       hash ^= zobrist.sideKey;
@@ -170,7 +173,7 @@ namespace Chess
 
     movePiece(from, to);
 
-    state &= ~EN_PASSANT;
+    enPassantFile = -1;
 
     if (pieceType == KING)
       removeCastlingRights(pieceColor, CASTLING);
@@ -228,7 +231,8 @@ namespace Chess
       hasCastled &= ~(piece & COLOR);
     }
 
-    updateState(move.state);
+    updateEnPassantFile(move.enPassantFile);
+    updateCastlingRights(move.castlingRights);
 
     if ((piece & TYPE) == KING)
       kingIndices[piece & COLOR] = from;
@@ -268,14 +272,14 @@ namespace Chess
         movesBitboard.addBit(pieceIndex - 7);
       }
 
-      if (state & EN_PASSANT)
+      if (enPassantFile != -1)
       {
-        if (pieceIndex % 8 != 0 && pieceIndex / 8 == 3 && (pieceIndex - 9) % 8 == state >> 4)
+        if (pieceIndex % 8 != 0 && pieceIndex / 8 == 3 && (pieceIndex - 9) % 8 == enPassantFile)
         {
           movesBitboard.addBit(pieceIndex - 9);
         }
 
-        if (pieceIndex % 8 != 7 && pieceIndex / 8 == 3 && (pieceIndex - 7) % 8 == state >> 4)
+        if (pieceIndex % 8 != 7 && pieceIndex / 8 == 3 && (pieceIndex - 7) % 8 == enPassantFile)
         {
           movesBitboard.addBit(pieceIndex - 7);
         }
@@ -301,14 +305,14 @@ namespace Chess
         movesBitboard.addBit(pieceIndex + 9);
       }
 
-      if (state & EN_PASSANT)
+      if (enPassantFile != -1)
       {
-        if (pieceIndex % 8 != 0 && pieceIndex / 8 == 4 && (pieceIndex + 7) % 8 == state >> 4)
+        if (pieceIndex % 8 != 0 && pieceIndex / 8 == 4 && (pieceIndex + 7) % 8 == enPassantFile)
         {
           movesBitboard.addBit(pieceIndex + 7);
         }
 
-        if (pieceIndex % 8 != 7 && pieceIndex / 8 == 4 && (pieceIndex + 9) % 8 == state >> 4)
+        if (pieceIndex % 8 != 7 && pieceIndex / 8 == 4 && (pieceIndex + 9) % 8 == enPassantFile)
         {
           movesBitboard.addBit(pieceIndex + 9);
         }
@@ -370,18 +374,18 @@ namespace Chess
 
     int piece = board[pieceIndex];
 
-    if (includeCastling && state & CASTLING_RIGHTS)
+    if (includeCastling && castlingRights)
     {
       if (piece == WHITE_KING)
       {
-        if (state & WHITE_KINGSIDE)
+        if (castlingRights & WHITE_KINGSIDE)
         {
           if (!board[F1] && !board[G1] && !isInCheck(WHITE) && !isAttacked(F1, BLACK))
           {
             movesBitboard.addBit(G1);
           }
         }
-        if (state & WHITE_QUEENSIDE)
+        if (castlingRights & WHITE_QUEENSIDE)
         {
           if (!board[D1] && !board[C1] && !board[B1] && !isInCheck(WHITE) && !isAttacked(D1, BLACK))
           {
@@ -391,14 +395,14 @@ namespace Chess
       }
       else if (piece == BLACK_KING)
       {
-        if (state & BLACK_KINGSIDE)
+        if (castlingRights & BLACK_KINGSIDE)
         {
           if (!board[F8] && !board[G8] && !isInCheck(BLACK) && !isAttacked(F8, WHITE))
           {
             movesBitboard.addBit(G8);
           }
         }
-        if (state & BLACK_QUEENSIDE)
+        if (castlingRights & BLACK_QUEENSIDE)
         {
           if (!board[D8] && !board[C8] && !board[B8] && !isInCheck(BLACK) && !isAttacked(D8, WHITE))
           {
@@ -423,7 +427,7 @@ namespace Chess
 
       pseudoLegalMovesBitboard.removeBit(toIndex);
 
-      Move move = Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], state, QUEEN);
+      Move move = Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, QUEEN);
 
       makeMove(move, true);
 
@@ -453,14 +457,14 @@ namespace Chess
       {
         if (movesBitboard.hasBit(j))
         {
-          legalMoves.push_back(Move(i, j, board[i], board[j], state));
+          legalMoves.push_back(Move(i, j, board[i], board[j], castlingRights, enPassantFile));
 
           if (legalMoves.back().flags & PROMOTION)
           {
             legalMoves.back().promotionPiece = QUEEN;
-            legalMoves.push_back(Move(i, j, board[i], board[j], state, KNIGHT));
-            legalMoves.push_back(Move(i, j, board[i], board[j], state, BISHOP));
-            legalMoves.push_back(Move(i, j, board[i], board[j], state, ROOK));
+            legalMoves.push_back(Move(i, j, board[i], board[j], castlingRights, enPassantFile, KNIGHT));
+            legalMoves.push_back(Move(i, j, board[i], board[j], castlingRights, enPassantFile, BISHOP));
+            legalMoves.push_back(Move(i, j, board[i], board[j], castlingRights, enPassantFile, ROOK));
           }
         }
       }
@@ -524,7 +528,7 @@ namespace Chess
     int piece = board[from];
     int capturedPiece = board[to];
 
-    return Move(from, to, piece, capturedPiece, state);
+    return Move(from, to, piece, capturedPiece, castlingRights, enPassantFile);
   }
 
   Move Board::generateMoveFromUCI(std::string uci)
@@ -556,7 +560,7 @@ namespace Chess
       }
     }
 
-    return Move(from, to, piece, capturedPiece, state, promotionPiece);
+    return Move(from, to, piece, capturedPiece, castlingRights, enPassantFile, promotionPiece);
   }
 
   Move Board::generateBotMove()
@@ -722,13 +726,13 @@ namespace Chess
     if (bitboards[BLACK_BISHOP].countBits() >= 2)
       evaluationBonus -= BISHOP_PAIR_BONUS;
 
-    if (state & WHITE_KINGSIDE)
+    if (castlingRights & WHITE_KINGSIDE)
       evaluationBonus += CAN_CASTLE_BONUS;
-    if (state & BLACK_KINGSIDE)
+    if (castlingRights & BLACK_KINGSIDE)
       evaluationBonus -= CAN_CASTLE_BONUS;
-    if (state & WHITE_QUEENSIDE)
+    if (castlingRights & WHITE_QUEENSIDE)
       evaluationBonus += CAN_CASTLE_BONUS;
-    if (state & BLACK_QUEENSIDE)
+    if (castlingRights & BLACK_QUEENSIDE)
       evaluationBonus -= CAN_CASTLE_BONUS;
 
     if (hasCastled & WHITE)

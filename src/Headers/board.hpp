@@ -30,8 +30,8 @@ namespace Chess
 
     int sideToMove;
 
-    // Last 4 bits are castling rights, next 3 bits are en passant file
-    GameState state;
+    int castlingRights;
+    int enPassantFile;
 
     Bitboard bitboards[PIECE_NUMBER];
 
@@ -117,9 +117,9 @@ namespace Chess
 
     inline void removeCastlingRights(int rights)
     {
-      zobristKey ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
-      state &= ~rights;
-      zobristKey ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
+      zobristKey ^= zobrist.castlingKeys[castlingRights];
+      castlingRights &= ~rights;
+      zobristKey ^= zobrist.castlingKeys[castlingRights];
     }
 
     inline void removeCastlingRights(int color, int side)
@@ -129,19 +129,16 @@ namespace Chess
 
     inline void updateEnPassantFile(int file)
     {
-      zobristKey ^= zobrist.enPassantKeys[(state & EN_PASSANT) >> 4];
-      state &= ~EN_PASSANT;
-      state |= file << 4;
+      zobristKey ^= zobrist.enPassantKeys[enPassantFile];
+      enPassantFile = file;
       zobristKey ^= zobrist.enPassantKeys[file];
     }
 
-    inline void updateState(int newState)
+    inline void updateCastlingRights(int rights)
     {
-      zobristKey ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
-      zobristKey ^= zobrist.enPassantKeys[(state & EN_PASSANT) >> 4];
-      state = newState;
-      zobristKey ^= zobrist.castlingKeys[state & CASTLING_RIGHTS];
-      zobristKey ^= zobrist.enPassantKeys[(state & EN_PASSANT) >> 4];
+      zobristKey ^= zobrist.castlingKeys[castlingRights];
+      castlingRights = rights;
+      zobristKey ^= zobrist.castlingKeys[castlingRights];
     }
 
     inline void switchSideToMove()
@@ -176,14 +173,12 @@ namespace Chess
 
     inline void addPieceToBitboard(int pieceIndex)
     {
-      if (board[pieceIndex])
-        bitboards[board[pieceIndex]].addBit(pieceIndex);
+      bitboards[board[pieceIndex]].addBit(pieceIndex);
     }
 
     inline void removePieceFromBitboard(int pieceIndex)
     {
-      if (board[pieceIndex])
-        bitboards[board[pieceIndex]].removeBit(pieceIndex);
+      bitboards[board[pieceIndex]].removeBit(pieceIndex);
     }
 
     inline int countRepetitions(ZobristKey key)

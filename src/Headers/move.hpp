@@ -9,7 +9,7 @@ namespace Chess
   class Move
   {
   public:
-    Move() : from(0), to(0), piece(0), capturedPiece(0), state(0), flags(NORMAL) {}
+    Move() : from(0), to(0), piece(0), capturedPiece(0), castlingRights(0), enPassantFile(0), flags(NORMAL) {}
 
     /**
      * @param from The square the piece is moving from
@@ -20,8 +20,8 @@ namespace Chess
      * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
      * @param promotionPiece The piece that the moving piece is being promoted to, if any
      */
-    Move(int from, int to, int piece, int capturedPiece, GameState state, int promotionPiece = EMPTY)
-        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), state(state), promotionPiece(promotionPiece), flags(NORMAL)
+    Move(int from, int to, int piece, int capturedPiece, int castlingRights, int enPassantFile, int promotionPiece = EMPTY)
+        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPiece(promotionPiece), flags(NORMAL)
     {
       int pieceType = piece & TYPE;
 
@@ -66,7 +66,8 @@ namespace Chess
     int capturedPiece;
     int promotionPiece;
 
-    GameState state;
+    int castlingRights;
+    int enPassantFile;
 
     int flags;
 

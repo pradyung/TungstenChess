@@ -68,22 +68,23 @@ namespace Chess
 
         KING_MOVES[square] = 0ULL;
 
-        if (square < 56)
-          KING_MOVES[square] |= position << 8;
-        if (square > 7)
-          KING_MOVES[square] |= position >> 8;
-        if (square % 8 > 0)
-          KING_MOVES[square] |= position << 1;
-        if (square % 8 < 7)
-          KING_MOVES[square] |= position >> 1;
-        if (square < 56 && square % 8 > 0)
-          KING_MOVES[square] |= position << 7;
-        if (square < 56 && square % 8 < 7)
-          KING_MOVES[square] |= position << 9;
-        if (square > 7 && square % 8 > 0)
-          KING_MOVES[square] |= position >> 9;
-        if (square > 7 && square % 8 < 7)
-          KING_MOVES[square] |= position >> 7;
+        int offsets[8] = {-1, 0, 1};
+        int rank = square / 8;
+        int file = square % 8;
+
+        for (int dr = 0; dr < 3; dr++)
+        {
+          for (int df = 0; df < 3; df++)
+          {
+            int toRank = rank + offsets[dr];
+            int toFile = file + offsets[df];
+
+            if (toRank < 0 || toRank > 7 || toFile < 0 || toFile > 7 || (dr == 1 && df == 1))
+              continue;
+
+            KING_MOVES[square] |= 1ULL << (toRank * 8 + toFile);
+          }
+        }
       }
     }
 
