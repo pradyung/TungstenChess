@@ -105,7 +105,7 @@ namespace Chess
 
             int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.state);
+            Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.castlingRights, board.enPassantFile);
 
             if (!(move.flags & PROMOTION))
             {
@@ -280,7 +280,7 @@ namespace Chess
       {
         window->draw(grayHighlightsSprites[i]);
       }
-      else if (yellowHighlightsBitboard.hasBit(i))
+      else if (yellowHighlightsBitboard.hasBit(i) || draggingPieceIndex == i)
       {
         window->draw(yellowHighlightsSprites[i]);
       }

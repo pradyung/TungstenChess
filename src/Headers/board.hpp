@@ -15,8 +15,8 @@
 
 namespace Chess
 {
-  const int SEARCH_DEPTH = 4;
-  const int MAX_QUIESCE_DEPTH = 5;
+  const int SEARCH_DEPTH = 5;
+  const int MAX_QUIESCE_DEPTH = 6;
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 

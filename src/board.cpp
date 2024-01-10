@@ -514,10 +514,19 @@ namespace Chess
     if (countRepetitions(zobristKey) >= 3)
       return STALEMATE;
 
-    if (getLegalMoves(color).size() == 0)
-      return isInCheck(color) ? LOSE : STALEMATE;
+    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(color);
 
-    return NO_MATE;
+    while (friendlyPiecesBitboard.bitboard)
+    {
+      int pieceIndex = __builtin_ctzll(friendlyPiecesBitboard.bitboard);
+
+      friendlyPiecesBitboard.removeBit(pieceIndex);
+
+      if (getLegalPieceMovesBitboard(pieceIndex).bitboard)
+        return NO_MATE;
+    }
+
+    return isInCheck(color) ? LOSE : STALEMATE;
   }
 
   Move Board::generateMoveFromInt(int moveInt)
