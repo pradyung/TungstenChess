@@ -540,10 +540,7 @@ namespace Chess
 
     int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
 
-    if (sideToMove == BLACK)
-      staticEvaluation = -staticEvaluation;
-
-    return staticEvaluation;
+    return sideToMove == WHITE ? staticEvaluation : -staticEvaluation;
   }
 
   int Board::getMaterialEvaluation()
@@ -618,16 +615,7 @@ namespace Chess
 
         if (friendlyPieces.countBits() <= 3 && friendlyPieces.countBits() >= 1)
         {
-          int kingsDistance = 0;
-
-          for (int j = 0; j < 64; j++)
-          {
-            if (board[j] == BLACK_KING)
-            {
-              kingsDistance = abs(i % 8 - j % 8) + abs(i / 8 - j / 8);
-              break;
-            }
-          }
+          int kingsDistance = abs(i % 8 - kingIndices[BLACK_KING] % 8) + abs(i / 8 - kingIndices[BLACK_KING] / 8);
 
           positionalEvaluation += pieceEvalTables.KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
@@ -645,16 +633,7 @@ namespace Chess
 
         if (friendlyPieces.countBits() <= 3 && friendlyPieces.countBits() >= 1)
         {
-          int kingsDistance = 0;
-
-          for (int j = 0; j < 64; j++)
-          {
-            if (board[j] == WHITE_KING)
-            {
-              kingsDistance = abs(i % 8 - j % 8) + abs(i / 8 - j / 8);
-              break;
-            }
-          }
+          int kingsDistance = abs(i % 8 - kingIndices[WHITE_KING] % 8) + abs(i / 8 - kingIndices[WHITE_KING] / 8);
 
           positionalEvaluation -= pieceEvalTables.KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
