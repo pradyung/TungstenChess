@@ -197,6 +197,11 @@ namespace Chess
       return count;
     }
 
+    inline std::vector<Move> getSortedLegalMoves(int color, bool includeCastling = true)
+    {
+      return heuristicSortMoves(getLegalMoves(color, includeCastling));
+    }
+
     void unmakeMove(Move move);
 
     Bitboard getPawnMoves(int pieceIndex, bool _ = false, bool onlyCaptures = false);

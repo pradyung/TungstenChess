@@ -411,6 +411,33 @@ namespace Chess
     return movesBitboard;
   }
 
+  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling)
+  {
+    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, includeCastling);
+
+    Bitboard legalMovesBitboard = Bitboard();
+
+    while (pseudoLegalMovesBitboard.bitboard)
+    {
+      int toIndex = __builtin_ctzll(pseudoLegalMovesBitboard.bitboard);
+
+      pseudoLegalMovesBitboard.removeBit(toIndex);
+
+      Move move = Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], state, QUEEN);
+
+      makeMove(move, true);
+
+      if (!isInCheck(board[toIndex] & COLOR))
+      {
+        legalMovesBitboard.addBit(toIndex);
+      }
+
+      unmakeMove(move);
+    }
+
+    return legalMovesBitboard;
+  }
+
   std::vector<Move> Board::getLegalMoves(int color, bool includeCastling)
   {
     std::vector<Move> legalMoves;
@@ -440,32 +467,6 @@ namespace Chess
     }
 
     return legalMoves;
-  }
-
-  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling)
-  {
-    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, includeCastling);
-
-    Bitboard legalMovesBitboard = Bitboard();
-
-    for (int j = 0; j < 64; j++)
-    {
-      if (pseudoLegalMovesBitboard.hasBit(j))
-      {
-        Move move = Move(pieceIndex, j, board[pieceIndex], board[j], state, QUEEN);
-
-        makeMove(move, true);
-
-        if (!isInCheck(board[j] & COLOR))
-        {
-          legalMovesBitboard.addBit(j);
-        }
-
-        unmakeMove(move);
-      }
-    }
-
-    return pseudoLegalMovesBitboard;
   }
 
   bool Board::isInCheck(int color)
@@ -806,95 +807,6 @@ namespace Chess
     return evaluationBonus;
   }
 
-  int Board::negamax(int depth, int alpha, int beta)
-  {
-    if (depth == 0)
-      return quiesce(MAX_QUIESCE_DEPTH, alpha, beta);
-
-    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
-
-    legalMoves = heuristicSortMoves(legalMoves);
-
-    int legalMovesCount = legalMoves.size();
-
-    if (legalMovesCount == 0)
-    {
-      if (isInCheck(sideToMove))
-        return -1000000;
-      else
-        return 0;
-    }
-
-    for (int i = 0; i < legalMovesCount; i++)
-    {
-      makeMove(legalMoves[i], true);
-
-      int evaluation = -negamax(depth - 1, -beta, -alpha);
-
-      unmakeMove(legalMoves[i]);
-
-      if (evaluation > alpha)
-      {
-        alpha = evaluation;
-      }
-
-      if (alpha >= beta)
-      {
-        return beta;
-      }
-    }
-
-    return alpha;
-  }
-
-  int Board::quiesce(int depth, int alpha, int beta)
-  {
-    int standPat = getStaticEvaluation();
-
-    if (depth == 0)
-      return standPat;
-
-    if (standPat >= beta)
-      return beta;
-
-    if (alpha < standPat)
-      alpha = standPat;
-
-    std::vector<Move> legalMoves = getLegalMoves(sideToMove, false);
-
-    legalMoves = heuristicSortMoves(legalMoves);
-
-    int legalMovesCount = legalMoves.size();
-
-    if (legalMovesCount == 0)
-    {
-      if (isInCheck(sideToMove))
-        return -1000000;
-      else
-        return 0;
-    }
-
-    for (int i = 0; i < legalMovesCount; i++)
-    {
-      if (!(legalMoves[i].flags & CAPTURE))
-        continue;
-
-      makeMove(legalMoves[i], true);
-
-      int evaluation = -quiesce(depth - 1, -beta, -alpha);
-
-      unmakeMove(legalMoves[i]);
-
-      if (evaluation >= beta)
-        return beta;
-
-      if (evaluation > alpha)
-        alpha = evaluation;
-    }
-
-    return alpha;
-  }
-
   Move Board::generateOneDeepMove()
   {
     std::vector<Move> legalMoves = getLegalMoves(sideToMove);
@@ -925,14 +837,93 @@ namespace Chess
     return legalMoves[bestMoveIndex];
   }
 
+  int Board::negamax(int depth, int alpha, int beta)
+  {
+    if (depth == 0)
+      return quiesce(MAX_QUIESCE_DEPTH, alpha, beta);
+
+    std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove);
+
+    int legalMovesCount = legalMoves.size();
+
+    if (legalMovesCount == 0)
+    {
+      if (isInCheck(sideToMove))
+        return -1000000;
+      else
+        return 0;
+    }
+
+    for (int i = 0; i < legalMovesCount; i++)
+    {
+      makeMove(legalMoves[i], true);
+
+      int evaluation = -negamax(depth - 1, -beta, -alpha);
+
+      unmakeMove(legalMoves[i]);
+
+      if (evaluation > alpha)
+        alpha = evaluation;
+
+      if (alpha >= beta)
+        return beta;
+    }
+
+    return alpha;
+  }
+
+  int Board::quiesce(int depth, int alpha, int beta)
+  {
+    int standPat = getStaticEvaluation();
+
+    if (depth == 0)
+      return standPat;
+
+    if (standPat >= beta)
+      return beta;
+
+    if (alpha < standPat)
+      alpha = standPat;
+
+    std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove, false);
+
+    int legalMovesCount = legalMoves.size();
+
+    if (legalMovesCount == 0)
+    {
+      if (isInCheck(sideToMove))
+        return -1000000;
+      else
+        return 0;
+    }
+
+    for (int i = 0; i < legalMovesCount; i++)
+    {
+      if (!(legalMoves[i].flags & CAPTURE))
+        continue;
+
+      makeMove(legalMoves[i], true);
+
+      int evaluation = -quiesce(depth - 1, -beta, -alpha);
+
+      unmakeMove(legalMoves[i]);
+
+      if (evaluation > alpha)
+        alpha = evaluation;
+
+      if (alpha >= beta)
+        return beta;
+    }
+
+    return alpha;
+  }
+
   Move Board::generateBestMove(int depth, int alpha, int beta)
   {
     if (depth == 0)
       return generateOneDeepMove();
 
-    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
-
-    legalMoves = heuristicSortMoves(legalMoves);
+    std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove);
 
     int legalMovesCount = legalMoves.size();
 
@@ -957,14 +948,10 @@ namespace Chess
       }
 
       if (evaluation > alpha)
-      {
         alpha = evaluation;
-      }
 
       if (alpha >= beta)
-      {
         break;
-      }
     }
 
     return legalMoves[bestMoveIndex];
