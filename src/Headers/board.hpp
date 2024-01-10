@@ -16,12 +16,9 @@
 namespace Chess
 {
   const int SEARCH_DEPTH = 5;
-  const int MAX_QUIESCE_DEPTH = 6;
+  const int QUIESCE_DEPTH = 5;
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
-
-  const int EN_PASSANT = 0x70;
-  const int CASTLING_RIGHTS = 0x0F;
 
   class Board
   {
@@ -37,7 +34,8 @@ namespace Chess
 
     ZobristKey zobristKey;
 
-    int kingIndices[BLACK + 1];
+    // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
+    int kingIndices[PIECE_NUMBER];
 
     /**
      * @brief Returns the bitboard of the squares a piece can move to
@@ -101,7 +99,19 @@ namespace Chess
 
     ZobristKey getInitialZobristKey();
 
-    void updatePiece(int pieceIndex, Piece piece);
+    inline void updatePiece(int pieceIndex, Piece piece)
+    {
+      zobristKey ^= zobrist.pieceKeys[pieceIndex][board[pieceIndex]];
+      zobristKey ^= zobrist.pieceKeys[pieceIndex][piece];
+
+      kingIndices[piece] = pieceIndex;
+
+      removePieceFromBitboard(pieceIndex);
+
+      board[pieceIndex] = piece;
+
+      addPieceToBitboard(pieceIndex);
+    }
 
     inline void movePiece(int from, int to)
     {
@@ -154,7 +164,7 @@ namespace Chess
 
     inline Bitboard getFriendlyPiecesBitboard(int color)
     {
-      return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color]);
+      return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color | KING]);
     }
 
     inline Bitboard getEnemyPiecesBitboard(int color)

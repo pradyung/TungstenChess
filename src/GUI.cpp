@@ -340,7 +340,7 @@ namespace Chess
     clearHighlights();
 
     if (board.isInCheck(board.sideToMove))
-      redHighlightsBitboard.addBit(board.kingIndices[board.sideToMove]);
+      redHighlightsBitboard.addBit(board.kingIndices[board.sideToMove | KING]);
 
     int gameStatus = board.getGameStatus(board.sideToMove);
 

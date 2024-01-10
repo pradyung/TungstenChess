@@ -19,22 +19,6 @@ namespace Chess
       fenParts[fenPartIndex] += fen[i];
     }
 
-    bitboards[EMPTY] = Bitboard();
-
-    bitboards[WHITE_PAWN] = Bitboard();
-    bitboards[WHITE_KNIGHT] = Bitboard();
-    bitboards[WHITE_BISHOP] = Bitboard();
-    bitboards[WHITE_ROOK] = Bitboard();
-    bitboards[WHITE_QUEEN] = Bitboard();
-    bitboards[WHITE_KING] = Bitboard();
-
-    bitboards[BLACK_PAWN] = Bitboard();
-    bitboards[BLACK_KNIGHT] = Bitboard();
-    bitboards[BLACK_BISHOP] = Bitboard();
-    bitboards[BLACK_ROOK] = Bitboard();
-    bitboards[BLACK_QUEEN] = Bitboard();
-    bitboards[BLACK_KING] = Bitboard();
-
     castlingRights = 0;
     enPassantFile = -1;
 
@@ -44,43 +28,14 @@ namespace Chess
     for (int i = 0; i < fenParts[0].length(); i++)
     {
       if (fen[i] == '/')
-      {
         continue;
-      }
       else if (isdigit(fen[i]))
-      {
         pieceIndex += fen[i] - '0';
-      }
       else
       {
         board[pieceIndex] = std::string("PNBRQK..pnbrqk").find(fen[i]) + WHITE_PAWN;
 
-        if (fen[i] == 'K')
-          kingIndices[WHITE] = pieceIndex;
-        else if (fen[i] == 'k')
-          kingIndices[BLACK] = pieceIndex;
-
-        if (fen[i] == 'P')
-          bitboards[WHITE_PAWN].addBit(pieceIndex);
-        else if (fen[i] == 'N')
-          bitboards[WHITE_KNIGHT].addBit(pieceIndex);
-        else if (fen[i] == 'B')
-          bitboards[WHITE_BISHOP].addBit(pieceIndex);
-        else if (fen[i] == 'R')
-          bitboards[WHITE_ROOK].addBit(pieceIndex);
-        else if (fen[i] == 'Q')
-          bitboards[WHITE_QUEEN].addBit(pieceIndex);
-
-        else if (fen[i] == 'p')
-          bitboards[BLACK_PAWN].addBit(pieceIndex);
-        else if (fen[i] == 'n')
-          bitboards[BLACK_KNIGHT].addBit(pieceIndex);
-        else if (fen[i] == 'b')
-          bitboards[BLACK_BISHOP].addBit(pieceIndex);
-        else if (fen[i] == 'r')
-          bitboards[BLACK_ROOK].addBit(pieceIndex);
-        else if (fen[i] == 'q')
-          bitboards[BLACK_QUEEN].addBit(pieceIndex);
+        updatePiece(pieceIndex, board[pieceIndex]);
 
         pieceIndex++;
       }
@@ -135,21 +90,6 @@ namespace Chess
       hash ^= zobrist.sideKey;
 
     return hash;
-  }
-
-  void Board::updatePiece(int pieceIndex, Piece piece)
-  {
-    zobristKey ^= zobrist.pieceKeys[pieceIndex][board[pieceIndex]];
-    zobristKey ^= zobrist.pieceKeys[pieceIndex][piece];
-
-    if ((piece & TYPE) == KING)
-      kingIndices[piece & COLOR] = pieceIndex;
-
-    removePieceFromBitboard(pieceIndex);
-
-    board[pieceIndex] = piece;
-
-    addPieceToBitboard(pieceIndex);
   }
 
   void Board::makeMove(Move move, bool speculative)
@@ -234,8 +174,7 @@ namespace Chess
     updateEnPassantFile(move.enPassantFile);
     updateCastlingRights(move.castlingRights);
 
-    if ((piece & TYPE) == KING)
-      kingIndices[piece & COLOR] = from;
+    kingIndices[piece] = from;
 
     if (move.flags & EP_CAPTURE)
     {
@@ -334,7 +273,7 @@ namespace Chess
 
     BitboardInt maskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard.bitboard;
 
-    int magicIndex = (maskedBlockers * movesLookup.BISHOP_MAGICS[pieceIndex]) >> movesLookup.BISHOP_SHIFTS[pieceIndex];
+    int magicIndex = (maskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
 
     return Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][magicIndex]) & ~friendlyPiecesBitboard;
   }
@@ -346,7 +285,7 @@ namespace Chess
 
     BitboardInt maskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard.bitboard;
 
-    int magicIndex = (maskedBlockers * movesLookup.ROOK_MAGICS[pieceIndex]) >> movesLookup.ROOK_SHIFTS[pieceIndex];
+    int magicIndex = (maskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
 
     return Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][magicIndex]) & ~friendlyPiecesBitboard;
   }
@@ -359,8 +298,8 @@ namespace Chess
     BitboardInt bishopMaskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard.bitboard;
     BitboardInt rookMaskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard.bitboard;
 
-    int bishopMagicIndex = (bishopMaskedBlockers * movesLookup.BISHOP_MAGICS[pieceIndex]) >> movesLookup.BISHOP_SHIFTS[pieceIndex];
-    int rookMagicIndex = (rookMaskedBlockers * movesLookup.ROOK_MAGICS[pieceIndex]) >> movesLookup.ROOK_SHIFTS[pieceIndex];
+    int bishopMagicIndex = (bishopMaskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
+    int rookMagicIndex = (rookMaskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
 
     Bitboard bishopMoves = Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][bishopMagicIndex]);
     Bitboard rookMoves = Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][rookMagicIndex]);
@@ -475,7 +414,7 @@ namespace Chess
 
   bool Board::isInCheck(int color)
   {
-    return isAttacked(kingIndices[color], color ^ COLOR);
+    return isAttacked(kingIndices[color | KING], color ^ COLOR);
   }
 
   bool Board::isAttacked(int square, int color)
@@ -609,7 +548,6 @@ namespace Chess
 
   int Board::getMaterialEvaluation()
   {
-
     int materialEvaluation = 0;
 
     materialEvaluation += bitboards[WHITE_PAWN].countBits() * PIECE_VALUES[PAWN];
@@ -853,7 +791,7 @@ namespace Chess
   int Board::negamax(int depth, int alpha, int beta)
   {
     if (depth == 0)
-      return quiesce(MAX_QUIESCE_DEPTH, alpha, beta);
+      return quiesce(QUIESCE_DEPTH, alpha, beta);
 
     std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove);
 
