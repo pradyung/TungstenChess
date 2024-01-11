@@ -8,13 +8,8 @@ namespace Chess
   typedef unsigned long long Magic;
   typedef unsigned long long ZobristKey;
   typedef uint8_t Piece;
+  typedef uint8_t GameState;
   typedef uint8_t Shift;
-  typedef uint8_t Square;
-  typedef uint16_t MagicIndex;
-  typedef int MoveInt;
-  typedef int Evaluation;
-
-  const uint8_t MAX_UINT8 = 255;
 
   enum CastlingRights
   {

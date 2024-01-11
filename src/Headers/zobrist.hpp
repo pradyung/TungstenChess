@@ -19,14 +19,14 @@ namespace Chess
       std::mt19937_64 gen(rd());
       std::uniform_int_distribution<ZobristKey> dis(0, 0xFFFFFFFFFFFFFFFF);
 
-      for (Square i = 0; i < 64; i++)
-        for (Piece j = 0; j < PIECE_NUMBER; j++)
+      for (int i = 0; i < 64; i++)
+        for (int j = 0; j < PIECE_NUMBER; j++)
           pieceKeys[i][j] = dis(gen);
 
-      for (uint8_t i = 0; i < 16; i++)
+      for (int i = 0; i < 16; i++)
         castlingKeys[i] = dis(gen);
 
-      for (uint8_t i = 0; i < 9; i++)
+      for (int i = 0; i < 9; i++)
         enPassantKeys[i] = dis(gen);
 
       sideKey = dis(gen);

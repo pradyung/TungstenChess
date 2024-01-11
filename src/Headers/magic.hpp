@@ -25,21 +25,21 @@ namespace Chess
     }
 
   private:
-    static std::vector<BitboardInt> getAllBlockers(Square square, BitboardInt mask)
+    static std::vector<BitboardInt> getAllBlockers(int square, BitboardInt mask)
     {
-      std::vector<Square> setBits = std::vector<Square>();
+      std::vector<int> setBits = std::vector<int>();
 
-      for (Square i = 0; i < 64; i++)
+      for (int i = 0; i < 64; i++)
         if (mask & (1ULL << i))
           setBits.push_back(i);
 
       std::vector<BitboardInt> blockers = std::vector<BitboardInt>();
 
-      for (uint32_t i = 0; i < (1 << setBits.size()); i++)
+      for (int i = 0; i < (1 << setBits.size()); i++)
       {
         BitboardInt blocker = 0;
 
-        for (uint8_t j = 0; j < setBits.size(); j++)
+        for (int j = 0; j < setBits.size(); j++)
           if (i & (1 << j))
             blocker |= 1ULL << setBits[j];
 
@@ -49,27 +49,27 @@ namespace Chess
       return blockers;
     }
 
-    static std::vector<BitboardInt> getShiftedBlockers(Magic magic, Shift shift, Square square, std::vector<BitboardInt> blocks)
+    static std::vector<BitboardInt> getShiftedBlockers(Magic magic, Shift shift, int square, std::vector<BitboardInt> blocks)
     {
       std::vector<BitboardInt> shifts = std::vector<BitboardInt>();
 
-      for (uint32_t i = 0; i < blocks.size(); i++)
+      for (int i = 0; i < blocks.size(); i++)
         shifts.push_back((magic * blocks[i]) >> shift);
 
       return shifts;
     }
 
-    static BitboardInt getRookMovesBitboard(Square square, BitboardInt blockers)
+    static BitboardInt getRookMovesBitboard(int square, BitboardInt blockers)
     {
       BitboardInt movesBitboard = 0;
 
-      int8_t directions[4] = {-8, -1, 1, 8};
-      int8_t rankEdges[4] = {0, -1, -1, 7};
-      int8_t fileEdges[4] = {-1, 0, 7, -1};
+      int directions[4] = {-8, -1, 1, 8};
+      int rankEdges[4] = {0, -1, -1, 7};
+      int fileEdges[4] = {-1, 0, 7, -1};
 
-      for (uint8_t i = 0; i < 4; i++)
+      for (int i = 0; i < 4; i++)
       {
-        Square to = square;
+        int to = square;
 
         while (true)
         {
@@ -87,17 +87,17 @@ namespace Chess
       return movesBitboard & ~(1ULL << square);
     }
 
-    static BitboardInt getBishopMovesBitboard(Square square, BitboardInt blockers)
+    static BitboardInt getBishopMovesBitboard(int square, BitboardInt blockers)
     {
       BitboardInt movesBitboard = 0;
 
-      int8_t directions[4] = {-9, -7, 7, 9};
-      int8_t rankEdges[4] = {0, 0, 7, 7};
-      int8_t fileEdges[4] = {0, 7, 0, 7};
+      int directions[4] = {-9, -7, 7, 9};
+      int rankEdges[4] = {0, 0, 7, 7};
+      int fileEdges[4] = {0, 7, 0, 7};
 
-      for (uint8_t i = 0; i < 4; i++)
+      for (int i = 0; i < 4; i++)
       {
-        Square to = square;
+        int to = square;
 
         while (true)
         {
@@ -115,11 +115,11 @@ namespace Chess
       return movesBitboard & ~(1ULL << square);
     }
 
-    static std::vector<BitboardInt> getAllMovesBitboards(Square square, std::vector<BitboardInt> blockers, bool rook)
+    static std::vector<BitboardInt> getAllMovesBitboards(int square, std::vector<BitboardInt> blockers, bool rook)
     {
       std::vector<BitboardInt> moves = std::vector<BitboardInt>();
 
-      for (uint32_t i = 0; i < blockers.size(); i++)
+      for (int i = 0; i < blockers.size(); i++)
       {
         if (rook)
           moves.push_back(getRookMovesBitboard(square, blockers[i]));
@@ -130,7 +130,7 @@ namespace Chess
       return moves;
     }
 
-    std::vector<BitboardInt> getMovesLookupTable(MovesLookup &movesLookup, Square square, bool rook)
+    std::vector<BitboardInt> getMovesLookupTable(MovesLookup &movesLookup, int square, bool rook)
     {
       Magic magic = rook ? ROOK_MAGICS[square] : BISHOP_MAGICS[square];
       Shift shift = rook ? ROOK_SHIFTS[square] : BISHOP_SHIFTS[square];
@@ -140,12 +140,12 @@ namespace Chess
       std::vector<BitboardInt> moves = getAllMovesBitboards(square, blocks, rook);
 
       BitboardInt maxShift = 0;
-      for (uint32_t i = 0; i < shifts.size(); i++)
+      for (int i = 0; i < shifts.size(); i++)
         maxShift = std::max(maxShift, shifts[i]);
 
       std::vector<BitboardInt> lookupTable = std::vector<BitboardInt>(maxShift + 1, 0);
 
-      for (uint32_t i = 0; i < shifts.size(); i++)
+      for (int i = 0; i < shifts.size(); i++)
         lookupTable[shifts[i]] = moves[i];
 
       return lookupTable;
@@ -155,7 +155,7 @@ namespace Chess
     {
       ROOK_LOOKUP_TABLES = std::array<std::vector<BitboardInt>, 64>();
 
-      for (Square i = 0; i < 64; i++)
+      for (int i = 0; i < 64; i++)
       {
         ROOK_LOOKUP_TABLES[i] = getMovesLookupTable(movesLookup, i, true);
       }
@@ -165,7 +165,7 @@ namespace Chess
     {
       BISHOP_LOOKUP_TABLES = std::array<std::vector<BitboardInt>, 64>();
 
-      for (Square i = 0; i < 64; i++)
+      for (int i = 0; i < 64; i++)
       {
         BISHOP_LOOKUP_TABLES[i] = getMovesLookupTable(movesLookup, i, false);
       }

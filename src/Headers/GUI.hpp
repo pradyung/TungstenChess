@@ -12,7 +12,7 @@ using namespace sf;
 
 namespace Chess
 {
-  const Piece PLAYER_COLOR = WHITE;
+  const int PLAYER_COLOR = WHITE;
 
   enum ScreenConstants
   {
@@ -60,14 +60,14 @@ namespace Chess
     Bitboard yellowHighlightsBitboard;
     Bitboard grayHighlightsBitboard;
 
-    Square yellowOutlineIndex = MAX_UINT8;
+    int yellowOutlineIndex = -1;
 
     Sprite redHighlightsSprites[64];
     Sprite yellowHighlightsSprites[64];
     Sprite grayHighlightsSprites[64];
     Sprite yellowOutlineSprites[64];
 
-    Square draggingPieceIndex = MAX_UINT8;
+    int draggingPieceIndex = -1;
     Sprite draggingPieceSprite;
 
     Sprite whitePromotionPieces[4];
@@ -91,7 +91,7 @@ namespace Chess
     void loadPromotionPieces();
 
     void clearHighlights();
-    void clearHighlights(uint8_t highlight);
+    void clearHighlights(int highlight);
 
     void makeMove(Move move);
     void makeBotMove();
@@ -104,11 +104,11 @@ namespace Chess
     void drawHighlights();
     void drawPromotionPieces();
 
-    static Square getSquareIndex(int x, int y) { return (y / SQUARE_SIZE) * 8 + (x / SQUARE_SIZE); }
+    static int getSquareIndex(int x, int y) { return (y / SQUARE_SIZE) * 8 + (x / SQUARE_SIZE); }
 
-    static Square getPromotionPiece(int x, int y)
+    static int getPromotionPiece(int x, int y)
     {
-      Square index = getSquareIndex(x, y);
+      int index = getSquareIndex(x, y);
 
       switch (index)
       {
@@ -129,11 +129,11 @@ namespace Chess
       case 53:
         return BLACK_KNIGHT;
       default:
-        return EMPTY;
+        return -1;
       }
     }
 
-    static Vector2f getSquareCoordinates(Square index) { return getSquareCoordinates(index % 8, index / 8); }
-    static Vector2f getSquareCoordinates(Square x, Square y) { return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE); }
+    static Vector2f getSquareCoordinates(int index) { return getSquareCoordinates(index % 8, index / 8); }
+    static Vector2f getSquareCoordinates(int x, int y) { return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE); }
   };
 }

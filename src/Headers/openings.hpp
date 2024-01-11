@@ -16,9 +16,9 @@ namespace Chess
      * @param move The move to add
      * @return Whether the move was added successfully - if false, the move is not in the opening book
      */
-    bool addMove(MoveInt move)
+    bool addMove(int move)
     {
-      for (int16_t i = lastMoveIndex + 1;; i++)
+      for (int i = lastMoveIndex + 1;; i++)
       {
         if (openingBook[i] >> 25 == moves.size() - 1)
         {
@@ -39,21 +39,21 @@ namespace Chess
     /**
      * @brief Gets the next move from the opening book, randomly selected weighted by the frequency of the moves
      */
-    MoveInt getNextMove() const { return getWeightedRandomMove(); }
+    int getNextMove() const { return getWeightedRandomMove(); }
 
   private:
     OpeningBook openingBook;
 
-    std::vector<MoveInt> moves;
+    std::vector<int> moves;
 
-    int16_t lastMoveIndex;
+    int lastMoveIndex;
 
-    std::vector<MoveInt> getChildrenMoves() const
+    std::vector<int> getChildrenMoves() const
     {
-      std::vector<MoveInt> childrenMoves;
-      int16_t childrenMovesIndex = 0;
+      std::vector<int> childrenMoves;
+      int childrenMovesIndex = 0;
 
-      for (int16_t i = lastMoveIndex + 1;; i++)
+      for (int i = lastMoveIndex + 1;; i++)
       {
         if (openingBook[i] >> 25 == moves.size())
         {
@@ -69,25 +69,25 @@ namespace Chess
       return childrenMoves;
     }
 
-    MoveInt getWeightedRandomMove() const
+    int getWeightedRandomMove() const
     {
-      std::vector<MoveInt> childrenMoves = getChildrenMoves();
+      std::vector<int> childrenMoves = getChildrenMoves();
 
       if (childrenMoves.size() == 0)
         return -1;
 
-      uint16_t totalWeight = 0;
+      int totalWeight = 0;
 
-      for (uint8_t i = 0; i < childrenMoves.size(); i++)
+      for (int i = 0; i < childrenMoves.size(); i++)
       {
         totalWeight += openingBook[lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
       }
 
-      uint16_t randomWeight = rand() % totalWeight;
+      int randomWeight = rand() % totalWeight;
 
-      uint16_t currentWeight = 0;
+      int currentWeight = 0;
 
-      for (uint16_t i = 0; i < childrenMoves.size(); i++)
+      for (int i = 0; i < childrenMoves.size(); i++)
       {
         currentWeight += openingBook[lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
 

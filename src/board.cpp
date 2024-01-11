@@ -6,9 +6,9 @@ namespace Chess
   {
     std::string fenParts[6];
 
-    uint8_t fenPartIndex = 0;
+    int fenPartIndex = 0;
 
-    for (uint8_t i = 0; i < fen.length(); i++)
+    for (int i = 0; i < fen.length(); i++)
     {
       if (fen[i] == ' ')
       {
@@ -20,12 +20,12 @@ namespace Chess
     }
 
     castlingRights = 0;
-    enPassantFile = MAX_UINT8;
+    enPassantFile = -1;
 
     sideToMove = WHITE;
 
-    Square pieceIndex = 0;
-    for (uint8_t i = 0; i < fenParts[0].length(); i++)
+    int pieceIndex = 0;
+    for (int i = 0; i < fenParts[0].length(); i++)
     {
       if (fen[i] == '/')
         continue;
@@ -48,7 +48,7 @@ namespace Chess
 
     if (fenParts[2] != "-")
     {
-      for (uint8_t i = 0; i < fenParts[2].length(); i++)
+      for (int i = 0; i < fenParts[2].length(); i++)
       {
         if (fenParts[2][i] == 'K')
           castlingRights |= WHITE_KINGSIDE;
@@ -75,7 +75,7 @@ namespace Chess
   {
     ZobristKey hash = 0;
 
-    for (Square i = 0; i < 64; i++)
+    for (int i = 0; i < 64; i++)
     {
       if (board[i])
       {
@@ -99,21 +99,21 @@ namespace Chess
     if (!speculative && inOpeningBook)
       inOpeningBook = openings.addMove(move.toInt());
 
-    Square from = move.from;
-    Square to = move.to;
-    Piece piece = move.piece;
-    Piece capturedPiece = move.capturedPiece;
-    Piece promotionPiece = move.promotionPiece & TYPE;
+    int from = move.from;
+    int to = move.to;
+    int piece = move.piece;
+    int capturedPiece = move.capturedPiece;
+    int promotionPiece = move.promotionPiece & TYPE;
 
-    Piece pieceType = piece & TYPE;
-    Piece pieceColor = piece & COLOR;
+    int pieceType = piece & TYPE;
+    int pieceColor = piece & COLOR;
 
-    Piece capturedPieceType = capturedPiece & TYPE;
-    Piece capturedPieceColor = capturedPiece & COLOR;
+    int capturedPieceType = capturedPiece & TYPE;
+    int capturedPieceColor = capturedPiece & COLOR;
 
     movePiece(from, to);
 
-    enPassantFile = MAX_UINT8;
+    enPassantFile = -1;
 
     if (pieceType == KING)
       removeCastlingRights(pieceColor, CASTLING);
@@ -151,11 +151,11 @@ namespace Chess
 
     switchSideToMove();
 
-    Square from = move.from;
-    Square to = move.to;
-    Piece piece = move.piece;
-    Piece capturedPiece = move.capturedPiece;
-    Piece promotionPiece = move.promotionPiece;
+    int from = move.from;
+    int to = move.to;
+    int piece = move.piece;
+    int capturedPiece = move.capturedPiece;
+    int promotionPiece = move.promotionPiece;
 
     unmovePiece(from, to, piece, capturedPiece);
 
@@ -185,11 +185,11 @@ namespace Chess
     }
   }
 
-  Bitboard Board::getPawnMoves(Square pieceIndex, bool _, bool onlyCaptures)
+  Bitboard Board::getPawnMoves(int pieceIndex, bool _, bool onlyCaptures)
   {
     Bitboard movesBitboard = Bitboard();
 
-    Piece piece = board[pieceIndex];
+    int piece = board[pieceIndex];
 
     if (piece == WHITE_PAWN)
     {
@@ -211,7 +211,7 @@ namespace Chess
         movesBitboard.addBit(pieceIndex - 7);
       }
 
-      if (enPassantFile != MAX_UINT8)
+      if (enPassantFile != -1)
       {
         if (pieceIndex % 8 != 0 && pieceIndex / 8 == 3 && (pieceIndex - 9) % 8 == enPassantFile)
         {
@@ -244,7 +244,7 @@ namespace Chess
         movesBitboard.addBit(pieceIndex + 9);
       }
 
-      if (enPassantFile != MAX_UINT8)
+      if (enPassantFile != -1)
       {
         if (pieceIndex % 8 != 0 && pieceIndex / 8 == 4 && (pieceIndex + 7) % 8 == enPassantFile)
         {
@@ -261,36 +261,36 @@ namespace Chess
     return movesBitboard;
   }
 
-  Bitboard Board::getKnightMoves(Square pieceIndex, bool _, bool __)
+  Bitboard Board::getKnightMoves(int pieceIndex, bool _, bool __)
   {
     return Bitboard(movesLookup.KNIGHT_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR).bitboard);
   }
 
-  Bitboard Board::getBishopMoves(Square pieceIndex, bool _, bool __)
+  Bitboard Board::getBishopMoves(int pieceIndex, bool _, bool __)
   {
     Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
     Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
 
     BitboardInt maskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard.bitboard;
 
-    MagicIndex magicIndex = (maskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
+    int magicIndex = (maskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
 
     return Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][magicIndex]) & ~friendlyPiecesBitboard;
   }
 
-  Bitboard Board::getRookMoves(Square pieceIndex, bool _, bool __)
+  Bitboard Board::getRookMoves(int pieceIndex, bool _, bool __)
   {
     Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
     Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
 
     BitboardInt maskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard.bitboard;
 
-    MagicIndex magicIndex = (maskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
+    int magicIndex = (maskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
 
     return Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][magicIndex]) & ~friendlyPiecesBitboard;
   }
 
-  Bitboard Board::getQueenMoves(Square pieceIndex, bool _, bool __)
+  Bitboard Board::getQueenMoves(int pieceIndex, bool _, bool __)
   {
     Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
     Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
@@ -298,8 +298,8 @@ namespace Chess
     BitboardInt bishopMaskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard.bitboard;
     BitboardInt rookMaskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard.bitboard;
 
-    MagicIndex bishopMagicIndex = (bishopMaskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
-    MagicIndex rookMagicIndex = (rookMaskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
+    int bishopMagicIndex = (bishopMaskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
+    int rookMagicIndex = (rookMaskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
 
     Bitboard bishopMoves = Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][bishopMagicIndex]);
     Bitboard rookMoves = Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][rookMagicIndex]);
@@ -307,11 +307,11 @@ namespace Chess
     return (bishopMoves | rookMoves) & ~friendlyPiecesBitboard;
   }
 
-  Bitboard Board::getKingMoves(Square pieceIndex, bool includeCastling, bool __)
+  Bitboard Board::getKingMoves(int pieceIndex, bool includeCastling, bool __)
   {
     Bitboard movesBitboard = Bitboard(movesLookup.KING_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR).bitboard);
 
-    Piece piece = board[pieceIndex];
+    int piece = board[pieceIndex];
 
     if (includeCastling && castlingRights)
     {
@@ -354,7 +354,7 @@ namespace Chess
     return movesBitboard;
   }
 
-  Bitboard Board::getLegalPieceMovesBitboard(Square pieceIndex, bool includeCastling)
+  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling)
   {
     Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, includeCastling);
 
@@ -362,7 +362,7 @@ namespace Chess
 
     while (pseudoLegalMovesBitboard.bitboard)
     {
-      Square toIndex = __builtin_ctzll(pseudoLegalMovesBitboard.bitboard);
+      int toIndex = __builtin_ctzll(pseudoLegalMovesBitboard.bitboard);
 
       pseudoLegalMovesBitboard.removeBit(toIndex);
 
@@ -381,18 +381,18 @@ namespace Chess
     return legalMovesBitboard;
   }
 
-  std::vector<Move> Board::getLegalMoves(Piece color, bool includeCastling)
+  std::vector<Move> Board::getLegalMoves(int color, bool includeCastling)
   {
     std::vector<Move> legalMoves;
 
-    for (Square i = 0; i < 64; i++)
+    for (int i = 0; i < 64; i++)
     {
       if (!board[i] || !(board[i] & color))
         continue;
 
       Bitboard movesBitboard = getLegalPieceMovesBitboard(i, includeCastling);
 
-      for (Square j = 0; j < 64; j++)
+      for (int j = 0; j < 64; j++)
       {
         if (movesBitboard.hasBit(j))
         {
@@ -412,14 +412,14 @@ namespace Chess
     return legalMoves;
   }
 
-  bool Board::isInCheck(Piece color)
+  bool Board::isInCheck(int color)
   {
     return isAttacked(kingIndices[color | KING], color ^ COLOR);
   }
 
-  bool Board::isAttacked(Square square, Piece color)
+  bool Board::isAttacked(int square, int color)
   {
-    Piece piece = board[square];
+    int piece = board[square];
 
     if (!piece)
       board[square] = (color | PAWN) ^ COLOR;
@@ -448,7 +448,7 @@ namespace Chess
     return attacked;
   }
 
-  uint8_t Board::getGameStatus(Piece color)
+  int Board::getGameStatus(int color)
   {
     if (countRepetitions(zobristKey) >= 3)
       return STALEMATE;
@@ -457,7 +457,7 @@ namespace Chess
 
     while (friendlyPiecesBitboard.bitboard)
     {
-      Square pieceIndex = __builtin_ctzll(friendlyPiecesBitboard.bitboard);
+      int pieceIndex = __builtin_ctzll(friendlyPiecesBitboard.bitboard);
 
       friendlyPiecesBitboard.removeBit(pieceIndex);
 
@@ -468,26 +468,26 @@ namespace Chess
     return isInCheck(color) ? LOSE : STALEMATE;
   }
 
-  Move Board::generateMoveFromInt(MoveInt moveInt)
+  Move Board::generateMoveFromInt(int moveInt)
   {
-    Square from = moveInt & 0x3f ^ 0x38;
-    Square to = (moveInt >> 6) & 0x3f ^ 0x38;
+    int from = moveInt & 0x3f ^ 0x38;
+    int to = (moveInt >> 6) & 0x3f ^ 0x38;
 
-    Piece piece = board[from];
-    Piece capturedPiece = board[to];
+    int piece = board[from];
+    int capturedPiece = board[to];
 
     return Move(from, to, piece, capturedPiece, castlingRights, enPassantFile);
   }
 
   Move Board::generateMoveFromUCI(std::string uci)
   {
-    Square from = (uci[0] - 'a') + (8 - uci[1] + '0') * 8;
-    Square to = (uci[2] - 'a') + (8 - uci[3] + '0') * 8;
+    int from = (uci[0] - 'a') + (8 - uci[1] + '0') * 8;
+    int to = (uci[2] - 'a') + (8 - uci[3] + '0') * 8;
 
-    Piece piece = board[from];
-    Piece capturedPiece = board[to];
+    int piece = board[from];
+    int capturedPiece = board[to];
 
-    Piece promotionPiece = EMPTY;
+    int promotionPiece = EMPTY;
 
     if (uci.length() == 5)
     {
@@ -515,7 +515,7 @@ namespace Chess
   {
     if (inOpeningBook)
     {
-      MoveInt moveInt = openings.getNextMove();
+      int moveInt = openings.getNextMove();
 
       if (moveInt != -1)
         return generateMoveFromInt(moveInt);
@@ -526,9 +526,9 @@ namespace Chess
     return generateBestMove(SEARCH_DEPTH);
   }
 
-  Evaluation Board::getStaticEvaluation()
+  int Board::getStaticEvaluation()
   {
-    uint8_t gameStatus = getGameStatus(sideToMove);
+    int gameStatus = getGameStatus(sideToMove);
 
     if (gameStatus != NO_MATE)
     {
@@ -538,14 +538,14 @@ namespace Chess
         return 0;
     }
 
-    Evaluation staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
+    int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
 
     return sideToMove == WHITE ? staticEvaluation : -staticEvaluation;
   }
 
-  Evaluation Board::getMaterialEvaluation()
+  int Board::getMaterialEvaluation()
   {
-    Evaluation materialEvaluation = 0;
+    int materialEvaluation = 0;
 
     materialEvaluation += bitboards[WHITE_PAWN].countBits() * PIECE_VALUES[PAWN];
     materialEvaluation += bitboards[WHITE_KNIGHT].countBits() * PIECE_VALUES[KNIGHT];
@@ -562,11 +562,11 @@ namespace Chess
     return materialEvaluation;
   }
 
-  Evaluation Board::getPositionalEvaluation()
+  int Board::getPositionalEvaluation()
   {
-    Evaluation positionalEvaluation = 0;
+    int positionalEvaluation = 0;
 
-    for (Square i = 0; i < 64; i++)
+    for (int i = 0; i < 64; i++)
     {
       switch (board[i])
       {
@@ -615,7 +615,7 @@ namespace Chess
 
         if (friendlyPieces.countBits() <= 3 && friendlyPieces.countBits() >= 1)
         {
-          uint8_t kingsDistance = abs(i % 8 - kingIndices[BLACK_KING] % 8) + abs(i / 8 - kingIndices[BLACK_KING] / 8);
+          int kingsDistance = abs(i % 8 - kingIndices[BLACK_KING] % 8) + abs(i / 8 - kingIndices[BLACK_KING] / 8);
 
           positionalEvaluation += pieceEvalTables.KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
@@ -633,7 +633,7 @@ namespace Chess
 
         if (friendlyPieces.countBits() <= 3 && friendlyPieces.countBits() >= 1)
         {
-          uint8_t kingsDistance = abs(i % 8 - kingIndices[WHITE_KING] % 8) + abs(i / 8 - kingIndices[WHITE_KING] / 8);
+          int kingsDistance = abs(i % 8 - kingIndices[WHITE_KING] % 8) + abs(i / 8 - kingIndices[WHITE_KING] / 8);
 
           positionalEvaluation -= pieceEvalTables.KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
@@ -643,9 +643,9 @@ namespace Chess
     return positionalEvaluation;
   }
 
-  Evaluation Board::getEvaluationBonus()
+  int Board::getEvaluationBonus()
   {
-    Evaluation evaluationBonus = 0;
+    int evaluationBonus = 0;
 
     if (bitboards[WHITE_BISHOP].countBits() >= 2)
       evaluationBonus += BISHOP_PAIR_BONUS;
@@ -666,10 +666,10 @@ namespace Chess
     if (hasCastled & BLACK)
       evaluationBonus -= CASTLED_KING_BONUS;
 
-    for (Square i = 0; i < 64; i++)
+    for (int i = 0; i < 64; i++)
     {
-      Square file = i % 8;
-      Square rank = i / 8;
+      int file = i % 8;
+      int rank = i / 8;
 
       if (rank == 0)
       {
@@ -741,19 +741,19 @@ namespace Chess
   {
     std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
-    uint8_t legalMovesCount = legalMoves.size();
+    int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
       return Move();
 
-    uint8_t bestMoveIndex = 0;
-    Evaluation bestMoveEvaluation = 1000000;
+    int bestMoveIndex = 0;
+    int bestMoveEvaluation = 1000000;
 
-    for (uint8_t i = 0; i < legalMovesCount; i++)
+    for (int i = 0; i < legalMovesCount; i++)
     {
       makeMove(legalMoves[i], true);
 
-      Evaluation evaluation = getStaticEvaluation();
+      int evaluation = getStaticEvaluation();
 
       unmakeMove(legalMoves[i]);
 
@@ -767,14 +767,14 @@ namespace Chess
     return legalMoves[bestMoveIndex];
   }
 
-  Evaluation Board::negamax(uint8_t depth, Evaluation alpha, Evaluation beta)
+  int Board::negamax(int depth, int alpha, int beta)
   {
     if (depth == 0)
       return quiesce(QUIESCE_DEPTH, alpha, beta);
 
     std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove);
 
-    uint8_t legalMovesCount = legalMoves.size();
+    int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
     {
@@ -784,11 +784,11 @@ namespace Chess
         return 0;
     }
 
-    for (uint8_t i = 0; i < legalMovesCount; i++)
+    for (int i = 0; i < legalMovesCount; i++)
     {
       makeMove(legalMoves[i], true);
 
-      Evaluation evaluation = -negamax(depth - 1, -beta, -alpha);
+      int evaluation = -negamax(depth - 1, -beta, -alpha);
 
       unmakeMove(legalMoves[i]);
 
@@ -802,9 +802,9 @@ namespace Chess
     return alpha;
   }
 
-  Evaluation Board::quiesce(uint8_t depth, Evaluation alpha, Evaluation beta)
+  int Board::quiesce(int depth, int alpha, int beta)
   {
-    Evaluation standPat = getStaticEvaluation();
+    int standPat = getStaticEvaluation();
 
     if (depth == 0)
       return standPat;
@@ -817,7 +817,7 @@ namespace Chess
 
     std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove, false);
 
-    uint8_t legalMovesCount = legalMoves.size();
+    int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
     {
@@ -827,14 +827,14 @@ namespace Chess
         return 0;
     }
 
-    for (uint8_t i = 0; i < legalMovesCount; i++)
+    for (int i = 0; i < legalMovesCount; i++)
     {
       if (!(legalMoves[i].flags & CAPTURE))
         continue;
 
       makeMove(legalMoves[i], true);
 
-      Evaluation evaluation = -quiesce(depth - 1, -beta, -alpha);
+      int evaluation = -quiesce(depth - 1, -beta, -alpha);
 
       unmakeMove(legalMoves[i]);
 
@@ -848,26 +848,26 @@ namespace Chess
     return alpha;
   }
 
-  Move Board::generateBestMove(uint8_t depth, Evaluation alpha, Evaluation beta)
+  Move Board::generateBestMove(int depth, int alpha, int beta)
   {
     if (depth == 0)
       return generateOneDeepMove();
 
     std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove);
 
-    uint8_t legalMovesCount = legalMoves.size();
+    int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
       return Move();
 
-    uint8_t bestMoveIndex = 0;
-    Evaluation bestMoveEvaluation = -1000000;
+    int bestMoveIndex = 0;
+    int bestMoveEvaluation = -1000000;
 
-    for (uint8_t i = 0; i < legalMovesCount; i++)
+    for (int i = 0; i < legalMovesCount; i++)
     {
       makeMove(legalMoves[i], true);
 
-      Evaluation evaluation = -negamax(depth - 1, -beta, -alpha);
+      int evaluation = -negamax(depth - 1, -beta, -alpha);
 
       unmakeMove(legalMoves[i]);
 
@@ -889,18 +889,18 @@ namespace Chess
 
   std::vector<Move> Board::heuristicSortMoves(std::vector<Move> moves)
   {
-    uint8_t legalMovesCount = moves.size();
+    int legalMovesCount = moves.size();
 
-    Evaluation evaluations[legalMovesCount];
+    int evaluations[legalMovesCount];
 
-    for (uint8_t i = 0; i < legalMovesCount; i++)
+    for (int i = 0; i < legalMovesCount; i++)
     {
       evaluations[i] = heuristicEvaluation(moves[i]);
     }
 
-    for (uint8_t i = 0; i < legalMovesCount; i++)
+    for (int i = 0; i < legalMovesCount; i++)
     {
-      for (uint8_t j = i + 1; j < legalMovesCount; j++)
+      for (int j = i + 1; j < legalMovesCount; j++)
       {
         if (evaluations[i] < evaluations[j])
         {
@@ -914,9 +914,9 @@ namespace Chess
     return moves;
   }
 
-  Evaluation Board::heuristicEvaluation(Move move)
+  int Board::heuristicEvaluation(Move move)
   {
-    Evaluation evaluation = 0;
+    int evaluation = 0;
 
     if (move.flags & CAPTURE)
     {
