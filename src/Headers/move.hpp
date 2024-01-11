@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "types.hpp"
 
 namespace Chess
@@ -20,10 +18,10 @@ namespace Chess
      * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
      * @param promotionPiece The piece that the moving piece is being promoted to, if any
      */
-    Move(int from, int to, int piece, int capturedPiece, int castlingRights, int enPassantFile, int promotionPiece = EMPTY)
+    Move(Square from, Square to, Piece piece, Piece capturedPiece, uint8_t castlingRights, uint8_t enPassantFile, Piece promotionPiece = EMPTY)
         : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPiece(promotionPiece), flags(NORMAL)
     {
-      int pieceType = piece & TYPE;
+      Piece pieceType = piece & TYPE;
 
       if (pieceType == KING && from - to == -2)
       {
@@ -60,21 +58,21 @@ namespace Chess
       }
     }
 
-    int from;
-    int to;
-    int piece;
-    int capturedPiece;
-    int promotionPiece;
+    Square from;
+    Square to;
+    Piece piece;
+    Piece capturedPiece;
+    Piece promotionPiece;
 
-    int castlingRights;
-    int enPassantFile;
+    uint8_t castlingRights;
+    uint8_t enPassantFile;
 
-    int flags;
+    uint8_t flags;
 
     /**
      * Returns an integer representation of the move
      */
-    int toInt() const { return from ^ 0x38 | ((to ^ 0x38) << 6); }
+    MoveInt toInt() const { return from ^ 0x38 | ((to ^ 0x38) << 6); }
 
     /**
      * Returns a UCI string representation of the move

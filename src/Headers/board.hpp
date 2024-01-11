@@ -15,33 +15,33 @@
 
 namespace Chess
 {
-  const int SEARCH_DEPTH = 5;
-  const int QUIESCE_DEPTH = 5;
+  const uint8_t SEARCH_DEPTH = 5;
+  const uint8_t QUIESCE_DEPTH = 5;
 
-  const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
+  const Evaluation PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 
   class Board
   {
   public:
     Board(std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-    int sideToMove;
+    Piece sideToMove;
 
-    int castlingRights;
-    int enPassantFile;
+    uint8_t castlingRights;
+    uint8_t enPassantFile;
 
     Bitboard bitboards[PIECE_NUMBER];
 
     ZobristKey zobristKey;
 
     // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
-    int kingIndices[PIECE_NUMBER];
+    Square kingIndices[PIECE_NUMBER];
 
     /**
      * @brief Returns the bitboard of the squares a piece can move to
      * @param pieceIndex The index of the piece
      */
-    Bitboard getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling = true);
+    Bitboard getLegalPieceMovesBitboard(Square pieceIndex, bool includeCastling = true);
 
     /**
      * @brief Makes a move on the board
@@ -54,14 +54,14 @@ namespace Chess
      * @brief Checks if a color is in check in the current position
      * @param color The color to check
      */
-    bool isInCheck(int color);
+    bool isInCheck(Piece color);
 
     /**
      * @brief Returns the game status for the current side - see enum GameStatus
      * @param color The color to check
-     * @return int - Note: returns NO_MATE even if "color" has won, only returns LOSE if "color" has lost
+     * @return uint8_t - Note: returns NO_MATE even if "color" has won, only returns LOSE if "color" has lost
      */
-    int getGameStatus(int color);
+    uint8_t getGameStatus(Piece color);
 
     /**
      * @brief Generates a move from a UCI string
@@ -77,12 +77,12 @@ namespace Chess
     /**
      * @brief Allows indexing the board like an array
      */
-    inline Piece operator[](int index) { return board[index]; }
+    inline Piece operator[](Square index) { return board[index]; }
 
   private:
     Piece board[64];
 
-    int hasCastled;
+    uint8_t hasCastled;
 
     std::vector<ZobristKey> positionHistory;
 
@@ -99,7 +99,7 @@ namespace Chess
 
     ZobristKey getInitialZobristKey() const;
 
-    inline void updatePiece(int pieceIndex, Piece piece)
+    inline void updatePiece(Square pieceIndex, Piece piece)
     {
       zobristKey ^= zobrist.pieceKeys[pieceIndex][board[pieceIndex]];
       zobristKey ^= zobrist.pieceKeys[pieceIndex][piece];
@@ -113,38 +113,38 @@ namespace Chess
       addPieceToBitboard(pieceIndex);
     }
 
-    inline void movePiece(int from, int to)
+    inline void movePiece(Square from, Square to)
     {
       updatePiece(to, board[from]);
       updatePiece(from, EMPTY);
     }
 
-    inline void unmovePiece(int from, int to, int movedPiece = EMPTY, int capturedPiece = EMPTY)
+    inline void unmovePiece(Square from, Square to, Piece movedPiece = EMPTY, Piece capturedPiece = EMPTY)
     {
       updatePiece(from, movedPiece == EMPTY ? board[to] : movedPiece);
       updatePiece(to, capturedPiece);
     }
 
-    inline void removeCastlingRights(int rights)
+    inline void removeCastlingRights(uint8_t rights)
     {
       zobristKey ^= zobrist.castlingKeys[castlingRights];
       castlingRights &= ~rights;
       zobristKey ^= zobrist.castlingKeys[castlingRights];
     }
 
-    inline void removeCastlingRights(int color, int side)
+    inline void removeCastlingRights(Piece color, uint8_t side)
     {
       removeCastlingRights(color == WHITE ? side >> 4 : side >> 2);
     }
 
-    inline void updateEnPassantFile(int file)
+    inline void updateEnPassantFile(Square file)
     {
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
       enPassantFile = file;
       zobristKey ^= zobrist.enPassantKeys[file];
     }
 
-    inline void updateCastlingRights(int rights)
+    inline void updateCastlingRights(uint8_t rights)
     {
       zobristKey ^= zobrist.castlingKeys[castlingRights];
       castlingRights = rights;
@@ -157,22 +157,22 @@ namespace Chess
       zobristKey ^= zobrist.sideKey;
     }
 
-    inline bool pieceCanMove(int pieceIndex, int to) const
+    inline bool pieceCanMove(Square pieceIndex, Square to) const
     {
       return (!board[to]) || (board[to] & COLOR) != (board[pieceIndex] & COLOR);
     }
 
-    inline Bitboard getFriendlyPiecesBitboard(int color) const
+    inline Bitboard getFriendlyPiecesBitboard(Piece color) const
     {
       return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color | KING]);
     }
 
-    inline Bitboard getEnemyPiecesBitboard(int color) const
+    inline Bitboard getEnemyPiecesBitboard(Piece color) const
     {
       return getFriendlyPiecesBitboard(color ^ COLOR);
     }
 
-    inline Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
+    inline Bitboard getPseudoLegalPieceMoves(Square pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
     {
       Bitboard movesBitboard = Bitboard();
 
@@ -181,42 +181,42 @@ namespace Chess
       return movesBitboard;
     }
 
-    inline void addPieceToBitboard(int pieceIndex)
+    inline void addPieceToBitboard(Square pieceIndex)
     {
       bitboards[board[pieceIndex]].addBit(pieceIndex);
     }
 
-    inline void removePieceFromBitboard(int pieceIndex)
+    inline void removePieceFromBitboard(Square pieceIndex)
     {
       bitboards[board[pieceIndex]].removeBit(pieceIndex);
     }
 
-    inline int countRepetitions(ZobristKey key) const
+    inline uint8_t countRepetitions(ZobristKey key) const
     {
-      int count = 0;
+      uint8_t count = 0;
 
-      for (int i = 0; i < positionHistory.size(); i++)
+      for (uint16_t i = 0; i < positionHistory.size(); i++)
         if (positionHistory[i] == key)
           count++;
 
       return count;
     }
 
-    inline std::vector<Move> getSortedLegalMoves(int color, bool includeCastling = true)
+    inline std::vector<Move> getSortedLegalMoves(Piece color, bool includeCastling = true)
     {
       return heuristicSortMoves(getLegalMoves(color, includeCastling));
     }
 
     void unmakeMove(Move move);
 
-    Bitboard getPawnMoves(int pieceIndex, bool _ = false, bool onlyCaptures = false);
-    Bitboard getKnightMoves(int pieceIndex, bool _ = false, bool __ = false);
-    Bitboard getBishopMoves(int pieceIndex, bool _ = false, bool __ = false);
-    Bitboard getRookMoves(int pieceIndex, bool _ = false, bool __ = false);
-    Bitboard getQueenMoves(int pieceIndex, bool _ = false, bool __ = false);
-    Bitboard getKingMoves(int pieceIndex, bool includeCastling = true, bool __ = false);
+    Bitboard getPawnMoves(Square pieceIndex, bool _ = false, bool onlyCaptures = false);
+    Bitboard getKnightMoves(Square pieceIndex, bool _ = false, bool __ = false);
+    Bitboard getBishopMoves(Square pieceIndex, bool _ = false, bool __ = false);
+    Bitboard getRookMoves(Square pieceIndex, bool _ = false, bool __ = false);
+    Bitboard getQueenMoves(Square pieceIndex, bool _ = false, bool __ = false);
+    Bitboard getKingMoves(Square pieceIndex, bool includeCastling = true, bool __ = false);
 
-    Bitboard (Chess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, bool, bool) = {
+    Bitboard (Chess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(Square, bool, bool) = {
         nullptr,
         &Chess::Board::getPawnMoves,
         &Chess::Board::getKnightMoves,
@@ -225,29 +225,29 @@ namespace Chess
         &Chess::Board::getQueenMoves,
         &Chess::Board::getKingMoves};
 
-    bool isAttacked(int square, int color);
+    bool isAttacked(Square square, Piece color);
 
-    std::vector<Move> getLegalMoves(int color, bool includeCastling = true);
+    std::vector<Move> getLegalMoves(Piece color, bool includeCastling = true);
 
-    Move generateMoveFromInt(int moveInt);
+    Move generateMoveFromInt(MoveInt moveInt);
 
     Move generateOneDeepMove();
 
-    Move generateBestMove(int depth, int alpha = -1000000, int beta = 1000000);
+    Move generateBestMove(uint8_t depth, Evaluation alpha = -1000000, Evaluation beta = 1000000);
 
-    int getStaticEvaluation();
+    Evaluation getStaticEvaluation();
 
-    int getMaterialEvaluation();
+    Evaluation getMaterialEvaluation();
 
-    int getPositionalEvaluation();
+    Evaluation getPositionalEvaluation();
 
-    int getEvaluationBonus();
+    Evaluation getEvaluationBonus();
 
-    int negamax(int depth, int alpha, int beta);
+    Evaluation negamax(uint8_t depth, Evaluation alpha, Evaluation beta);
 
-    int quiesce(int depth, int alpha, int beta);
+    Evaluation quiesce(uint8_t depth, Evaluation alpha, Evaluation beta);
 
-    int heuristicEvaluation(Move move);
+    Evaluation heuristicEvaluation(Move move);
 
     std::vector<Move> heuristicSortMoves(std::vector<Move> moves);
   };

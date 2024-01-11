@@ -57,21 +57,21 @@ namespace Chess
         {
           if (event.mouseButton.button == Mouse::Left && !gameOver)
           {
-            int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
+            Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
             if (!(board.sideToMove & board[index]) && !awaitingPromotion)
               continue;
 
             if (awaitingPromotion)
             {
-              int promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
+              Piece promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
-              if (promotionPiece == -1 || !(promotionPiece & board.sideToMove))
+              if (promotionPiece == EMPTY || !(promotionPiece & board.sideToMove))
                 continue;
 
               promotionMove.promotionPiece = promotionPiece;
 
-              draggingPieceIndex = -1;
+              draggingPieceIndex = MAX_UINT8;
 
               awaitingPromotion = false;
 
@@ -93,17 +93,17 @@ namespace Chess
         {
           if (event.mouseButton.button == Mouse::Left)
           {
-            if (draggingPieceIndex == -1)
+            if (draggingPieceIndex == MAX_UINT8)
               continue;
 
             if (!(grayHighlightsBitboard.hasBit(GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y))))
             {
-              draggingPieceIndex = -1;
+              draggingPieceIndex = MAX_UINT8;
               clearHighlights(GRAY_HIGHLIGHT);
               continue;
             }
 
-            int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
+            Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
             Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.castlingRights, board.enPassantFile);
 
@@ -117,7 +117,7 @@ namespace Chess
               promotionMove = move;
             }
 
-            draggingPieceIndex = -1;
+            draggingPieceIndex = MAX_UINT8;
           }
         }
       }
@@ -130,7 +130,7 @@ namespace Chess
       if (x >= 0 && x <= 640 && y >= 0 && y <= 640)
         yellowOutlineIndex = getSquareIndex(x, y);
       else
-        yellowOutlineIndex = -1;
+        yellowOutlineIndex = MAX_UINT8;
 
       window->clear();
 
@@ -162,10 +162,11 @@ namespace Chess
 
   void GUIHandler::loadBoardSquares()
   {
-    int squareIndex = 0;
-    for (int i = 0; i < 8; i++)
+    Square squareIndex = 0;
+
+    for (Square i = 0; i < 8; i++)
     {
-      for (int j = 0; j < 8; j++)
+      for (Square j = 0; j < 8; j++)
       {
         boardSquares[squareIndex].setTexture(squares[(i + j) % 2]);
         redHighlightsSprites[squareIndex].setTexture(squares[RED_HIGHLIGHT]);
@@ -206,7 +207,7 @@ namespace Chess
     piecesTextures[BLACK_QUEEN].loadFromMemory(images.BLACK_QUEEN, images.BLACK_QUEEN_SIZE);
     piecesTextures[BLACK_KING].loadFromMemory(images.BLACK_KING, images.BLACK_KING_SIZE);
 
-    for (int i = 0; i < PIECE_NUMBER; i++)
+    for (Piece i = 0; i < PIECE_NUMBER; i++)
     {
       piecesTextures[i].setSmooth(true);
     }
@@ -214,9 +215,9 @@ namespace Chess
 
   void GUIHandler::loadPieces()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
-      for (int j = 0; j < PIECE_NUMBER; j++)
+      for (Piece j = 0; j < PIECE_NUMBER; j++)
       {
         pieceSprites[j][i].setTexture(piecesTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
@@ -229,7 +230,7 @@ namespace Chess
 
   void GUIHandler::loadPromotionPieces()
   {
-    for (int i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 4; i++)
     {
       whitePromotionPieces[i].setTexture(piecesTextures[WHITE_QUEEN - i]);
       blackPromotionPieces[i].setTexture(piecesTextures[BLACK_QUEEN - i]);
@@ -244,7 +245,7 @@ namespace Chess
 
   void GUIHandler::drawBoardSquares()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
       window->draw(boardSquares[i]);
     }
@@ -252,7 +253,7 @@ namespace Chess
 
   void GUIHandler::drawPieces()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
       if (draggingPieceIndex == i || (awaitingPromotion && promotionMove.from == i))
         continue;
@@ -260,7 +261,7 @@ namespace Chess
       window->draw(pieceSprites[board[i]][i]);
     }
 
-    if (draggingPieceIndex != -1)
+    if (draggingPieceIndex != MAX_UINT8)
     {
       draggingPieceSprite.setTexture(piecesTextures[board[draggingPieceIndex]]);
       draggingPieceSprite.setPosition(Mouse::getPosition(*window).x - SQUARE_SIZE / 2, Mouse::getPosition(*window).y - SQUARE_SIZE / 2);
@@ -270,7 +271,7 @@ namespace Chess
 
   void GUIHandler::drawHighlights()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
       if (redHighlightsBitboard.hasBit(i))
       {
@@ -314,7 +315,7 @@ namespace Chess
     grayHighlightsBitboard.bitboard = 0;
   }
 
-  void GUIHandler::clearHighlights(int highlight)
+  void GUIHandler::clearHighlights(uint8_t highlight)
   {
     if (highlight == RED_HIGHLIGHT)
     {
@@ -342,7 +343,7 @@ namespace Chess
     if (board.isInCheck(board.sideToMove))
       redHighlightsBitboard.addBit(board.kingIndices[board.sideToMove | KING]);
 
-    int gameStatus = board.getGameStatus(board.sideToMove);
+    uint8_t gameStatus = board.getGameStatus(board.sideToMove);
 
     if (gameStatus)
     {
