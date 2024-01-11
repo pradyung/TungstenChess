@@ -122,9 +122,6 @@ namespace Chess
         }
       }
 
-      if (isThinking)
-        continue;
-
       int x = Mouse::getPosition(*window).x;
       int y = Mouse::getPosition(*window).y;
       if (x >= 0 && x <= 640 && y >= 0 && y <= 640)
@@ -257,8 +254,14 @@ namespace Chess
       if (draggingPieceIndex == i || (awaitingPromotion && promotionMove.from == i))
         continue;
 
-      window->draw(pieceSprites[board[i]][i]);
+      if (!isThinking)
+        window->draw(pieceSprites[board[i]][i]);
+      else
+        window->draw(pieceSprites[bufferBoard[i]][i]);
     }
+
+    if (isThinking)
+      return;
 
     if (draggingPieceIndex != -1)
     {
@@ -371,9 +374,19 @@ namespace Chess
     stopThinking();
   }
 
+  void GUIHandler::saveBufferBoard()
+  {
+    for (int i = 0; i < 64; i++)
+    {
+      bufferBoard[i] = board[i];
+    }
+  }
+
   void GUIHandler::startThinking()
   {
     isThinking = true;
+
+    saveBufferBoard();
 
     thinkingThread = std::thread(&GUIHandler::makeBotMove, this);
 

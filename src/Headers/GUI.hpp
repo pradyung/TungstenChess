@@ -44,6 +44,8 @@ namespace Chess
   private:
     Board board;
 
+    Piece bufferBoard[64];
+
     RenderWindow *window;
 
     Images images;
@@ -98,6 +100,8 @@ namespace Chess
 
     void startThinking();
     void stopThinking();
+
+    void saveBufferBoard();
 
     void drawBoardSquares();
     void drawPieces();

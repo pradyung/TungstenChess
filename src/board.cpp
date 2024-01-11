@@ -829,7 +829,7 @@ namespace Chess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      if (!(legalMoves[i].flags & CAPTURE))
+      if (!(legalMoves[i].flags & ~PAWN_DOUBLE))
         continue;
 
       makeMove(legalMoves[i], true);
