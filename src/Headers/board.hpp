@@ -174,11 +174,7 @@ namespace Chess
 
     inline Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
     {
-      Bitboard movesBitboard = Bitboard();
-
-      movesBitboard = (this->*getPieceMoves[board[pieceIndex] & TYPE])(pieceIndex, includeCastling, onlyCaptures);
-
-      return movesBitboard;
+      return (this->*getPieceMoves[board[pieceIndex] & TYPE])(pieceIndex, includeCastling, onlyCaptures);
     }
 
     inline void addPieceToBitboard(int pieceIndex)

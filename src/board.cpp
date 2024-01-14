@@ -385,26 +385,29 @@ namespace Chess
   {
     std::vector<Move> legalMoves;
 
-    for (int i = 0; i < 64; i++)
+    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(color);
+
+    while (friendlyPiecesBitboard.bitboard)
     {
-      if (!board[i] || !(board[i] & color))
-        continue;
+      int pieceIndex = __builtin_ctzll(friendlyPiecesBitboard.bitboard);
 
-      Bitboard movesBitboard = getLegalPieceMovesBitboard(i, includeCastling);
+      friendlyPiecesBitboard.removeBit(pieceIndex);
 
-      for (int j = 0; j < 64; j++)
+      Bitboard movesBitboard = getLegalPieceMovesBitboard(pieceIndex, includeCastling);
+
+      while (movesBitboard.bitboard)
       {
-        if (movesBitboard.hasBit(j))
-        {
-          legalMoves.push_back(Move(i, j, board[i], board[j], castlingRights, enPassantFile));
+        int toIndex = __builtin_ctzll(movesBitboard.bitboard);
 
-          if (legalMoves.back().flags & PROMOTION)
-          {
-            legalMoves.back().promotionPiece = QUEEN;
-            legalMoves.push_back(Move(i, j, board[i], board[j], castlingRights, enPassantFile, KNIGHT));
-            legalMoves.push_back(Move(i, j, board[i], board[j], castlingRights, enPassantFile, BISHOP));
-            legalMoves.push_back(Move(i, j, board[i], board[j], castlingRights, enPassantFile, ROOK));
-          }
+        movesBitboard.removeBit(toIndex);
+
+        legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, QUEEN));
+
+        if (legalMoves.back().flags & PROMOTION)
+        {
+          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, KNIGHT));
+          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, BISHOP));
+          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, ROOK));
         }
       }
     }
