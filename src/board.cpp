@@ -111,9 +111,9 @@ namespace Chess
     int capturedPieceType = capturedPiece & TYPE;
     int capturedPieceColor = capturedPiece & COLOR;
 
-    movePiece(from, to);
+    movePiece(from, to, promotionPiece);
 
-    enPassantFile = -1;
+    updateEnPassantFile(move.flags & PAWN_DOUBLE ? move.to % 8 : -1);
 
     if (pieceType == KING)
       removeCastlingRights(pieceColor, CASTLING);
@@ -126,9 +126,6 @@ namespace Chess
     if (move.flags & EP_CAPTURE)
       updatePiece(to + (piece & WHITE ? 8 : -8), EMPTY);
 
-    if (move.flags & PROMOTION)
-      updatePiece(to, pieceColor | promotionPiece);
-
     if (move.flags & CASTLE)
     {
       hasCastled |= pieceColor;
@@ -139,9 +136,6 @@ namespace Chess
         movePiece(to - 2, to + 1);
     }
 
-    if (move.flags & PAWN_DOUBLE)
-      updateEnPassantFile(to % 8);
-
     positionHistory.push_back(zobristKey);
   }
 
@@ -151,38 +145,23 @@ namespace Chess
 
     switchSideToMove();
 
-    int from = move.from;
-    int to = move.to;
-    int piece = move.piece;
-    int capturedPiece = move.capturedPiece;
-    int promotionPiece = move.promotionPiece;
+    unmovePiece(move.from, move.to, move.piece, move.capturedPiece);
 
-    unmovePiece(from, to, piece, capturedPiece);
-
-    if (move.flags & KSIDE_CASTLE)
+    if (move.flags & CASTLE)
     {
-      unmovePiece(to + 1, to - 1);
-      hasCastled &= ~(piece & COLOR);
-    }
+      hasCastled &= ~(move.piece & COLOR);
 
-    else if (move.flags & QSIDE_CASTLE)
-    {
-      unmovePiece(to - 2, to + 1);
-      hasCastled &= ~(piece & COLOR);
+      if (move.flags & KSIDE_CASTLE)
+        unmovePiece(move.to + 1, move.to - 1);
+      else
+        unmovePiece(move.to - 2, move.to + 1);
     }
 
     updateEnPassantFile(move.enPassantFile);
     updateCastlingRights(move.castlingRights);
 
-    kingIndices[piece] = from;
-
     if (move.flags & EP_CAPTURE)
-    {
-      if (piece & WHITE)
-        updatePiece(to + 8, BLACK_PAWN);
-      else
-        updatePiece(to - 8, WHITE_PAWN);
-    }
+      updatePiece((move.piece & WHITE) ? move.to + 8 : move.to - 8, move.piece ^ COLOR);
   }
 
   Bitboard Board::getPawnMoves(int pieceIndex, bool _, bool onlyCaptures)
@@ -317,37 +296,19 @@ namespace Chess
     {
       if (piece == WHITE_KING)
       {
-        if (castlingRights & WHITE_KINGSIDE)
-        {
-          if (!board[F1] && !board[G1] && !isInCheck(WHITE) && !isAttacked(F1, BLACK))
-          {
-            movesBitboard.addBit(G1);
-          }
-        }
-        if (castlingRights & WHITE_QUEENSIDE)
-        {
-          if (!board[D1] && !board[C1] && !board[B1] && !isInCheck(WHITE) && !isAttacked(D1, BLACK))
-          {
-            movesBitboard.addBit(C1);
-          }
-        }
+        if (castlingRights & WHITE_KINGSIDE && !board[F1] && !board[G1] && !isInCheck(WHITE) && !isAttacked(F1, BLACK))
+          movesBitboard.addBit(G1);
+
+        if (castlingRights & WHITE_QUEENSIDE && !board[D1] && !board[C1] && !board[B1] && !isInCheck(WHITE) && !isAttacked(D1, BLACK))
+          movesBitboard.addBit(C1);
       }
       else if (piece == BLACK_KING)
       {
-        if (castlingRights & BLACK_KINGSIDE)
-        {
-          if (!board[F8] && !board[G8] && !isInCheck(BLACK) && !isAttacked(F8, WHITE))
-          {
-            movesBitboard.addBit(G8);
-          }
-        }
-        if (castlingRights & BLACK_QUEENSIDE)
-        {
-          if (!board[D8] && !board[C8] && !board[B8] && !isInCheck(BLACK) && !isAttacked(D8, WHITE))
-          {
-            movesBitboard.addBit(B8);
-          }
-        }
+        if (castlingRights & BLACK_KINGSIDE && !board[F8] && !board[G8] && !isInCheck(BLACK) && !isAttacked(F8, WHITE))
+          movesBitboard.addBit(G8);
+
+        if (castlingRights & BLACK_QUEENSIDE && !board[D8] && !board[C8] && !board[B8] && !isInCheck(BLACK) && !isAttacked(D8, WHITE))
+          movesBitboard.addBit(C8);
       }
     }
 

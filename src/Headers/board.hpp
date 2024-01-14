@@ -113,9 +113,9 @@ namespace Chess
       addPieceToBitboard(pieceIndex);
     }
 
-    inline void movePiece(int from, int to)
+    inline void movePiece(int from, int to, int promotionPiece = EMPTY)
     {
-      updatePiece(to, board[from]);
+      updatePiece(to, promotionPiece == EMPTY ? board[from] : promotionPiece);
       updatePiece(from, EMPTY);
     }
 
@@ -141,7 +141,8 @@ namespace Chess
     {
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
       enPassantFile = file;
-      zobristKey ^= zobrist.enPassantKeys[file];
+      if (file != -1)
+        zobristKey ^= zobrist.enPassantKeys[file];
     }
 
     inline void updateCastlingRights(int rights)
