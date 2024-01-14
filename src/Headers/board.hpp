@@ -158,11 +158,6 @@ namespace Chess
       zobristKey ^= zobrist.sideKey;
     }
 
-    inline bool pieceCanMove(int pieceIndex, int to) const
-    {
-      return (!board[to]) || (board[to] & COLOR) != (board[pieceIndex] & COLOR);
-    }
-
     inline Bitboard getFriendlyPiecesBitboard(int color) const
     {
       return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color | KING]);
