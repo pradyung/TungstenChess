@@ -115,7 +115,7 @@ namespace Chess
 
     inline void movePiece(int from, int to, int promotionPiece = EMPTY)
     {
-      updatePiece(to, promotionPiece == EMPTY ? board[from] : promotionPiece);
+      updatePiece(to, (promotionPiece & TYPE) == EMPTY ? board[from] : promotionPiece);
       updatePiece(from, EMPTY);
     }
 
