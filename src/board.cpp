@@ -111,7 +111,7 @@ namespace Chess
     int capturedPieceType = capturedPiece & TYPE;
     int capturedPieceColor = capturedPiece & COLOR;
 
-    movePiece(from, to, promotionPiece);
+    movePiece(from, to, promotionPiece | pieceColor);
 
     updateEnPassantFile(move.flags & PAWN_DOUBLE ? move.to % 8 : -1);
 
