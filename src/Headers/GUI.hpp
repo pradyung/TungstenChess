@@ -62,14 +62,14 @@ namespace Chess
     Bitboard yellowHighlightsBitboard;
     Bitboard grayHighlightsBitboard;
 
-    int yellowOutlineIndex = -1;
+    int yellowOutlineIndex = INVALID_SQUARE;
 
     Sprite redHighlightsSprites[64];
     Sprite yellowHighlightsSprites[64];
     Sprite grayHighlightsSprites[64];
     Sprite yellowOutlineSprites[64];
 
-    int draggingPieceIndex = -1;
+    int draggingPieceIndex = INVALID_SQUARE;
     Sprite draggingPieceSprite;
 
     Sprite whitePromotionPieces[4];
@@ -133,7 +133,7 @@ namespace Chess
       case F2:
         return BLACK_KNIGHT;
       default:
-        return -1;
+        return INVALID;
       }
     }
 

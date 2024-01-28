@@ -224,7 +224,7 @@ namespace Chess
 
     Move generateOneDeepMove();
 
-    Move generateBestMove(int depth, int alpha = -1000000, int beta = 1000000);
+    Move generateBestMove(int depth, int alpha = NEGATIVE_INFINITY, int beta = POSITIVE_INFINITY);
 
     int getStaticEvaluation();
 

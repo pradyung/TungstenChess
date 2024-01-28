@@ -190,7 +190,7 @@ namespace Chess
         movesBitboard.addBit(pieceIndex - 7);
       }
 
-      if (enPassantFile != -1)
+      if (enPassantFile != NO_EP)
       {
         if (pieceIndex % 8 != 0 && pieceIndex / 8 == 3 && (pieceIndex - 9) % 8 == enPassantFile)
         {
@@ -223,7 +223,7 @@ namespace Chess
         movesBitboard.addBit(pieceIndex + 9);
       }
 
-      if (enPassantFile != -1)
+      if (enPassantFile != NO_EP)
       {
         if (pieceIndex % 8 != 0 && pieceIndex / 8 == 4 && (pieceIndex + 7) % 8 == enPassantFile)
         {
@@ -481,7 +481,7 @@ namespace Chess
     {
       int moveInt = openings.getNextMove();
 
-      if (moveInt != -1)
+      if (moveInt != INVALID)
         return generateMoveFromInt(moveInt);
 
       inOpeningBook = false;
@@ -497,7 +497,7 @@ namespace Chess
     if (gameStatus != NO_MATE)
     {
       if (gameStatus == LOSE)
-        return sideToMove == WHITE ? 1000000 : -1000000;
+        return sideToMove == WHITE ? POSITIVE_INFINITY : NEGATIVE_INFINITY;
       else
         return 0;
     }
@@ -708,7 +708,7 @@ namespace Chess
     int legalMovesCount = legalMoves.size();
 
     int bestMoveIndex = 0;
-    int bestMoveEvaluation = 1000000;
+    int bestMoveEvaluation = POSITIVE_INFINITY;
 
     for (int i = 0; i < legalMovesCount; i++)
     {
@@ -738,7 +738,7 @@ namespace Chess
     int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
-      return isInCheck(sideToMove) ? -1000000 : 0;
+      return isInCheck(sideToMove) ? NEGATIVE_INFINITY : 0;
 
     for (int i = 0; i < legalMovesCount; i++)
     {

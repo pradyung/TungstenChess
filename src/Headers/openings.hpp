@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "types.hpp"
 #include "Data/opening_book.hpp"
 
 namespace Chess
@@ -9,7 +10,7 @@ namespace Chess
   class Openings
   {
   public:
-    Openings() : lastMoveIndex(-1) {}
+    Openings() : lastMoveIndex(INVALID) {}
 
     /**
      * @brief Adds a move to the move history
@@ -74,7 +75,7 @@ namespace Chess
       std::vector<int> childrenMoves = getChildrenMoves();
 
       if (childrenMoves.size() == 0)
-        return -1;
+        return INVALID;
 
       int totalWeight = 0;
 
