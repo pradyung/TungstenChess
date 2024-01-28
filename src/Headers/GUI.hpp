@@ -62,14 +62,14 @@ namespace Chess
     Bitboard yellowHighlightsBitboard;
     Bitboard grayHighlightsBitboard;
 
-    int yellowOutlineIndex = INVALID_SQUARE;
+    int yellowOutlineIndex = INVALID;
 
     Sprite redHighlightsSprites[64];
     Sprite yellowHighlightsSprites[64];
     Sprite grayHighlightsSprites[64];
     Sprite yellowOutlineSprites[64];
 
-    int draggingPieceIndex = INVALID_SQUARE;
+    int draggingPieceIndex = INVALID;
     Sprite draggingPieceSprite;
 
     Sprite whitePromotionPieces[4];
