@@ -116,21 +116,21 @@ namespace Chess
 
       switch (index)
       {
-      case 10:
+      case C7:
         return WHITE_QUEEN;
-      case 11:
+      case D7:
         return WHITE_ROOK;
-      case 12:
+      case E7:
         return WHITE_BISHOP;
-      case 13:
+      case F7:
         return WHITE_KNIGHT;
-      case 50:
+      case C2:
         return BLACK_QUEEN;
-      case 51:
+      case D2:
         return BLACK_ROOK;
-      case 52:
+      case E2:
         return BLACK_BISHOP;
-      case 53:
+      case F2:
         return BLACK_KNIGHT;
       default:
         return -1;

@@ -15,8 +15,8 @@
 
 namespace Chess
 {
-  const int SEARCH_DEPTH = 5;
-  const int QUIESCE_DEPTH = 5;
+  const int SEARCH_DEPTH = 4;
+  const int QUIESCE_DEPTH = 4;
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 
@@ -141,8 +141,7 @@ namespace Chess
     {
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
       enPassantFile = file;
-      if (file != -1)
-        zobristKey ^= zobrist.enPassantKeys[file];
+      zobristKey ^= zobrist.enPassantKeys[file == NO_EP ? 8 : file];
     }
 
     inline void updateCastlingRights(int rights)

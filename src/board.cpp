@@ -4,7 +4,7 @@ namespace Chess
 {
   Board::Board(std::string fen) : magicMoveGen(MagicMoveGen(movesLookup))
   {
-    std::string fenParts[6];
+    std::string fenParts[FEN_LENGTH];
 
     int fenPartIndex = 0;
 
@@ -20,12 +20,12 @@ namespace Chess
     }
 
     castlingRights = 0;
-    enPassantFile = -1;
+    enPassantFile = NO_EP;
 
     sideToMove = WHITE;
 
     int pieceIndex = 0;
-    for (int i = 0; i < fenParts[0].length(); i++)
+    for (int i = 0; i < fenParts[BOARD].length(); i++)
     {
       if (fen[i] == '/')
         continue;
@@ -41,29 +41,29 @@ namespace Chess
       }
     }
 
-    if (fenParts[0] != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
+    if (fenParts[BOARD] != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
       inOpeningBook = false;
 
-    sideToMove = fenParts[1] == "w" ? WHITE : BLACK;
+    sideToMove = fenParts[SIDE_TO_MOVE] == "w" ? WHITE : BLACK;
 
-    if (fenParts[2] != "-")
+    if (fenParts[CASTLING_RIGHTS] != "-")
     {
-      for (int i = 0; i < fenParts[2].length(); i++)
+      for (int i = 0; i < fenParts[CASTLING_RIGHTS].length(); i++)
       {
-        if (fenParts[2][i] == 'K')
+        if (fenParts[CASTLING_RIGHTS][i] == 'K')
           castlingRights |= WHITE_KINGSIDE;
-        else if (fenParts[2][i] == 'Q')
+        else if (fenParts[CASTLING_RIGHTS][i] == 'Q')
           castlingRights |= WHITE_QUEENSIDE;
-        else if (fenParts[2][i] == 'k')
+        else if (fenParts[CASTLING_RIGHTS][i] == 'k')
           castlingRights |= BLACK_KINGSIDE;
-        else if (fenParts[2][i] == 'q')
+        else if (fenParts[CASTLING_RIGHTS][i] == 'q')
           castlingRights |= BLACK_QUEENSIDE;
       }
     }
 
-    if (fenParts[3] != "-")
+    if (fenParts[EN_PASSANT] != "-")
     {
-      enPassantFile = fenParts[3][0] - 'a';
+      enPassantFile = fenParts[EN_PASSANT][0] - 'a';
     }
 
     zobristKey = getInitialZobristKey();
@@ -84,7 +84,7 @@ namespace Chess
     }
 
     hash ^= zobrist.castlingKeys[castlingRights];
-    hash ^= zobrist.enPassantKeys[enPassantFile];
+    hash ^= zobrist.enPassantKeys[enPassantFile == NO_EP ? 8 : enPassantFile];
 
     if (sideToMove == WHITE)
       hash ^= zobrist.sideKey;
@@ -113,7 +113,7 @@ namespace Chess
 
     movePiece(from, to, promotionPiece | pieceColor);
 
-    updateEnPassantFile(move.flags & PAWN_DOUBLE ? move.to % 8 : -1);
+    updateEnPassantFile(move.flags & PAWN_DOUBLE ? move.to % 8 : NO_EP);
 
     if (pieceType == KING)
       removeCastlingRights(pieceColor, CASTLING);
@@ -707,9 +707,6 @@ namespace Chess
 
     int legalMovesCount = legalMoves.size();
 
-    if (legalMovesCount == 0)
-      return Move();
-
     int bestMoveIndex = 0;
     int bestMoveEvaluation = 1000000;
 
@@ -741,12 +738,7 @@ namespace Chess
     int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
-    {
-      if (isInCheck(sideToMove))
-        return -1000000;
-      else
-        return 0;
-    }
+      return isInCheck(sideToMove) ? -1000000 : 0;
 
     for (int i = 0; i < legalMovesCount; i++)
     {
@@ -773,23 +765,18 @@ namespace Chess
     if (depth == 0)
       return standPat;
 
-    if (standPat >= beta)
-      return beta;
-
-    if (alpha < standPat)
+    if (standPat > alpha)
       alpha = standPat;
+
+    if (alpha >= beta)
+      return beta;
 
     std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove, false);
 
     int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
-    {
-      if (isInCheck(sideToMove))
-        return -1000000;
-      else
-        return 0;
-    }
+      return standPat;
 
     for (int i = 0; i < legalMovesCount; i++)
     {
@@ -797,9 +784,7 @@ namespace Chess
         continue;
 
       makeMove(legalMoves[i], true);
-
       int evaluation = -quiesce(depth - 1, -beta, -alpha);
-
       unmakeMove(legalMoves[i]);
 
       if (evaluation > alpha)
@@ -821,28 +806,19 @@ namespace Chess
 
     int legalMovesCount = legalMoves.size();
 
-    if (legalMovesCount == 0)
-      return Move();
-
     int bestMoveIndex = 0;
-    int bestMoveEvaluation = -1000000;
 
     for (int i = 0; i < legalMovesCount; i++)
     {
       makeMove(legalMoves[i], true);
-
       int evaluation = -negamax(depth - 1, -beta, -alpha);
-
       unmakeMove(legalMoves[i]);
 
-      if (evaluation > bestMoveEvaluation)
+      if (evaluation > alpha)
       {
-        bestMoveEvaluation = evaluation;
+        alpha = evaluation;
         bestMoveIndex = i;
       }
-
-      if (evaluation > alpha)
-        alpha = evaluation;
 
       if (alpha >= beta)
         break;
@@ -853,27 +829,8 @@ namespace Chess
 
   std::vector<Move> Board::heuristicSortMoves(std::vector<Move> moves)
   {
-    int legalMovesCount = moves.size();
-
-    int evaluations[legalMovesCount];
-
-    for (int i = 0; i < legalMovesCount; i++)
-    {
-      evaluations[i] = heuristicEvaluation(moves[i]);
-    }
-
-    for (int i = 0; i < legalMovesCount; i++)
-    {
-      for (int j = i + 1; j < legalMovesCount; j++)
-      {
-        if (evaluations[i] < evaluations[j])
-        {
-          Move temp = moves[i];
-          moves[i] = moves[j];
-          moves[j] = temp;
-        }
-      }
-    }
+    std::sort(moves.begin(), moves.end(), [this](Move a, Move b)
+              { return heuristicEvaluation(a) > heuristicEvaluation(b); });
 
     return moves;
   }
@@ -882,30 +839,11 @@ namespace Chess
   {
     int evaluation = 0;
 
-    if (move.flags & CAPTURE)
-    {
-      evaluation += PIECE_VALUES[move.capturedPiece & TYPE];
-    }
-
-    if (move.flags & PROMOTION)
-    {
-      evaluation += PIECE_VALUES[move.promotionPiece & TYPE] - PIECE_VALUES[move.piece & TYPE];
-    }
-
-    if (move.flags & KSIDE_CASTLE)
-    {
-      evaluation += 50;
-    }
-
-    if (move.flags & QSIDE_CASTLE)
-    {
-      evaluation += 50;
-    }
-
-    if (move.flags & EP_CAPTURE)
-    {
-      evaluation += 100;
-    }
+    evaluation += PIECE_VALUES[move.capturedPiece & TYPE] * (move.flags & CAPTURE);
+    evaluation += PIECE_VALUES[move.promotionPiece & TYPE] * (move.flags & PROMOTION);
+    evaluation += 50 * (move.flags & KSIDE_CASTLE);
+    evaluation += 50 * (move.flags & QSIDE_CASTLE);
+    evaluation += 100 * (move.flags & EP_CAPTURE);
 
     return evaluation;
   }

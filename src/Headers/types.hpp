@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 
+#define FEN_LENGTH 6
+#define NO_EP -1
+
 namespace Chess
 {
   typedef unsigned long long BitboardInt;
@@ -27,7 +30,7 @@ namespace Chess
   enum EvaluationBonus
   {
     BISHOP_PAIR_BONUS = 100,
-    CASTLED_KING_BONUS = 50,
+    CASTLED_KING_BONUS = 25,
     CAN_CASTLE_BONUS = 25,
     ROOK_ON_OPEN_FILE_BONUS = 50,
     ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
@@ -171,5 +174,15 @@ namespace Chess
     F1 = 61,
     G1 = 62,
     H1 = 63
+  };
+
+  enum FenParts
+  {
+    BOARD = 0,
+    SIDE_TO_MOVE = 1,
+    CASTLING_RIGHTS = 2,
+    EN_PASSANT = 3,
+    HALFMOVE_CLOCK = 4,
+    FULLMOVE_NUMBER = 5
   };
 }
