@@ -141,7 +141,7 @@ namespace Chess
     {
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
       enPassantFile = file;
-      zobristKey ^= zobrist.enPassantKeys[file == NO_EP ? 8 : file];
+      zobristKey ^= zobrist.enPassantKeys[file];
     }
 
     inline void updateCastlingRights(int rights)

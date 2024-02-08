@@ -84,7 +84,7 @@ namespace Chess
     }
 
     hash ^= zobrist.castlingKeys[castlingRights];
-    hash ^= zobrist.enPassantKeys[enPassantFile == NO_EP ? 8 : enPassantFile];
+    hash ^= zobrist.enPassantKeys[enPassantFile];
 
     if (sideToMove == WHITE)
       hash ^= zobrist.sideKey;
