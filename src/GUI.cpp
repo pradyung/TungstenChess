@@ -208,19 +208,22 @@ namespace Chess
 
   void GUIHandler::loadPieceTextures()
   {
-    piecesTextures[WHITE_PAWN].loadFromFile(resourcePath + "wp.png");
-    piecesTextures[WHITE_KNIGHT].loadFromFile(resourcePath + "wn.png");
-    piecesTextures[WHITE_BISHOP].loadFromFile(resourcePath + "wb.png");
-    piecesTextures[WHITE_ROOK].loadFromFile(resourcePath + "wr.png");
-    piecesTextures[WHITE_QUEEN].loadFromFile(resourcePath + "wq.png");
-    piecesTextures[WHITE_KING].loadFromFile(resourcePath + "wk.png");
+    sf::Texture atlas;
+    atlas.loadFromFile(resourcePath + "atlas.png");
 
-    piecesTextures[BLACK_PAWN].loadFromFile(resourcePath + "bp.png");
-    piecesTextures[BLACK_KNIGHT].loadFromFile(resourcePath + "bn.png");
-    piecesTextures[BLACK_BISHOP].loadFromFile(resourcePath + "bb.png");
-    piecesTextures[BLACK_ROOK].loadFromFile(resourcePath + "br.png");
-    piecesTextures[BLACK_QUEEN].loadFromFile(resourcePath + "bq.png");
-    piecesTextures[BLACK_KING].loadFromFile(resourcePath + "bk.png");
+    piecesTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * 333, 0 * 333, 333, 333));
+    piecesTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * 333, 0 * 333, 333, 333));
+    piecesTextures[WHITE_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * 333, 0 * 333, 333, 333));
+    piecesTextures[WHITE_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * 333, 0 * 333, 333, 333));
+    piecesTextures[WHITE_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * 333, 0 * 333, 333, 333));
+    piecesTextures[WHITE_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * 333, 0 * 333, 333, 333));
+
+    piecesTextures[BLACK_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * 333, 333, 333, 333));
+    piecesTextures[BLACK_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * 333, 333, 333, 333));
+    piecesTextures[BLACK_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * 333, 333, 333, 333));
+    piecesTextures[BLACK_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * 333, 333, 333, 333));
+    piecesTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * 333, 333, 333, 333));
+    piecesTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * 333, 333, 333, 333));
 
     for (int i = 0; i < PIECE_NUMBER; i++)
     {
