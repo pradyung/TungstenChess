@@ -181,7 +181,7 @@ namespace Chess
         }
       }
 
-      movesBitboard.bitboard |= (movesLookup.WHITE_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(WHITE).bitboard) | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 16)));
+      movesBitboard.bitboard |= (movesLookup.WHITE_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(WHITE).bitboard | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 16))));
     }
     else if (piece == BLACK_PAWN)
     {
@@ -194,7 +194,7 @@ namespace Chess
         }
       }
 
-      movesBitboard.bitboard |= (movesLookup.BLACK_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(BLACK).bitboard) | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 40)));
+      movesBitboard.bitboard |= (movesLookup.BLACK_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(BLACK).bitboard | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 40))));
     }
 
     return movesBitboard;
