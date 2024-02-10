@@ -181,27 +181,7 @@ namespace Chess
         }
       }
 
-      if (pieceIndex % 8 != 0 && (board[pieceIndex - 9] & BLACK))
-      {
-        movesBitboard.addBit(pieceIndex - 9);
-      }
-      if (pieceIndex % 8 != 7 && (board[pieceIndex - 7] & BLACK))
-      {
-        movesBitboard.addBit(pieceIndex - 7);
-      }
-
-      if (enPassantFile != NO_EP)
-      {
-        if (pieceIndex % 8 != 0 && pieceIndex / 8 == 3 && (pieceIndex - 9) % 8 == enPassantFile)
-        {
-          movesBitboard.addBit(pieceIndex - 9);
-        }
-
-        if (pieceIndex % 8 != 7 && pieceIndex / 8 == 3 && (pieceIndex - 7) % 8 == enPassantFile)
-        {
-          movesBitboard.addBit(pieceIndex - 7);
-        }
-      }
+      movesBitboard.bitboard |= (movesLookup.WHITE_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(WHITE).bitboard) | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 16)));
     }
     else if (piece == BLACK_PAWN)
     {
@@ -214,27 +194,7 @@ namespace Chess
         }
       }
 
-      if (pieceIndex % 8 != 0 && (board[pieceIndex + 7] & WHITE))
-      {
-        movesBitboard.addBit(pieceIndex + 7);
-      }
-      if (pieceIndex % 8 != 7 && (board[pieceIndex + 9] & WHITE))
-      {
-        movesBitboard.addBit(pieceIndex + 9);
-      }
-
-      if (enPassantFile != NO_EP)
-      {
-        if (pieceIndex % 8 != 0 && pieceIndex / 8 == 4 && (pieceIndex + 7) % 8 == enPassantFile)
-        {
-          movesBitboard.addBit(pieceIndex + 7);
-        }
-
-        if (pieceIndex % 8 != 7 && pieceIndex / 8 == 4 && (pieceIndex + 9) % 8 == enPassantFile)
-        {
-          movesBitboard.addBit(pieceIndex + 9);
-        }
-      }
+      movesBitboard.bitboard |= (movesLookup.BLACK_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(BLACK).bitboard) | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 40)));
     }
 
     return movesBitboard;
@@ -390,10 +350,10 @@ namespace Chess
 
     bool attacked = false;
 
-    if (piece & WHITE && movesLookup.REVERSE_BLACK_PAWN_CAPTURE_MOVES[square] & bitboards[BLACK_PAWN].bitboard)
+    if (piece & WHITE && movesLookup.WHITE_PAWN_CAPTURE_MOVES[square] & bitboards[BLACK_PAWN].bitboard)
       attacked = true;
 
-    else if (piece & BLACK && movesLookup.REVERSE_WHITE_PAWN_CAPTURE_MOVES[square] & bitboards[WHITE_PAWN].bitboard)
+    else if (piece & BLACK && movesLookup.BLACK_PAWN_CAPTURE_MOVES[square] & bitboards[WHITE_PAWN].bitboard)
       attacked = true;
 
     else if (movesLookup.KNIGHT_MOVES[square] & bitboards[(color) | KNIGHT].bitboard)

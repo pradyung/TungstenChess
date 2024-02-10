@@ -14,15 +14,15 @@ namespace Chess
     {
       initKnightMoves();
       initKingMoves();
-      initReversePawnCaptureMoves();
+      initPawnCaptureMoves();
       initBishopMasks();
       initRookMasks();
     }
 
     std::array<BitboardInt, 64> KNIGHT_MOVES;
     std::array<BitboardInt, 64> KING_MOVES;
-    std::array<BitboardInt, 64> REVERSE_WHITE_PAWN_CAPTURE_MOVES;
-    std::array<BitboardInt, 64> REVERSE_BLACK_PAWN_CAPTURE_MOVES;
+    std::array<BitboardInt, 64> WHITE_PAWN_CAPTURE_MOVES;
+    std::array<BitboardInt, 64> BLACK_PAWN_CAPTURE_MOVES;
     std::array<BitboardInt, 64> BISHOP_MASKS;
     std::array<BitboardInt, 64> ROOK_MASKS;
 
@@ -82,23 +82,23 @@ namespace Chess
       }
     }
 
-    void initReversePawnCaptureMoves()
+    void initPawnCaptureMoves()
     {
       for (int square = 0; square < 64; square++)
       {
         BitboardInt position = 1ULL << square;
 
-        REVERSE_WHITE_PAWN_CAPTURE_MOVES[square] = 0ULL;
-        REVERSE_BLACK_PAWN_CAPTURE_MOVES[square] = 0ULL;
+        BLACK_PAWN_CAPTURE_MOVES[square] = 0ULL;
+        WHITE_PAWN_CAPTURE_MOVES[square] = 0ULL;
 
         if (square < 56 && square % 8 > 0)
-          REVERSE_WHITE_PAWN_CAPTURE_MOVES[square] |= position << 7;
+          BLACK_PAWN_CAPTURE_MOVES[square] |= position << 7;
         if (square < 56 && square % 8 < 7)
-          REVERSE_WHITE_PAWN_CAPTURE_MOVES[square] |= position << 9;
+          BLACK_PAWN_CAPTURE_MOVES[square] |= position << 9;
         if (square > 7 && square % 8 > 0)
-          REVERSE_BLACK_PAWN_CAPTURE_MOVES[square] |= position >> 9;
+          WHITE_PAWN_CAPTURE_MOVES[square] |= position >> 9;
         if (square > 7 && square % 8 < 7)
-          REVERSE_BLACK_PAWN_CAPTURE_MOVES[square] |= position >> 7;
+          WHITE_PAWN_CAPTURE_MOVES[square] |= position >> 7;
       }
     }
 
