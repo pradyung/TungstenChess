@@ -4,6 +4,8 @@
 <dict>
     <key>CFBundleExecutable</key>
     <string>Chess</string>
+    <key>CFBundleIconFile</key>
+    <string>icon.icns</string>
     <key>CFBundleName</key>
     <string>Chess</string>
     <key>CFBundleVersion</key>
