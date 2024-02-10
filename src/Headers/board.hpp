@@ -86,7 +86,7 @@ namespace Chess
     /**
      * @brief Allows indexing the board like an array
      */
-    inline Piece operator[](int index) { return board[index]; }
+    Piece operator[](int index) { return board[index]; }
 
   private:
     Piece board[64];
@@ -108,7 +108,7 @@ namespace Chess
 
     ZobristKey getInitialZobristKey() const;
 
-    inline void updatePiece(int pieceIndex, Piece piece)
+    void updatePiece(int pieceIndex, Piece piece)
     {
       zobristKey ^= zobrist.pieceKeys[pieceIndex][board[pieceIndex]];
       zobristKey ^= zobrist.pieceKeys[pieceIndex][piece];
@@ -122,76 +122,76 @@ namespace Chess
       addPieceToBitboard(pieceIndex);
     }
 
-    inline void movePiece(int from, int to, int promotionPiece = EMPTY)
+    void movePiece(int from, int to, int promotionPiece = EMPTY)
     {
       updatePiece(to, (promotionPiece & TYPE) == EMPTY ? board[from] : promotionPiece);
       updatePiece(from, EMPTY);
     }
 
-    inline void unmovePiece(int from, int to, int movedPiece = EMPTY, int capturedPiece = EMPTY)
+    void unmovePiece(int from, int to, int movedPiece = EMPTY, int capturedPiece = EMPTY)
     {
       updatePiece(from, movedPiece == EMPTY ? board[to] : movedPiece);
       updatePiece(to, capturedPiece);
     }
 
-    inline void removeCastlingRights(int rights)
+    void removeCastlingRights(int rights)
     {
       zobristKey ^= zobrist.castlingKeys[castlingRights];
       castlingRights &= ~rights;
       zobristKey ^= zobrist.castlingKeys[castlingRights];
     }
 
-    inline void removeCastlingRights(int color, int side)
+    void removeCastlingRights(int color, int side)
     {
       removeCastlingRights(color == WHITE ? side >> 4 : side >> 2);
     }
 
-    inline void updateEnPassantFile(int file)
+    void updateEnPassantFile(int file)
     {
       zobristKey ^= zobrist.enPassantKeys[enPassantFile];
       enPassantFile = file;
       zobristKey ^= zobrist.enPassantKeys[file];
     }
 
-    inline void updateCastlingRights(int rights)
+    void updateCastlingRights(int rights)
     {
       zobristKey ^= zobrist.castlingKeys[castlingRights];
       castlingRights = rights;
       zobristKey ^= zobrist.castlingKeys[castlingRights];
     }
 
-    inline void switchSideToMove()
+    void switchSideToMove()
     {
       sideToMove ^= COLOR;
       zobristKey ^= zobrist.sideKey;
     }
 
-    inline Bitboard getFriendlyPiecesBitboard(int color) const
+    Bitboard getFriendlyPiecesBitboard(int color) const
     {
       return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color | KING]);
     }
 
-    inline Bitboard getEnemyPiecesBitboard(int color) const
+    Bitboard getEnemyPiecesBitboard(int color) const
     {
       return getFriendlyPiecesBitboard(color ^ COLOR);
     }
 
-    inline Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
+    Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
     {
       return (this->*getPieceMoves[board[pieceIndex] & TYPE])(pieceIndex, includeCastling, onlyCaptures);
     }
 
-    inline void addPieceToBitboard(int pieceIndex)
+    void addPieceToBitboard(int pieceIndex)
     {
       bitboards[board[pieceIndex]].addBit(pieceIndex);
     }
 
-    inline void removePieceFromBitboard(int pieceIndex)
+    void removePieceFromBitboard(int pieceIndex)
     {
       bitboards[board[pieceIndex]].removeBit(pieceIndex);
     }
 
-    inline int countRepetitions(ZobristKey key) const
+    int countRepetitions(ZobristKey key) const
     {
       int count = 0;
 
@@ -202,7 +202,7 @@ namespace Chess
       return count;
     }
 
-    inline std::vector<Move> getSortedLegalMoves(int color, bool includeCastling = true)
+    std::vector<Move> getSortedLegalMoves(int color, bool includeCastling = true)
     {
       return heuristicSortMoves(getLegalMoves(color, includeCastling));
     }
