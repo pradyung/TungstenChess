@@ -4,6 +4,14 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 
+if (NOT SFML_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(SFML
+      GIT_REPOSITORY https://github.com/SFML/SFML.git
+      GIT_TAG 2.6.x)
+  FetchContent_MakeAvailable(SFML)
+endif()
+
 file(GLOB_RECURSE RESOURCES "resources/*")
 set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
