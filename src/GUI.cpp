@@ -28,6 +28,8 @@ namespace Chess
 
     this->window = &window;
 
+    board.loadOpeningBook(resourcePath + "opening_book.txt");
+
     loadSquareTextures();
     loadBoardSquares();
 

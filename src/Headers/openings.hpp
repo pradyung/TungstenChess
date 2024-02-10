@@ -13,6 +13,15 @@ namespace Chess
     Openings() : lastMoveIndex(INVALID) {}
 
     /**
+     * @brief Loads the opening book from a file
+     * @param path The path to the opening book file
+     */
+    void loadOpeningBook(const std::string &path)
+    {
+      openingBook.loadBook(path);
+    }
+
+    /**
      * @brief Adds a move to the move history
      * @param move The move to add
      * @return Whether the move was added successfully - if false, the move is not in the opening book
@@ -42,9 +51,9 @@ namespace Chess
      */
     int getNextMove() const { return getWeightedRandomMove(); }
 
-  private:
     OpeningBook openingBook;
 
+  private:
     std::vector<int> moves;
 
     int lastMoveIndex;

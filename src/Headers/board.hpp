@@ -38,6 +38,15 @@ namespace Chess
     int kingIndices[PIECE_NUMBER];
 
     /**
+     * @brief Loads the opening book from a file
+     * @param path The path to the opening book file
+     */
+    void loadOpeningBook(const std::string path)
+    {
+      openings.loadOpeningBook(path);
+    }
+
+    /**
      * @brief Returns the bitboard of the squares a piece can move to
      * @param pieceIndex The index of the piece
      */
