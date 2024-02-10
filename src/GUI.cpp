@@ -222,7 +222,7 @@ namespace Chess
 
     for (int i = 0; i < PIECE_NUMBER; i++)
     {
-      piecesTextures[i].setSmooth(true);
+      // piecesTextures[i].setSmooth(true);
     }
   }
 
