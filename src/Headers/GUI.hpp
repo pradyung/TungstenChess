@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <CoreFoundation/CoreFoundation.h>
 #include <string>
 #include <thread>
 
@@ -43,6 +44,8 @@ namespace Chess
     void runMainLoop();
 
   private:
+    std::string resourcePath;
+
     Board board;
 
     Piece bufferBoard[64];

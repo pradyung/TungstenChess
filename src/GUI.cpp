@@ -17,6 +17,15 @@ namespace Chess
 {
   GUIHandler::GUIHandler(RenderWindow &window)
   {
+    CFBundleRef mainBundle = CFBundleGetMainBundle();
+    CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+    char path[PATH_MAX];
+    if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+      resourcePath = "";
+    else
+      resourcePath = std::string(path) + "/";
+    CFRelease(resourcesURL);
+
     this->window = &window;
 
     loadSquareTextures();
@@ -27,7 +36,7 @@ namespace Chess
     loadPromotionPieces();
 
     Image icon;
-    icon.loadFromFile("../Resources/images/wk.png");
+    icon.loadFromFile(resourcePath + "high_res_wn.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
   }
 
@@ -162,7 +171,7 @@ namespace Chess
     square.create(80, 80, sf::Color(127, 127, 127, 200));
     squares[GRAY_HIGHLIGHT].loadFromImage(square);
 
-    squares[YELLOW_OUTLINE].loadFromFile("../Resources/images/yellow_outline.png");
+    squares[YELLOW_OUTLINE].loadFromFile(resourcePath + "yellow_outline.png");
   }
 
   void GUIHandler::loadBoardSquares()
@@ -197,19 +206,19 @@ namespace Chess
 
   void GUIHandler::loadPieceTextures()
   {
-    piecesTextures[WHITE_PAWN].loadFromFile("../Resources/images/wp.png");
-    piecesTextures[WHITE_KNIGHT].loadFromFile("../Resources/images/wn.png");
-    piecesTextures[WHITE_BISHOP].loadFromFile("../Resources/images/wb.png");
-    piecesTextures[WHITE_ROOK].loadFromFile("../Resources/images/wr.png");
-    piecesTextures[WHITE_QUEEN].loadFromFile("../Resources/images/wq.png");
-    piecesTextures[WHITE_KING].loadFromFile("../Resources/images/wk.png");
+    piecesTextures[WHITE_PAWN].loadFromFile(resourcePath + "wp.png");
+    piecesTextures[WHITE_KNIGHT].loadFromFile(resourcePath + "wn.png");
+    piecesTextures[WHITE_BISHOP].loadFromFile(resourcePath + "wb.png");
+    piecesTextures[WHITE_ROOK].loadFromFile(resourcePath + "wr.png");
+    piecesTextures[WHITE_QUEEN].loadFromFile(resourcePath + "wq.png");
+    piecesTextures[WHITE_KING].loadFromFile(resourcePath + "wk.png");
 
-    piecesTextures[BLACK_PAWN].loadFromFile("../Resources/images/bp.png");
-    piecesTextures[BLACK_KNIGHT].loadFromFile("../Resources/images/bn.png");
-    piecesTextures[BLACK_BISHOP].loadFromFile("../Resources/images/bb.png");
-    piecesTextures[BLACK_ROOK].loadFromFile("../Resources/images/br.png");
-    piecesTextures[BLACK_QUEEN].loadFromFile("../Resources/images/bq.png");
-    piecesTextures[BLACK_KING].loadFromFile("../Resources/images/bk.png");
+    piecesTextures[BLACK_PAWN].loadFromFile(resourcePath + "bp.png");
+    piecesTextures[BLACK_KNIGHT].loadFromFile(resourcePath + "bn.png");
+    piecesTextures[BLACK_BISHOP].loadFromFile(resourcePath + "bb.png");
+    piecesTextures[BLACK_ROOK].loadFromFile(resourcePath + "br.png");
+    piecesTextures[BLACK_QUEEN].loadFromFile(resourcePath + "bq.png");
+    piecesTextures[BLACK_KING].loadFromFile(resourcePath + "bk.png");
 
     for (int i = 0; i < PIECE_NUMBER; i++)
     {
