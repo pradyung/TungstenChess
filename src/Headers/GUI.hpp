@@ -6,7 +6,6 @@
 #include <thread>
 
 #include "board.hpp"
-#include "Data/images.hpp"
 
 using namespace sf;
 
@@ -16,11 +15,13 @@ namespace Chess
 
   enum ScreenConstants
   {
-    SQUARE_SIZE = 80,
+    SQUARE_SIZE = 100,
   };
 
   enum Highlights
   {
+    WHITE_SQUARE = 0,
+    BLACK_SQUARE = 1,
     YELLOW_HIGHLIGHT = 2,
     RED_HIGHLIGHT = 3,
     GRAY_HIGHLIGHT = 4,
@@ -47,8 +48,6 @@ namespace Chess
     Piece bufferBoard[64];
 
     RenderWindow *window;
-
-    Images images;
 
     Texture squares[6];
     Texture piecesTextures[PIECE_NUMBER];

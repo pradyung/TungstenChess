@@ -27,7 +27,7 @@ namespace Chess
     loadPromotionPieces();
 
     Image icon;
-    icon.loadFromMemory(images.WHITE_KNIGHT, images.WHITE_KNIGHT_SIZE);
+    icon.loadFromFile("../Resources/images/wk.png");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
   }
 
@@ -124,7 +124,7 @@ namespace Chess
 
       int x = Mouse::getPosition(*window).x;
       int y = Mouse::getPosition(*window).y;
-      if (x >= 0 && x <= 640 && y >= 0 && y <= 640)
+      if (x >= 0 && x <= 8 * SQUARE_SIZE && y >= 0 && y <= 8 * SQUARE_SIZE)
         yellowOutlineIndex = getSquareIndex(x, y);
       else
         yellowOutlineIndex = INVALID;
@@ -149,12 +149,20 @@ namespace Chess
 
   void GUIHandler::loadSquareTextures()
   {
-    squares[0].loadFromMemory(images.WHITE_SQUARE, images.WHITE_SQUARE_SIZE);
-    squares[1].loadFromMemory(images.BLACK_SQUARE, images.BLACK_SQUARE_SIZE);
-    squares[YELLOW_HIGHLIGHT].loadFromMemory(images.YELLOW_HIGHLIGHT, images.YELLOW_HIGHLIGHT_SIZE);
-    squares[RED_HIGHLIGHT].loadFromMemory(images.RED_HIGHLIGHT, images.RED_HIGHLIGHT_SIZE);
-    squares[GRAY_HIGHLIGHT].loadFromMemory(images.GRAY_HIGHLIGHT, images.GRAY_HIGHLIGHT_SIZE);
-    squares[YELLOW_OUTLINE].loadFromMemory(images.YELLOW_OUTLINE, images.YELLOW_OUTLINE_SIZE);
+    sf::Image square;
+
+    square.create(80, 80, sf::Color(255, 255, 255));
+    squares[WHITE_SQUARE].loadFromImage(square);
+    square.create(80, 80, sf::Color(216, 181, 149));
+    squares[BLACK_SQUARE].loadFromImage(square);
+    square.create(80, 80, sf::Color(255, 255, 0, 127));
+    squares[YELLOW_HIGHLIGHT].loadFromImage(square);
+    square.create(80, 80, sf::Color(255, 0, 0, 200));
+    squares[RED_HIGHLIGHT].loadFromImage(square);
+    square.create(80, 80, sf::Color(127, 127, 127, 200));
+    squares[GRAY_HIGHLIGHT].loadFromImage(square);
+
+    squares[YELLOW_OUTLINE].loadFromFile("../Resources/images/yellow_outline.png");
   }
 
   void GUIHandler::loadBoardSquares()
@@ -189,19 +197,19 @@ namespace Chess
 
   void GUIHandler::loadPieceTextures()
   {
-    piecesTextures[WHITE_PAWN].loadFromMemory(images.WHITE_PAWN, images.WHITE_PAWN_SIZE);
-    piecesTextures[WHITE_KNIGHT].loadFromMemory(images.WHITE_KNIGHT, images.WHITE_KNIGHT_SIZE);
-    piecesTextures[WHITE_BISHOP].loadFromMemory(images.WHITE_BISHOP, images.WHITE_BISHOP_SIZE);
-    piecesTextures[WHITE_ROOK].loadFromMemory(images.WHITE_ROOK, images.WHITE_ROOK_SIZE);
-    piecesTextures[WHITE_QUEEN].loadFromMemory(images.WHITE_QUEEN, images.WHITE_QUEEN_SIZE);
-    piecesTextures[WHITE_KING].loadFromMemory(images.WHITE_KING, images.WHITE_KING_SIZE);
+    piecesTextures[WHITE_PAWN].loadFromFile("../Resources/images/wp.png");
+    piecesTextures[WHITE_KNIGHT].loadFromFile("../Resources/images/wn.png");
+    piecesTextures[WHITE_BISHOP].loadFromFile("../Resources/images/wb.png");
+    piecesTextures[WHITE_ROOK].loadFromFile("../Resources/images/wr.png");
+    piecesTextures[WHITE_QUEEN].loadFromFile("../Resources/images/wq.png");
+    piecesTextures[WHITE_KING].loadFromFile("../Resources/images/wk.png");
 
-    piecesTextures[BLACK_PAWN].loadFromMemory(images.BLACK_PAWN, images.BLACK_PAWN_SIZE);
-    piecesTextures[BLACK_KNIGHT].loadFromMemory(images.BLACK_KNIGHT, images.BLACK_KNIGHT_SIZE);
-    piecesTextures[BLACK_BISHOP].loadFromMemory(images.BLACK_BISHOP, images.BLACK_BISHOP_SIZE);
-    piecesTextures[BLACK_ROOK].loadFromMemory(images.BLACK_ROOK, images.BLACK_ROOK_SIZE);
-    piecesTextures[BLACK_QUEEN].loadFromMemory(images.BLACK_QUEEN, images.BLACK_QUEEN_SIZE);
-    piecesTextures[BLACK_KING].loadFromMemory(images.BLACK_KING, images.BLACK_KING_SIZE);
+    piecesTextures[BLACK_PAWN].loadFromFile("../Resources/images/bp.png");
+    piecesTextures[BLACK_KNIGHT].loadFromFile("../Resources/images/bn.png");
+    piecesTextures[BLACK_BISHOP].loadFromFile("../Resources/images/bb.png");
+    piecesTextures[BLACK_ROOK].loadFromFile("../Resources/images/br.png");
+    piecesTextures[BLACK_QUEEN].loadFromFile("../Resources/images/bq.png");
+    piecesTextures[BLACK_KING].loadFromFile("../Resources/images/bk.png");
 
     for (int i = 0; i < PIECE_NUMBER; i++)
     {
@@ -217,10 +225,10 @@ namespace Chess
       {
         pieceSprites[j][i].setTexture(piecesTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
-        pieceSprites[j][i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
+        pieceSprites[j][i].setScale(SQUARE_SIZE / 333.0f, SQUARE_SIZE / 333.0f);
       }
 
-      draggingPieceSprite.setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
+      draggingPieceSprite.setScale(SQUARE_SIZE / 333.0f, SQUARE_SIZE / 333.0f);
     }
   }
 
