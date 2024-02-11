@@ -17,6 +17,13 @@ namespace Chess
   typedef uint8_t GameState;
   typedef uint8_t Shift;
 
+  struct BotSettings
+  {
+    int searchDepth;
+    int quiesceDepth;
+    bool useOpeningBook;
+  };
+
   enum CastlingRights
   {
     WHITE_KINGSIDE = 1,

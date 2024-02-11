@@ -15,8 +15,11 @@
 
 namespace Chess
 {
-  const int SEARCH_DEPTH = 4;
-  const int QUIESCE_DEPTH = 4;
+  const BotSettings DEFAULT_BOT_SETTINGS = {
+      5, // search depth
+      6, // quiesce depth
+      0  // use opening book
+  };
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
 
@@ -105,6 +108,8 @@ namespace Chess
     MagicMoveGen magicMoveGen;
 
     Zobrist zobrist;
+
+    BotSettings botSettings = DEFAULT_BOT_SETTINGS;
 
     ZobristKey getInitialZobristKey() const;
 

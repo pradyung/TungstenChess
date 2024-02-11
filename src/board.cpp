@@ -437,7 +437,7 @@ namespace Chess
 
   Move Board::generateBotMove()
   {
-    if (inOpeningBook)
+    if (inOpeningBook && botSettings.useOpeningBook)
     {
       int moveInt = openings.getNextMove();
 
@@ -447,7 +447,7 @@ namespace Chess
       inOpeningBook = false;
     }
 
-    return generateBestMove(SEARCH_DEPTH);
+    return generateBestMove(botSettings.searchDepth);
   }
 
   int Board::getStaticEvaluation()
@@ -691,7 +691,7 @@ namespace Chess
   int Board::negamax(int depth, int alpha, int beta)
   {
     if (depth == 0)
-      return quiesce(QUIESCE_DEPTH, alpha, beta);
+      return quiesce(botSettings.quiesceDepth, alpha, beta);
 
     std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove);
 
