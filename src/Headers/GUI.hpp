@@ -14,7 +14,7 @@ namespace Chess
 {
   const int PLAYER_COLOR = WHITE;
 
-  const bool THREADING = false;
+  const bool THREADING = true;
 
   enum ScreenConstants
   {

@@ -304,7 +304,7 @@ namespace Chess
 
   std::vector<Move> Board::getLegalMoves(int color, bool includeCastling)
   {
-    std::vector<Move> legalMoves = std::vector<Move>(256);
+    std::vector<Move> legalMoves;
 
     Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(color);
 
