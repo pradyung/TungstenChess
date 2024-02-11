@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <string>
+#include <iostream>
 
 namespace Chess
 {
@@ -12,9 +13,10 @@ namespace Chess
     {
       std::ifstream file(book_path);
 
+      // read the file 4 bytes at a time into the book array
       for (int i = 0; i < 16552; i++)
       {
-        file >> book[i];
+        file.read((char *)&book[i], sizeof(int));
       }
 
       file.close();

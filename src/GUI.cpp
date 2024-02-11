@@ -28,7 +28,7 @@ namespace Chess
 
     this->window = &window;
 
-    board.loadOpeningBook(resourcePath + "opening_book.txt");
+    board.loadOpeningBook(resourcePath + "opening_book.bin");
 
     loadSquareTextures();
     loadBoardSquares();
@@ -408,11 +408,18 @@ namespace Chess
   {
     isThinking = true;
 
-    saveBufferBoard();
+    if (THREADING)
+    {
+      saveBufferBoard();
 
-    thinkingThread = std::thread(&GUIHandler::makeBotMove, this);
+      thinkingThread = std::thread(&GUIHandler::makeBotMove, this);
 
-    thinkingThread.detach();
+      thinkingThread.detach();
+    }
+    else
+    {
+      makeBotMove();
+    }
   }
 
   void GUIHandler::stopThinking()

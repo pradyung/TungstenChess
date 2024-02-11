@@ -14,6 +14,8 @@ namespace Chess
 {
   const int PLAYER_COLOR = WHITE;
 
+  const bool THREADING = false;
+
   enum ScreenConstants
   {
     SQUARE_SIZE = 100,
