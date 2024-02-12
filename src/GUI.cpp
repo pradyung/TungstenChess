@@ -28,7 +28,7 @@ namespace Chess
 
     this->window = &window;
 
-    board.loadOpeningBook(resourcePath + "opening_book.bin");
+    board.loadOpeningBook(resourcePath + "opening_book");
 
     loadSquareTextures();
     loadBoardSquares();
