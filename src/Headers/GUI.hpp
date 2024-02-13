@@ -10,16 +10,14 @@
 
 using namespace sf;
 
+#define SQUARE_SIZE 100
+#define SPRITE_SIZE 100.0f
+
 namespace Chess
 {
   const int PLAYER_COLOR = WHITE;
 
   const bool THREADING = true;
-
-  enum ScreenConstants
-  {
-    SQUARE_SIZE = 100,
-  };
 
   enum Highlights
   {

@@ -211,19 +211,19 @@ namespace Chess
     sf::Texture atlas;
     atlas.loadFromFile(resourcePath + "atlas.png");
 
-    piecesTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * 333, 0 * 333, 333, 333));
-    piecesTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * 333, 0 * 333, 333, 333));
-    piecesTextures[WHITE_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * 333, 0 * 333, 333, 333));
-    piecesTextures[WHITE_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * 333, 0 * 333, 333, 333));
-    piecesTextures[WHITE_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * 333, 0 * 333, 333, 333));
-    piecesTextures[WHITE_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * 333, 0 * 333, 333, 333));
+    piecesTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[WHITE_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[WHITE_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[WHITE_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[WHITE_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
 
-    piecesTextures[BLACK_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * 333, 333, 333, 333));
-    piecesTextures[BLACK_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * 333, 333, 333, 333));
-    piecesTextures[BLACK_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * 333, 333, 333, 333));
-    piecesTextures[BLACK_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * 333, 333, 333, 333));
-    piecesTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * 333, 333, 333, 333));
-    piecesTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * 333, 333, 333, 333));
+    piecesTextures[BLACK_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[BLACK_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[BLACK_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[BLACK_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    piecesTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
 
     for (int i = 0; i < PIECE_NUMBER; i++)
     {
@@ -239,10 +239,10 @@ namespace Chess
       {
         pieceSprites[j][i].setTexture(piecesTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
-        pieceSprites[j][i].setScale(SQUARE_SIZE / 333.0f, SQUARE_SIZE / 333.0f);
+        pieceSprites[j][i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
       }
 
-      draggingPieceSprite.setScale(SQUARE_SIZE / 333.0f, SQUARE_SIZE / 333.0f);
+      draggingPieceSprite.setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
     }
   }
 
