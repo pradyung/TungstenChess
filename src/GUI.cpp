@@ -162,15 +162,15 @@ namespace Chess
   {
     sf::Image square;
 
-    square.create(80, 80, sf::Color(255, 255, 255));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 255, 255));
     squares[WHITE_SQUARE].loadFromImage(square);
-    square.create(80, 80, sf::Color(216, 181, 149));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(216, 181, 149));
     squares[BLACK_SQUARE].loadFromImage(square);
-    square.create(80, 80, sf::Color(255, 255, 0, 127));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 255, 0, 127));
     squares[YELLOW_HIGHLIGHT].loadFromImage(square);
-    square.create(80, 80, sf::Color(255, 0, 0, 200));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 0, 0, 200));
     squares[RED_HIGHLIGHT].loadFromImage(square);
-    square.create(80, 80, sf::Color(127, 127, 127, 200));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(127, 127, 127, 200));
     squares[GRAY_HIGHLIGHT].loadFromImage(square);
 
     squares[YELLOW_OUTLINE].loadFromFile(resourcePath + "yellow_outline.png");
@@ -194,12 +194,6 @@ namespace Chess
         yellowHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
         grayHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
         yellowOutlineSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
-
-        boardSquares[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-        redHighlightsSprites[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-        yellowHighlightsSprites[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-        grayHighlightsSprites[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-        yellowOutlineSprites[squareIndex].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
 
         squareIndex++;
       }
@@ -256,8 +250,8 @@ namespace Chess
       whitePromotionPieces[i].setPosition(getSquareCoordinates(10 + i));
       blackPromotionPieces[i].setPosition(getSquareCoordinates(50 + i));
 
-      whitePromotionPieces[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
-      blackPromotionPieces[i].setScale(SQUARE_SIZE / 80.0f, SQUARE_SIZE / 80.0f);
+      whitePromotionPieces[i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
+      blackPromotionPieces[i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
     }
   }
 
