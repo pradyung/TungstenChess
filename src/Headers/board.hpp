@@ -16,9 +16,9 @@
 namespace Chess
 {
   const BotSettings DEFAULT_BOT_SETTINGS = {
-      5, // search depth
-      6, // quiesce depth
-      1  // use opening book
+      5,  // search depth
+      10, // quiesce depth
+      0   // use opening book
   };
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
