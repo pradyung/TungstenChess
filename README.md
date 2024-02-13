@@ -1,6 +1,6 @@
 # Chess Bot
 
-This is a simple but powerful chess AI built using C++ and SFML. The bot uses the negamax algorithm with a depth of 5 moves.
+This is a simple but powerful chess AI built using C++ and SFML. The bot uses the negamax algorithm with a minimum depth of 5 moves, and a maximum depth of 15 moves (for quiescence search).
 
 ## Platform
 
