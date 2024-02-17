@@ -1,4 +1,4 @@
-#include "Headers/board.hpp"
+#include "Headers/board.hpp" // See for documentation and helper function implementations
 
 namespace Chess
 {
@@ -66,30 +66,26 @@ namespace Chess
       enPassantFile = fenParts[EN_PASSANT][0] - 'a';
     }
 
-    zobristKey = getInitialZobristKey();
+    calculateInitialZobristKey();
 
     positionHistory.push_back(zobristKey);
   }
 
-  ZobristKey Board::getInitialZobristKey() const
+  void Board::calculateInitialZobristKey()
   {
-    ZobristKey hash = 0;
-
     for (int i = 0; i < 64; i++)
     {
       if (board[i])
       {
-        hash ^= zobrist.pieceKeys[i][board[i]];
+        zobristKey ^= zobrist.pieceKeys[i][board[i]];
       }
     }
 
-    hash ^= zobrist.castlingKeys[castlingRights];
-    hash ^= zobrist.enPassantKeys[enPassantFile];
+    zobristKey ^= zobrist.castlingKeys[castlingRights];
+    zobristKey ^= zobrist.enPassantKeys[enPassantFile];
 
     if (sideToMove == WHITE)
-      hash ^= zobrist.sideKey;
-
-    return hash;
+      zobristKey ^= zobrist.sideKey;
   }
 
   void Board::makeMove(Move move, bool speculative)
