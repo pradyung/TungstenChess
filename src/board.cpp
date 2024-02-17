@@ -42,7 +42,7 @@ namespace Chess
     }
 
     if (fenParts[BOARD] != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
-      inOpeningBook = false;
+      openings.inOpeningBook = false;
 
     sideToMove = fenParts[SIDE_TO_MOVE] == "w" ? WHITE : BLACK;
 
@@ -96,8 +96,8 @@ namespace Chess
   {
     switchSideToMove();
 
-    if (!speculative && inOpeningBook)
-      inOpeningBook = openings.addMove(move.toInt());
+    if (!speculative && openings.inOpeningBook)
+      openings.inOpeningBook = openings.addMove(move.toInt());
 
     int from = move.from;
     int to = move.to;
@@ -438,14 +438,14 @@ namespace Chess
 
   Move Board::generateBotMove()
   {
-    if (inOpeningBook && botSettings.useOpeningBook)
+    if (openings.inOpeningBook && botSettings.useOpeningBook)
     {
       int moveInt = openings.getNextMove();
 
       if (moveInt != INVALID)
         return generateMoveFromInt(moveInt);
 
-      inOpeningBook = false;
+      openings.inOpeningBook = false;
     }
 
     return generateBestMove(botSettings.searchDepth);

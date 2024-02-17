@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.hpp"
-#include "Data/move_gen_helpers.hpp"
+#include "move_gen_helpers.hpp"
 #include "bitboard.hpp"
 
 namespace Chess

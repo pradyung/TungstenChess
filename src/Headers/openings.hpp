@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <fstream>
 
 #include "types.hpp"
-#include "Data/opening_book.hpp"
 
 namespace Chess
 {
@@ -12,13 +12,23 @@ namespace Chess
   public:
     Openings() : lastMoveIndex(INVALID) {}
 
+    bool inOpeningBook = true;
+
     /**
      * @brief Loads the opening book from a file
      * @param path The path to the opening book file
      */
     void loadOpeningBook(const std::string &path)
     {
-      openingBook.loadBook(path);
+      std::ifstream file(path);
+
+      // read the file 4 bytes at a time into the book array
+      for (int i = 0; i < 16552; i++)
+      {
+        file.read((char *)&openingBook[i], sizeof(int));
+      }
+
+      file.close();
     }
 
     /**
@@ -51,9 +61,9 @@ namespace Chess
      */
     int getNextMove() const { return getWeightedRandomMove(); }
 
-    OpeningBook openingBook;
-
   private:
+    int openingBook[16552];
+
     std::vector<int> moves;
 
     int lastMoveIndex;

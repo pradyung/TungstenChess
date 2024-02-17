@@ -3,7 +3,7 @@
 #include <array>
 #include <iostream>
 
-#include "../types.hpp"
+#include "types.hpp"
 
 namespace Chess
 {

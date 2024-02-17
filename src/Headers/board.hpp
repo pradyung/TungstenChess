@@ -11,15 +11,15 @@
 #include "zobrist.hpp"
 #include "openings.hpp"
 #include "magic.hpp"
-#include "Data/move_gen_helpers.hpp"
-#include "Data/piece_eval_tables.hpp"
+#include "move_gen_helpers.hpp"
+#include "piece_eval_tables.hpp"
 
 namespace Chess
 {
   const BotSettings DEFAULT_BOT_SETTINGS = {
       5,  // search depth
       10, // quiesce depth
-      0,  // use opening book
+      1,  // use opening book
       1   // log positions evaluated
   };
 
@@ -103,14 +103,9 @@ namespace Chess
     std::vector<ZobristKey> positionHistory;
 
     Openings openings;
-    bool inOpeningBook = true;
-
     MovesLookup movesLookup;
-
     PieceEvalTables pieceEvalTables;
-
     MagicMoveGen magicMoveGen;
-
     Zobrist zobrist;
 
     BotSettings botSettings = DEFAULT_BOT_SETTINGS;
