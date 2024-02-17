@@ -22,6 +22,7 @@ namespace Chess
     int searchDepth;
     int quiesceDepth;
     bool useOpeningBook;
+    bool logPositionsEvaluated;
   };
 
   enum CastlingRights

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <stack>
@@ -18,7 +19,8 @@ namespace Chess
   const BotSettings DEFAULT_BOT_SETTINGS = {
       5,  // search depth
       10, // quiesce depth
-      0   // use opening book
+      0,  // use opening book
+      1   // log positions evaluated
   };
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
@@ -32,6 +34,8 @@ namespace Chess
 
     int castlingRights;
     int enPassantFile;
+
+    int positionsEvaluated;
 
     Bitboard bitboards[PIECE_NUMBER];
 
@@ -210,6 +214,40 @@ namespace Chess
     std::vector<Move> getSortedLegalMoves(int color, bool includeCastling = true)
     {
       return heuristicSortMoves(getLegalMoves(color, includeCastling));
+    }
+
+    int getPiecePositionalEvaluation(int pieceIndex, bool absolute = false) const
+    {
+      int positionalEvaluation = 0;
+
+      if (board[pieceIndex] == EMPTY || (board[pieceIndex] & TYPE) == KING)
+        return 0;
+
+      int lookupIndex = (board[pieceIndex] & COLOR) == WHITE ? pieceIndex : 63 - pieceIndex;
+
+      switch (board[pieceIndex] & TYPE)
+      {
+      case PAWN:
+        positionalEvaluation = pieceEvalTables.PAWN_EVAL_TABLE[lookupIndex];
+        break;
+      case KNIGHT:
+        positionalEvaluation = pieceEvalTables.KNIGHT_EVAL_TABLE[lookupIndex];
+        break;
+      case BISHOP:
+        positionalEvaluation = pieceEvalTables.BISHOP_EVAL_TABLE[lookupIndex];
+        break;
+      case ROOK:
+        positionalEvaluation = pieceEvalTables.ROOK_EVAL_TABLE[lookupIndex];
+        break;
+      case QUEEN:
+        positionalEvaluation = pieceEvalTables.QUEEN_EVAL_TABLE[lookupIndex];
+        break;
+      }
+
+      if ((board[pieceIndex] & COLOR) == BLACK && !absolute)
+        positionalEvaluation = -positionalEvaluation;
+
+      return positionalEvaluation;
     }
 
     void unmakeMove(Move move);

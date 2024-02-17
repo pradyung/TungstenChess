@@ -453,6 +453,8 @@ namespace Chess
 
   int Board::getStaticEvaluation()
   {
+    positionsEvaluated++;
+
     int gameStatus = getGameStatus(sideToMove);
 
     if (gameStatus != NO_MATE)
@@ -493,39 +495,7 @@ namespace Chess
 
     for (int i = 0; i < 64; i++)
     {
-      switch (board[i])
-      {
-      case WHITE_PAWN:
-        positionalEvaluation += pieceEvalTables.PAWN_EVAL_TABLE[i];
-        break;
-      case WHITE_KNIGHT:
-        positionalEvaluation += pieceEvalTables.KNIGHT_EVAL_TABLE[i];
-        break;
-      case WHITE_BISHOP:
-        positionalEvaluation += pieceEvalTables.BISHOP_EVAL_TABLE[i];
-        break;
-      case WHITE_ROOK:
-        positionalEvaluation += pieceEvalTables.ROOK_EVAL_TABLE[i];
-        break;
-      case WHITE_QUEEN:
-        positionalEvaluation += pieceEvalTables.QUEEN_EVAL_TABLE[i];
-        break;
-      case BLACK_PAWN:
-        positionalEvaluation -= pieceEvalTables.PAWN_EVAL_TABLE[63 - i];
-        break;
-      case BLACK_KNIGHT:
-        positionalEvaluation -= pieceEvalTables.KNIGHT_EVAL_TABLE[63 - i];
-        break;
-      case BLACK_BISHOP:
-        positionalEvaluation -= pieceEvalTables.BISHOP_EVAL_TABLE[63 - i];
-        break;
-      case BLACK_ROOK:
-        positionalEvaluation -= pieceEvalTables.ROOK_EVAL_TABLE[63 - i];
-        break;
-      case BLACK_QUEEN:
-        positionalEvaluation -= pieceEvalTables.QUEEN_EVAL_TABLE[63 - i];
-        break;
-      }
+      positionalEvaluation += getPiecePositionalEvaluation(i);
 
       if (board[i] == WHITE_KING)
       {
@@ -760,6 +730,8 @@ namespace Chess
 
   Move Board::generateBestMove(int depth, int alpha, int beta)
   {
+    positionsEvaluated = 0;
+
     if (depth == 0)
       return generateOneDeepMove();
 
@@ -785,6 +757,9 @@ namespace Chess
         break;
     }
 
+    if (botSettings.logPositionsEvaluated)
+      std::cout << "Positions evaluated: " << positionsEvaluated << std::endl;
+
     return legalMoves[bestMoveIndex];
   }
 
@@ -802,9 +777,8 @@ namespace Chess
 
     evaluation += PIECE_VALUES[move.capturedPiece & TYPE] * (move.flags & CAPTURE);
     evaluation += PIECE_VALUES[move.promotionPiece & TYPE] * (move.flags & PROMOTION);
-    evaluation += 50 * (move.flags & KSIDE_CASTLE);
-    evaluation += 50 * (move.flags & QSIDE_CASTLE);
-    evaluation += 100 * (move.flags & EP_CAPTURE);
+
+    evaluation += getPiecePositionalEvaluation(move.to, true) - getPiecePositionalEvaluation(move.from, true);
 
     return evaluation;
   }
