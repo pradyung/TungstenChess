@@ -444,7 +444,7 @@ namespace Chess
       openings.inOpeningBook = false;
     }
 
-    return generateBestMove(botSettings.searchDepth);
+    return iterativeDeepening(botSettings.maxSearchTime);
   }
 
   int Board::getStaticEvaluation()
@@ -753,10 +753,31 @@ namespace Chess
         break;
     }
 
-    if (botSettings.logPositionsEvaluated)
-      std::cout << "Positions evaluated: " << positionsEvaluated << std::endl;
-
     return legalMoves[bestMoveIndex];
+  }
+
+  Move Board::iterativeDeepening(int time)
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    int depth = 1;
+
+    Move bestMove = generateBestMove(depth);
+
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() < time)
+    {
+      depth++;
+
+      Move newBestMove = generateBestMove(depth);
+
+      bestMove = newBestMove;
+    }
+
+    if (botSettings.logPositionsEvaluated)
+      std::cout << "Depth: " << depth << ", "
+                << "Positions evaluated: " << positionsEvaluated << std::endl;
+
+    return bestMove;
   }
 
   std::vector<Move> Board::heuristicSortMoves(std::vector<Move> moves)
