@@ -20,7 +20,7 @@ namespace Chess
       500, // max search time in ms
       10,  // quiesce depth
       1,   // use opening book
-      1    // log positions evaluated
+      1    // log depth searched, time taken, and nodes evaluated
   };
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
@@ -28,7 +28,7 @@ namespace Chess
   class Board
   {
   public:
-    Board(std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    Board(std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", BotSettings settings = DEFAULT_BOT_SETTINGS);
 
     int sideToMove;
 
@@ -108,7 +108,7 @@ namespace Chess
     MagicMoveGen magicMoveGen;
     Zobrist zobrist;
 
-    BotSettings botSettings = DEFAULT_BOT_SETTINGS;
+    BotSettings botSettings;
 
     /**
      * @brief Calculates the Zobrist key for the current position. Should only be called once at board initialization
@@ -363,7 +363,8 @@ namespace Chess
 
     /**
      * @brief Uses iterative deepening to find the best move in a constant amount of time
-     * @param time The time in milliseconds to search for (this time is not exact, but the bot will stop after a search is complete AND the time has run out)
+     * @param time The time in milliseconds to search for (this time is not exact, but the bot will stop after a search is complete AND the time has run out.
+     *             It will not stop in the middle of a search, so the actual time spent may be significantly longer than the time parameter)
      */
     Move iterativeDeepening(int time);
 

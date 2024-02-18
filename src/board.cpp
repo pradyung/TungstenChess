@@ -2,7 +2,8 @@
 
 namespace Chess
 {
-  Board::Board(std::string fen) : magicMoveGen(MagicMoveGen(movesLookup))
+  Board::Board(std::string fen, BotSettings botSettings)
+      : magicMoveGen(MagicMoveGen(movesLookup)), botSettings(botSettings)
   {
     std::string fenParts[FEN_LENGTH];
 
@@ -775,6 +776,7 @@ namespace Chess
 
     if (botSettings.logPositionsEvaluated)
       std::cout << "Depth: " << depth << ", "
+                << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms, "
                 << "Positions evaluated: " << positionsEvaluated << std::endl;
 
     return bestMove;
