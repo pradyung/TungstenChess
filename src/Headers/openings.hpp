@@ -68,6 +68,9 @@ namespace Chess
 
     int lastMoveIndex;
 
+    /**
+     * @brief Gets the next possible "children" moves from the opening book
+     */
     std::vector<int> getChildrenMoves() const
     {
       std::vector<int> childrenMoves;
@@ -89,6 +92,9 @@ namespace Chess
       return childrenMoves;
     }
 
+    /**
+     * @brief Gets a random next move, weighted by the frequency of the children moves
+     */
     int getWeightedRandomMove() const
     {
       std::vector<int> childrenMoves = getChildrenMoves();

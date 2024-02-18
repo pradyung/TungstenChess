@@ -18,6 +18,10 @@ namespace Chess
     const Magic BISHOP_MAGICS[64] = {8017588328645042171ULL, 6007577461340950354ULL, 3813354908954347151ULL, 6464933238120839123ULL, 11879815850915417173ULL, 568215059584905889ULL, 3233825377581302821ULL, 16050787983471935383ULL, 17090357297884846079ULL, 3305060684517928954ULL, 14197754980172280776ULL, 15794554870930224410ULL, 6324728021570488234ULL, 4386168619574438524ULL, 3264868769964939707ULL, 4105817386461839319ULL, 9776147838709414967ULL, 7499669276741979680ULL, 13335850962031936333ULL, 14439211441603787457ULL, 143927301612160585ULL, 10879532463223142353ULL, 3445146371971913458ULL, 5359785949763016537ULL, 5993755088132702138ULL, 11476755375037820729ULL, 16238298582571586052ULL, 11809961220229807678ULL, 1603936011622941651ULL, 12040054947452418920ULL, 10196609040130900149ULL, 7897780414771258984ULL, 13345293622117982603ULL, 15321604517186371231ULL, 6164256739328496077ULL, 3131202398497994824ULL, 15149606292837371442ULL, 13560759540658065164ULL, 17582529281731803094ULL, 15736960641726849905ULL, 6460605290323577482ULL, 164361425742159233ULL, 15596083846782157315ULL, 1619836206092341657ULL, 4751945299948273436ULL, 5347407521658715476ULL, 18135059554113176715ULL, 595316331634685307ULL, 16599342878468561509ULL, 3733481883356566675ULL, 4538998911170827286ULL, 4547734092616200512ULL, 10708688982182548051ULL, 2466531037541086642ULL, 3999110633058906306ULL, 1226899720714895682ULL, 6593071869795443279ULL, 9131822247971587526ULL, 4915140371221576591ULL, 3514027078995846705ULL, 13509357176708445488ULL, 16863355650733748365ULL, 5316234222833021038ULL, 9441936417810848256ULL};
     const Shift BISHOP_SHIFTS[64] = {57, 59, 58, 59, 58, 58, 59, 58, 59, 58, 58, 58, 58, 58, 58, 59, 58, 58, 56, 55, 55, 56, 58, 58, 58, 58, 55, 53, 52, 56, 58, 58, 58, 58, 55, 52, 52, 55, 58, 58, 58, 58, 56, 56, 55, 55, 58, 58, 59, 59, 58, 58, 58, 59, 59, 58, 57, 59, 58, 58, 58, 58, 59, 57};
 
+    /**
+     * @brief Initializes the magic move generation lookup tables
+     * @param movesLookup The move generation helper object with populated mask lookup tables
+     */
     MagicMoveGen(MovesLookup &movesLookup)
     {
       initRookLookupTables(movesLookup);
@@ -25,6 +29,11 @@ namespace Chess
     }
 
   private:
+    /**
+     * @brief Gets all possible blocker bitboards for a given square and mask
+     * @param square The square to get blockers for
+     * @param mask The mask to get blockers for
+     */
     static std::vector<BitboardInt> getAllBlockers(int square, BitboardInt mask)
     {
       std::vector<int> setBits = std::vector<int>();
@@ -49,6 +58,13 @@ namespace Chess
       return blockers;
     }
 
+    /**
+     * @brief Gets all possible shifted blocker bitboards for a given square, magic number, shift, and blockers
+     * @param magic The magic number to be used for the calculation
+     * @param shift The shift to be used for the calculation
+     * @param square The square to get shifted blockers for
+     * @param blocks The blocker bitboards to be shifted
+     */
     static std::vector<BitboardInt> getShiftedBlockers(Magic magic, Shift shift, int square, std::vector<BitboardInt> blocks)
     {
       std::vector<BitboardInt> shifts = std::vector<BitboardInt>();
@@ -59,6 +75,11 @@ namespace Chess
       return shifts;
     }
 
+    /**
+     * @brief Gets the rook moves bitboard for a given square and blockers
+     * @param square The square to get moves for
+     * @param blockers The blockers to be used for the calculation
+     */
     static BitboardInt getRookMovesBitboard(int square, BitboardInt blockers)
     {
       BitboardInt movesBitboard = 0;
@@ -87,6 +108,11 @@ namespace Chess
       return movesBitboard & ~(1ULL << square);
     }
 
+    /**
+     * @brief Gets the bishop moves bitboard for a given square and blockers
+     * @param square The square to get moves for
+     * @param blockers The blockers to be used for the calculation
+     */
     static BitboardInt getBishopMovesBitboard(int square, BitboardInt blockers)
     {
       BitboardInt movesBitboard = 0;
@@ -115,6 +141,12 @@ namespace Chess
       return movesBitboard & ~(1ULL << square);
     }
 
+    /**
+     * @brief Gets all possible moves bitboards for a given square and blockers
+     * @param square The square to get moves for
+     * @param blockers The blockers to be used for the calculation
+     * @param rook Whether the moves are for a rook or bishop (true for rook, false for bishop)
+     */
     static std::vector<BitboardInt> getAllMovesBitboards(int square, std::vector<BitboardInt> blockers, bool rook)
     {
       std::vector<BitboardInt> moves = std::vector<BitboardInt>();
@@ -130,6 +162,12 @@ namespace Chess
       return moves;
     }
 
+    /**
+     * @brief Gets the lookup table for a given square and piece type
+     * @param movesLookup The move generation helper object with populated mask lookup tables
+     * @param square The square to get the lookup table for
+     * @param rook Whether the lookup table is for a rook or bishop (true for rook, false for bishop)
+     */
     std::vector<BitboardInt> getMovesLookupTable(MovesLookup &movesLookup, int square, bool rook)
     {
       Magic magic = rook ? ROOK_MAGICS[square] : BISHOP_MAGICS[square];
@@ -151,6 +189,10 @@ namespace Chess
       return lookupTable;
     }
 
+    /**
+     * @brief Initializes the rook lookup tables
+     * @param movesLookup The move generation helper object with populated mask lookup tables
+     */
     void initRookLookupTables(MovesLookup &movesLookup)
     {
       ROOK_LOOKUP_TABLES = std::array<std::vector<BitboardInt>, 64>();
@@ -161,6 +203,10 @@ namespace Chess
       }
     }
 
+    /**
+     * @brief Initializes the bishop lookup tables
+     * @param movesLookup The move generation helper object with populated mask lookup tables
+     */
     void initBishopLookupTables(MovesLookup &movesLookup)
     {
       BISHOP_LOOKUP_TABLES = std::array<std::vector<BitboardInt>, 64>();

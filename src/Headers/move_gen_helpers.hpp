@@ -10,6 +10,9 @@ namespace Chess
   class MovesLookup
   {
   public:
+    /**
+     * @brief Initializes the move lookup tables
+     */
     MovesLookup()
     {
       initKnightMoves();
@@ -27,6 +30,9 @@ namespace Chess
     std::array<BitboardInt, 64> ROOK_MASKS;
 
   private:
+    /**
+     * @brief Initializes the knight move lookup table
+     */
     void initKnightMoves()
     {
       for (int square = 0; square < 64; square++)
@@ -54,6 +60,9 @@ namespace Chess
       }
     }
 
+    /**
+     * @brief Initializes the king move lookup table
+     */
     void initKingMoves()
     {
       for (int square = 0; square < 64; square++)
@@ -82,6 +91,9 @@ namespace Chess
       }
     }
 
+    /**
+     * @brief Initializes the pawn capture move lookup table
+     */
     void initPawnCaptureMoves()
     {
       for (int square = 0; square < 64; square++)
@@ -102,6 +114,9 @@ namespace Chess
       }
     }
 
+    /**
+     * @brief Initializes the bishop mask lookup tables
+     */
     void initBishopMasks()
     {
       for (int square = 0; square < 64; square++)
@@ -131,6 +146,9 @@ namespace Chess
       }
     }
 
+    /**
+     * @brief Initializes the rook mask lookup table
+     */
     void initRookMasks()
     {
       for (int square = 0; square < 64; square++)
