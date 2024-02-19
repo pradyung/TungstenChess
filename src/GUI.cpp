@@ -354,9 +354,6 @@ namespace Chess
     if (move.from == move.to)
       return;
 
-    if (LOG_MOVES)
-      std::cout << move.getUCI() << std::endl;
-
     board.makeMove(move);
 
     clearHighlights();

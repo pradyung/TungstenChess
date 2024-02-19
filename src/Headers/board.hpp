@@ -19,9 +19,11 @@ namespace Chess
   const BotSettings DEFAULT_BOT_SETTINGS = {
       500, // max search time in ms
       3,   // min search depth
+      5,   // max search depth
       10,  // quiesce depth
-      0,   // use opening book
-      1    // log depth searched, time taken, and nodes evaluated
+      1,   // use opening book
+      1,   // log search info
+      0    // fixed depth search
   };
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
@@ -37,6 +39,7 @@ namespace Chess
     int enPassantFile;
 
     int positionsEvaluated;
+    int depthSearched;
 
     Bitboard bitboards[PIECE_NUMBER];
 
@@ -366,8 +369,9 @@ namespace Chess
      * @brief Uses iterative deepening to find the best move in a constant amount of time
      * @param time The time in milliseconds to search for (this time is not exact, but the bot will stop after a search is complete AND the time has run out.
      *             It will not stop in the middle of a search, so the actual time spent may be significantly longer than the time parameter)
+     * @param start The time the search started, used to check if the time has run out
      */
-    Move iterativeDeepening(int time);
+    Move iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start);
 
     /**
      * @brief Gets the static evaluation of the current position, from the perspective of the side to move

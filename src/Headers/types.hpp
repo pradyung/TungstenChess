@@ -21,9 +21,11 @@ namespace Chess
   {
     int maxSearchTime; // In milliseconds, not a hard limit
     int minSearchDepth;
+    int maxSearchDepth;
     int quiesceDepth;
     bool useOpeningBook;
-    bool logPositionsEvaluated;
+    bool logSearchInfo;
+    bool fixedDepthSearch;
   };
 
   enum CastlingRights

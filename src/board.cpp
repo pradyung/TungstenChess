@@ -440,12 +440,31 @@ namespace Chess
       int moveInt = openings.getNextMove();
 
       if (moveInt != INVALID)
-        return generateMoveFromInt(moveInt);
+      {
+        Move bestMove = generateMoveFromInt(moveInt);
+
+        if (botSettings.logSearchInfo)
+          std::cout << "Book move: " << bestMove.getUCI() << std::endl;
+
+        return bestMove;
+      }
 
       openings.inOpeningBook = false;
     }
 
-    return iterativeDeepening(botSettings.maxSearchTime);
+    positionsEvaluated = 0;
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    Move bestMove = botSettings.fixedDepthSearch ? generateBestMove(botSettings.maxSearchDepth) : iterativeDeepening(botSettings.maxSearchTime, start);
+
+    if (botSettings.logSearchInfo)
+      std::cout << "Move: " << bestMove.getUCI() << ", "
+                << "Depth: " << depthSearched << ", "
+                << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms, "
+                << "Positions evaluated: " << positionsEvaluated << std::endl;
+
+    return bestMove;
   }
 
   int Board::getStaticEvaluation()
@@ -727,7 +746,7 @@ namespace Chess
 
   Move Board::generateBestMove(int depth, int alpha, int beta)
   {
-    positionsEvaluated = 0;
+    depthSearched = depth;
 
     if (depth == 0)
       return generateOneDeepMove();
@@ -757,10 +776,8 @@ namespace Chess
     return legalMoves[bestMoveIndex];
   }
 
-  Move Board::iterativeDeepening(int time)
+  Move Board::iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start)
   {
-    auto start = std::chrono::high_resolution_clock::now();
-
     int depth = botSettings.minSearchDepth;
 
     Move bestMove = generateBestMove(depth);
@@ -773,11 +790,6 @@ namespace Chess
 
       bestMove = newBestMove;
     }
-
-    if (botSettings.logPositionsEvaluated)
-      std::cout << "Depth: " << depth << ", "
-                << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms, "
-                << "Positions evaluated: " << positionsEvaluated << std::endl;
 
     return bestMove;
   }

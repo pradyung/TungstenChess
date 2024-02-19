@@ -17,7 +17,6 @@ namespace Chess
 {
   const int PLAYER_COLOR = WHITE;
   const bool THREADING = true;
-  const bool LOG_MOVES = false;
 
   enum Highlights
   {
