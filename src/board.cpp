@@ -761,7 +761,7 @@ namespace Chess
   {
     auto start = std::chrono::high_resolution_clock::now();
 
-    int depth = 1;
+    int depth = botSettings.minSearchDepth;
 
     Move bestMove = generateBestMove(depth);
 

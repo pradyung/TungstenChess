@@ -20,6 +20,7 @@ namespace Chess
   struct BotSettings
   {
     int maxSearchTime; // In milliseconds, not a hard limit
+    int minSearchDepth;
     int quiesceDepth;
     bool useOpeningBook;
     bool logPositionsEvaluated;

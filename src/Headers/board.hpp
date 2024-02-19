@@ -18,8 +18,9 @@ namespace Chess
 {
   const BotSettings DEFAULT_BOT_SETTINGS = {
       500, // max search time in ms
+      3,   // min search depth
       10,  // quiesce depth
-      1,   // use opening book
+      0,   // use opening book
       1    // log depth searched, time taken, and nodes evaluated
   };
 
