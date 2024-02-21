@@ -57,7 +57,7 @@ namespace Chess
       if (pieceType == PAWN && (to <= 7 || to >= 56))
       {
         this->flags |= PROMOTION;
-        promotionPiece = promotionPiece;
+        this->promotionPiece = promotionPiece;
       }
     }
 
