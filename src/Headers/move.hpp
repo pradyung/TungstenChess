@@ -21,7 +21,7 @@ namespace Chess
      * @param promotionPiece The piece that the moving piece is being promoted to, if any
      */
     Move(int from, int to, int piece, int capturedPiece, int castlingRights, int enPassantFile, int promotionPiece = EMPTY)
-        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPiece(EMPTY), flags(NORMAL)
+        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPiece(promotionPiece), flags(NORMAL)
     {
       int pieceType = piece & TYPE;
 
@@ -57,7 +57,6 @@ namespace Chess
       if (pieceType == PAWN && (to <= 7 || to >= 56))
       {
         this->flags |= PROMOTION;
-        this->promotionPiece = promotionPiece;
       }
     }
 

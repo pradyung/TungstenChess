@@ -31,7 +31,7 @@ namespace Chess
   class Board
   {
   public:
-    Board(std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", BotSettings settings = DEFAULT_BOT_SETTINGS);
+    Board(std::string fen = START_FEN, BotSettings settings = DEFAULT_BOT_SETTINGS);
 
     int sideToMove;
 

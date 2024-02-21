@@ -8,6 +8,8 @@
 #define POSITIVE_INFINITY 1000000
 #define NEGATIVE_INFINITY -1000000
 
+#define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
 namespace Chess
 {
   typedef unsigned long long BitboardInt;

@@ -100,7 +100,6 @@ namespace Chess
     int to = move.to;
     int piece = move.piece;
     int capturedPiece = move.capturedPiece;
-    int promotionPiece = move.promotionPiece & TYPE;
 
     int pieceType = piece & TYPE;
     int pieceColor = piece & COLOR;
@@ -108,7 +107,7 @@ namespace Chess
     int capturedPieceType = capturedPiece & TYPE;
     int capturedPieceColor = capturedPiece & COLOR;
 
-    movePiece(from, to, promotionPiece | pieceColor);
+    movePiece(from, to, (move.flags & PROMOTION) ? (move.promotionPiece | pieceColor) : EMPTY);
 
     updateEnPassantFile(move.flags & PAWN_DOUBLE ? move.to % 8 : NO_EP);
 
@@ -320,10 +319,11 @@ namespace Chess
 
         movesBitboard.removeBit(toIndex);
 
-        legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, QUEEN));
+        legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, EMPTY));
 
         if (legalMoves.back().flags & PROMOTION)
         {
+          legalMoves.back().promotionPiece = QUEEN;
           legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, KNIGHT));
           legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, BISHOP));
           legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, ROOK));
