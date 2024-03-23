@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <stack>
 #include <map>
 
@@ -104,7 +105,7 @@ namespace Chess
 
     int hasCastled;
 
-    std::vector<ZobristKey> positionHistory;
+    std::unordered_map<ZobristKey, int> positionHistory;
 
     Openings openings;
     MovesLookup movesLookup;
@@ -250,15 +251,9 @@ namespace Chess
      * @brief Counts the number of times a position has been repeated
      * @param key The Zobrist key of the position to check
      */
-    int countRepetitions(ZobristKey key) const
+    int countRepetitions(ZobristKey key)
     {
-      int count = 0;
-
-      for (int i = 0; i < positionHistory.size(); i++)
-        if (positionHistory[i] == key)
-          count++;
-
-      return count;
+      return positionHistory[key];
     }
 
     /**

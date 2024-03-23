@@ -69,7 +69,7 @@ namespace Chess
 
     calculateInitialZobristKey();
 
-    positionHistory.push_back(zobristKey);
+    positionHistory[zobristKey] = 1;
   }
 
   void Board::calculateInitialZobristKey()
@@ -132,12 +132,12 @@ namespace Chess
         movePiece(to - 2, to + 1);
     }
 
-    positionHistory.push_back(zobristKey);
+    positionHistory[zobristKey] = positionHistory[zobristKey] ? positionHistory[zobristKey] + 1 : 1;
   }
 
   void Board::unmakeMove(Move move)
   {
-    positionHistory.pop_back();
+    positionHistory[zobristKey]--;
 
     switchSideToMove();
 
@@ -476,9 +476,9 @@ namespace Chess
     if (gameStatus != NO_MATE)
     {
       if (gameStatus == LOSE)
-        return sideToMove == WHITE ? POSITIVE_INFINITY : NEGATIVE_INFINITY;
+        return NEGATIVE_INFINITY;
       else
-        return 0;
+        return -STALEMATE_PENALTY;
     }
 
     int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
@@ -680,12 +680,15 @@ namespace Chess
     if (depth == 0)
       return quiesce(botSettings.quiesceDepth, alpha, beta);
 
+    if (countRepetitions(zobristKey) >= 3)
+      return -STALEMATE_PENALTY;
+
     std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove);
 
     int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
-      return isInCheck(sideToMove) ? NEGATIVE_INFINITY : 0;
+      return isInCheck(sideToMove) ? NEGATIVE_INFINITY : -STALEMATE_PENALTY;
 
     for (int i = 0; i < legalMovesCount; i++)
     {
@@ -717,6 +720,9 @@ namespace Chess
 
     if (alpha >= beta)
       return beta;
+
+    if (countRepetitions(zobristKey) >= 3)
+      return -STALEMATE_PENALTY;
 
     std::vector<Move> legalMoves = getSortedLegalMoves(sideToMove, false);
 
