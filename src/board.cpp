@@ -814,4 +814,30 @@ namespace Chess
 
     return evaluation;
   }
+
+  int Board::countGames(int depth)
+  {
+    if (depth == 0)
+      return 1;
+
+    std::vector<Move> legalMoves = getLegalMoves(sideToMove);
+
+    int legalMovesCount = legalMoves.size();
+
+    if (depth == 1 || legalMovesCount == 0)
+      return legalMovesCount;
+
+    int games = 0;
+
+    for (int i = 0; i < legalMovesCount; i++)
+    {
+      makeMove(legalMoves[i], true);
+
+      games += countGames(depth - 1);
+
+      unmakeMove(legalMoves[i]);
+    }
+
+    return games;
+  }
 }

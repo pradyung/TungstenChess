@@ -99,6 +99,12 @@ namespace Chess
     Move generateBotMove();
 
     /**
+     * @brief Counts the number of games that can be played from the current position to a given depth
+     * @param depth The depth to search to
+     */
+    int countGames(int depth);
+
+    /**
      * @brief Allows indexing the board like an array
      */
     Piece operator[](int index) { return board[index]; }
