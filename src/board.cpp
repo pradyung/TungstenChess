@@ -334,11 +334,6 @@ namespace Chess
     return legalMoves;
   }
 
-  bool Board::isInCheck(int color)
-  {
-    return isAttacked(kingIndices[color | KING], color ^ COLOR);
-  }
-
   bool Board::isAttacked(int square, int color)
   {
     int piece = board[square];

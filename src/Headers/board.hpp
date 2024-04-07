@@ -50,6 +50,15 @@ namespace Chess
     int kingIndices[PIECE_NUMBER];
 
     /**
+     * @brief Checks if a color is in check in the current position
+     * @param color The color to check
+     */
+    bool isInCheck(int color)
+    {
+      return isAttacked(kingIndices[color | KING], color ^ COLOR);
+    }
+
+    /**
      * @brief Loads the opening book from a file
      * @param path The path to the opening book file
      */
@@ -70,12 +79,6 @@ namespace Chess
      * @param speculative Whether the move is speculative (used for move tree search and check detection) - MUST BE SET TO FALSE FOR ACTUAL MOVES
      */
     void makeMove(Move move, bool speculative = false);
-
-    /**
-     * @brief Checks if a color is in check in the current position
-     * @param color The color to check
-     */
-    bool isInCheck(int color);
 
     /**
      * @brief Returns the game status for the current side - see enum GameStatus
