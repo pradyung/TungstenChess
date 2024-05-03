@@ -18,10 +18,10 @@ namespace Chess
      * @param capturedPiece The piece that is being captured, if any
      * @param enPassantFile The current state of the en passant file, used to restore it when the move is unmade
      * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
-     * @param promotionPiece The piece that the moving piece is being promoted to, if any (only piece type)
+     * @param promotionPieceType The piece that the moving piece is being promoted to, if any (only piece type)
      */
-    Move(int from, int to, int piece, int capturedPiece, int castlingRights, int enPassantFile, int promotionPiece = EMPTY)
-        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPiece(promotionPiece), flags(NORMAL)
+    Move(int from, int to, int piece, int capturedPiece, int castlingRights, int enPassantFile, int promotionPieceType = EMPTY)
+        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPieceType(promotionPieceType), flags(NORMAL)
     {
       int pieceType = piece & TYPE;
 
@@ -64,7 +64,7 @@ namespace Chess
     int to;
     int piece;
     int capturedPiece;
-    int promotionPiece;
+    int promotionPieceType;
 
     int castlingRights;
     int enPassantFile;
@@ -88,9 +88,9 @@ namespace Chess
       uci += 'a' + (to & TYPE);
       uci += '8' - (to >> 3);
 
-      if (promotionPiece != EMPTY)
+      if (promotionPieceType != EMPTY)
       {
-        uci += ".pnbrqk"[promotionPiece & TYPE];
+        uci += ".pnbrqk"[promotionPieceType];
       }
 
       return uci;

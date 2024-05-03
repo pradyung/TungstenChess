@@ -192,7 +192,7 @@ namespace Chess
       case F2:
         return BLACK_KNIGHT;
       default:
-        return INVALID;
+        return EMPTY;
       }
     }
 

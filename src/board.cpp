@@ -95,43 +95,36 @@ namespace Chess
     if (!speculative && openings.inOpeningBook)
       openings.inOpeningBook = openings.addMove(move.toInt());
 
-    int from = move.from;
-    int to = move.to;
-    int piece = move.piece;
-    int capturedPiece = move.capturedPiece;
+    auto [from, to, piece, capturedPiece, promotionPieceType, castlingRights, enPassantFile, flags] = move;
 
-    int pieceType = piece & TYPE;
-    int pieceColor = piece & COLOR;
+    int pieceType = piece & TYPE, capturedPieceType = capturedPiece & TYPE;
 
-    int capturedPieceType = capturedPiece & TYPE;
-    int capturedPieceColor = capturedPiece & COLOR;
+    movePiece(from, to, (flags & PROMOTION) ? (promotionPieceType | sideToMove) : EMPTY);
 
-    movePiece(from, to, (move.flags & PROMOTION) ? (move.promotionPiece | pieceColor) : EMPTY);
-
-    updateEnPassantFile(move.flags & PAWN_DOUBLE ? move.to % 8 : NO_EP);
+    updateEnPassantFile(flags & PAWN_DOUBLE ? to % 8 : NO_EP);
 
     if (pieceType == KING)
-      removeCastlingRights(pieceColor, BOTHSIDES);
+      removeCastlingRights(sideToMove, BOTHSIDES);
 
     if (pieceType == ROOK && (from == A8 || from == H8 || from == A1 || from == H1))
-      removeCastlingRights(pieceColor, from % 8 == 0 ? QUEENSIDE : KINGSIDE);
+      removeCastlingRights(sideToMove, from % 8 == 0 ? QUEENSIDE : KINGSIDE);
     if (capturedPieceType == ROOK && (to == A8 || to == H8 || to == A1 || to == H1))
-      removeCastlingRights(capturedPieceColor, to % 8 == 0 ? QUEENSIDE : KINGSIDE);
+      removeCastlingRights(sideToMove ^ COLOR, to % 8 == 0 ? QUEENSIDE : KINGSIDE);
 
-    if (move.flags & EP_CAPTURE)
+    if (flags & EP_CAPTURE)
       updatePiece(to + (piece & WHITE ? 8 : -8), EMPTY);
 
-    if (move.flags & CASTLE)
+    if (flags & CASTLE)
     {
-      hasCastled |= pieceColor;
+      hasCastled |= sideToMove;
 
-      if (move.flags & KSIDE_CASTLE)
+      if (flags & KSIDE_CASTLE)
         movePiece(to + 1, to - 1);
       else
         movePiece(to - 2, to + 1);
     }
 
-    positionHistory[zobristKey] = positionHistory[zobristKey] ? positionHistory[zobristKey] + 1 : 1;
+    positionHistory[zobristKey]++;
   }
 
   void Board::unmakeMove(Move move)
@@ -322,7 +315,7 @@ namespace Chess
 
         if (legalMoves.back().flags & PROMOTION)
         {
-          legalMoves.back().promotionPiece = QUEEN;
+          legalMoves.back().promotionPieceType = QUEEN;
           legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, KNIGHT));
           legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, BISHOP));
           legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, ROOK));
@@ -403,28 +396,28 @@ namespace Chess
     int piece = board[from];
     int capturedPiece = board[to];
 
-    int promotionPiece = EMPTY;
+    int promotionPieceType = EMPTY;
 
     if (uci.length() == 5)
     {
       switch (uci[4])
       {
       case 'q':
-        promotionPiece = QUEEN;
+        promotionPieceType = QUEEN;
         break;
       case 'r':
-        promotionPiece = ROOK;
+        promotionPieceType = ROOK;
         break;
       case 'b':
-        promotionPiece = BISHOP;
+        promotionPieceType = BISHOP;
         break;
       case 'n':
-        promotionPiece = KNIGHT;
+        promotionPieceType = KNIGHT;
         break;
       }
     }
 
-    return Move(from, to, piece, capturedPiece, castlingRights, enPassantFile, promotionPiece);
+    return Move(from, to, piece, capturedPiece, castlingRights, enPassantFile, promotionPieceType);
   }
 
   Move Board::generateBotMove()
@@ -807,7 +800,7 @@ namespace Chess
     int evaluation = 0;
 
     evaluation += PIECE_VALUES[move.capturedPiece & TYPE] * (move.flags & CAPTURE);
-    evaluation += PIECE_VALUES[move.promotionPiece] * (move.flags & PROMOTION);
+    evaluation += PIECE_VALUES[move.promotionPieceType] * (move.flags & PROMOTION);
 
     evaluation += getPiecePositionalEvaluation(move.to, true) - getPiecePositionalEvaluation(move.from, true);
 

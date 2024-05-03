@@ -66,10 +66,10 @@ namespace Chess
             {
               int promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
-              if (promotionPiece == INVALID || !(promotionPiece & board.sideToMove))
+              if (promotionPiece == EMPTY || !(promotionPiece & board.sideToMove))
                 continue;
 
-              promotionMove.promotionPiece = promotionPiece & TYPE;
+              promotionMove.promotionPieceType = promotionPiece & TYPE;
 
               draggingPieceIndex = INVALID;
 
