@@ -17,29 +17,17 @@ namespace Chess
 {
   GUIHandler::GUIHandler(RenderWindow &window)
   {
-    CFBundleRef mainBundle = CFBundleGetMainBundle();
-    CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
-    char path[PATH_MAX];
-    if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
-      resourcePath = "";
-    else
-      resourcePath = std::string(path) + "/";
-    CFRelease(resourcesURL);
-
     this->window = &window;
 
-    board.loadOpeningBook(resourcePath + "opening_book");
+    board.loadOpeningBook(resourceManager.openingBookPath);
 
     loadSquareTextures();
     loadBoardSquares();
 
-    loadPieceTextures();
     loadPieces();
     loadPromotionPieces();
 
-    Image icon;
-    icon.loadFromFile(resourcePath + "high_res_wn.png");
-    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    window.setIcon(resourceManager.icon.getSize().x, resourceManager.icon.getSize().y, resourceManager.icon.getPixelsPtr());
   }
 
   void GUIHandler::runMainLoop()
@@ -164,17 +152,15 @@ namespace Chess
     sf::Image square;
 
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 255, 255));
-    squares[WHITE_SQUARE].loadFromImage(square);
+    squareTextures[WHITE_SQUARE].loadFromImage(square);
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(216, 181, 149));
-    squares[BLACK_SQUARE].loadFromImage(square);
+    squareTextures[BLACK_SQUARE].loadFromImage(square);
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 255, 0, 127));
-    squares[YELLOW_HIGHLIGHT].loadFromImage(square);
+    squareTextures[YELLOW_HIGHLIGHT].loadFromImage(square);
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 0, 0, 200));
-    squares[RED_HIGHLIGHT].loadFromImage(square);
+    squareTextures[RED_HIGHLIGHT].loadFromImage(square);
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(127, 127, 127, 200));
-    squares[GRAY_HIGHLIGHT].loadFromImage(square);
-
-    squares[YELLOW_OUTLINE].loadFromFile(resourcePath + "yellow_outline.png");
+    squareTextures[GRAY_HIGHLIGHT].loadFromImage(square);
   }
 
   void GUIHandler::loadBoardSquares()
@@ -184,11 +170,11 @@ namespace Chess
     {
       for (int j = 0; j < 8; j++)
       {
-        boardSquares[squareIndex].setTexture(squares[(i + j) % 2]);
-        redHighlightsSprites[squareIndex].setTexture(squares[RED_HIGHLIGHT]);
-        yellowHighlightsSprites[squareIndex].setTexture(squares[YELLOW_HIGHLIGHT]);
-        grayHighlightsSprites[squareIndex].setTexture(squares[GRAY_HIGHLIGHT]);
-        yellowOutlineSprites[squareIndex].setTexture(squares[YELLOW_OUTLINE]);
+        boardSquares[squareIndex].setTexture(squareTextures[(i + j) % 2]);
+        redHighlightsSprites[squareIndex].setTexture(squareTextures[RED_HIGHLIGHT]);
+        yellowHighlightsSprites[squareIndex].setTexture(squareTextures[YELLOW_HIGHLIGHT]);
+        grayHighlightsSprites[squareIndex].setTexture(squareTextures[GRAY_HIGHLIGHT]);
+        yellowOutlineSprites[squareIndex].setTexture(resourceManager.yellowOutlineTexture);
 
         boardSquares[squareIndex].setPosition(getSquareCoordinates(j, i));
         redHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
@@ -201,38 +187,13 @@ namespace Chess
     }
   }
 
-  void GUIHandler::loadPieceTextures()
-  {
-    sf::Texture atlas;
-    atlas.loadFromFile(resourcePath + "atlas.png");
-
-    piecesTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[WHITE_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[WHITE_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[WHITE_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[WHITE_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-
-    piecesTextures[BLACK_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[BLACK_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[BLACK_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[BLACK_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-    piecesTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-
-    for (int i = 0; i < PIECE_NUMBER; i++)
-    {
-      piecesTextures[i].setSmooth(true);
-    }
-  }
-
   void GUIHandler::loadPieces()
   {
     for (int i = 0; i < 64; i++)
     {
       for (int j = 0; j < PIECE_NUMBER; j++)
       {
-        pieceSprites[j][i].setTexture(piecesTextures[j]);
+        pieceSprites[j][i].setTexture(resourceManager.pieceTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
         pieceSprites[j][i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
       }
@@ -245,8 +206,8 @@ namespace Chess
   {
     for (int i = 0; i < 4; i++)
     {
-      whitePromotionPieces[i].setTexture(piecesTextures[WHITE_QUEEN - i]);
-      blackPromotionPieces[i].setTexture(piecesTextures[BLACK_QUEEN - i]);
+      whitePromotionPieces[i].setTexture(resourceManager.pieceTextures[WHITE_QUEEN - i]);
+      blackPromotionPieces[i].setTexture(resourceManager.pieceTextures[BLACK_QUEEN - i]);
 
       whitePromotionPieces[i].setPosition(getSquareCoordinates(10 + i));
       blackPromotionPieces[i].setPosition(getSquareCoordinates(50 + i));
@@ -282,7 +243,7 @@ namespace Chess
 
     if (draggingPieceIndex != INVALID)
     {
-      draggingPieceSprite.setTexture(piecesTextures[board[draggingPieceIndex]]);
+      draggingPieceSprite.setTexture(resourceManager.pieceTextures[board[draggingPieceIndex]]);
       draggingPieceSprite.setPosition(Mouse::getPosition(*window).x - SQUARE_SIZE / 2, Mouse::getPosition(*window).y - SQUARE_SIZE / 2);
       window->draw(draggingPieceSprite);
     }

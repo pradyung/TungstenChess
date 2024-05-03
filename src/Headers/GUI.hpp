@@ -25,7 +25,67 @@ namespace Chess
     YELLOW_HIGHLIGHT = 2,
     RED_HIGHLIGHT = 3,
     GRAY_HIGHLIGHT = 4,
-    YELLOW_OUTLINE = 5
+  };
+
+  class ResourceManager
+  {
+  public:
+    /**
+     * @brief Get the singleton instance of the ResourceManager
+     * @return ResourceManager&
+     */
+    static ResourceManager &getInstance()
+    {
+      static ResourceManager instance;
+      return instance;
+    }
+
+    std::string openingBookPath;
+
+    Texture yellowOutlineTexture;
+    Texture pieceTextures[PIECE_NUMBER];
+
+    Image icon;
+
+  private:
+    /**
+     * @brief Construct a new ResourceManager object
+     */
+    ResourceManager()
+    {
+      CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
+      char path[PATH_MAX];
+      if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+        resourcePath = "";
+      else
+        resourcePath = std::string(path) + "/";
+      CFRelease(resourcesURL);
+
+      openingBookPath = resourcePath + "opening_book";
+
+      yellowOutlineTexture.loadFromFile(resourcePath + "yellow_outline.png");
+
+      sf::Texture atlas;
+      atlas.loadFromFile(resourcePath + "atlas.png");
+
+      pieceTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[WHITE_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[WHITE_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[WHITE_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[WHITE_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+
+      pieceTextures[BLACK_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[BLACK_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[BLACK_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[BLACK_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+      pieceTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+
+      icon.loadFromFile(resourcePath + "high_res_wn.png");
+    }
+
+    std::string resourcePath;
   };
 
   class GUIHandler
@@ -43,7 +103,7 @@ namespace Chess
     void runMainLoop();
 
   private:
-    std::string resourcePath;
+    ResourceManager &resourceManager = ResourceManager::getInstance();
 
     Board board;
 
@@ -51,8 +111,7 @@ namespace Chess
 
     RenderWindow *window;
 
-    Texture squares[6];
-    Texture piecesTextures[PIECE_NUMBER];
+    Texture squareTextures[5];
 
     Sprite boardSquares[64];
     Sprite pieces[64];
@@ -86,7 +145,6 @@ namespace Chess
     std::thread thinkingThread;
 
     void loadSquareTextures();
-    void loadPieceTextures();
 
     void loadBoardSquares();
     void loadPieces();
