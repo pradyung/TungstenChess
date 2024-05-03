@@ -11,6 +11,22 @@ namespace Chess
   {
   public:
     /**
+     * @brief Get the instance of the Zobrist singleton
+     * @return Zobrist&
+     */
+    static Zobrist &getInstance()
+    {
+      static Zobrist instance;
+      return instance;
+    }
+
+    std::array<std::array<ZobristKey, PIECE_NUMBER>, 64> pieceKeys;
+    std::array<ZobristKey, 16> castlingKeys;
+    std::array<ZobristKey, 9> enPassantKeys;
+    ZobristKey sideKey;
+
+  private:
+    /**
      * @brief Populates the pieceKeys, castlingKeys, enPassantKeys, and sideKey vectors with random keys
      */
     Zobrist()
@@ -31,10 +47,5 @@ namespace Chess
 
       sideKey = dis(gen);
     }
-
-    std::array<std::array<ZobristKey, PIECE_NUMBER>, 64> pieceKeys;
-    std::array<ZobristKey, 16> castlingKeys;
-    std::array<ZobristKey, 9> enPassantKeys;
-    ZobristKey sideKey;
   };
 }

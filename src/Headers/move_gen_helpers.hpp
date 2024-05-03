@@ -11,6 +11,24 @@ namespace Chess
   {
   public:
     /**
+     * @brief Get the instance of the MovesLookup singleton
+     * @return MovesLookup&
+     */
+    static MovesLookup &getInstance()
+    {
+      static MovesLookup instance;
+      return instance;
+    }
+
+    std::array<BitboardInt, 64> KNIGHT_MOVES;
+    std::array<BitboardInt, 64> KING_MOVES;
+    std::array<BitboardInt, 64> WHITE_PAWN_CAPTURE_MOVES;
+    std::array<BitboardInt, 64> BLACK_PAWN_CAPTURE_MOVES;
+    std::array<BitboardInt, 64> BISHOP_MASKS;
+    std::array<BitboardInt, 64> ROOK_MASKS;
+
+  private:
+    /**
      * @brief Initializes the move lookup tables
      */
     MovesLookup()
@@ -22,14 +40,6 @@ namespace Chess
       initRookMasks();
     }
 
-    std::array<BitboardInt, 64> KNIGHT_MOVES;
-    std::array<BitboardInt, 64> KING_MOVES;
-    std::array<BitboardInt, 64> WHITE_PAWN_CAPTURE_MOVES;
-    std::array<BitboardInt, 64> BLACK_PAWN_CAPTURE_MOVES;
-    std::array<BitboardInt, 64> BISHOP_MASKS;
-    std::array<BitboardInt, 64> ROOK_MASKS;
-
-  private:
     /**
      * @brief Initializes the knight move lookup table
      */

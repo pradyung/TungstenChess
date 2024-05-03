@@ -2,8 +2,7 @@
 
 namespace Chess
 {
-  Board::Board(std::string fen, BotSettings botSettings)
-      : magicMoveGen(MagicMoveGen(movesLookup)), botSettings(botSettings)
+  Board::Board(std::string fen, BotSettings botSettings) : botSettings(botSettings)
   {
     std::string fenParts[FEN_LENGTH];
 
@@ -112,7 +111,7 @@ namespace Chess
     updateEnPassantFile(move.flags & PAWN_DOUBLE ? move.to % 8 : NO_EP);
 
     if (pieceType == KING)
-      removeCastlingRights(pieceColor, CASTLING);
+      removeCastlingRights(pieceColor, BOTHSIDES);
 
     if (pieceType == ROOK && (from == A8 || from == H8 || from == A1 || from == H1))
       removeCastlingRights(pieceColor, from % 8 == 0 ? QUEENSIDE : KINGSIDE);
@@ -515,15 +514,15 @@ namespace Chess
 
         float endgameScore = enemyPieces.countBits() / 16.0;
 
-        positionalEvaluation += pieceEvalTables.KING_EVAL_TABLE[i] * endgameScore;
+        positionalEvaluation += KING_EVAL_TABLE[i] * endgameScore;
 
-        positionalEvaluation += pieceEvalTables.KING_ENDGAME_EVAL_TABLE[i] * (1 - endgameScore);
+        positionalEvaluation += KING_ENDGAME_EVAL_TABLE[i] * (1 - endgameScore);
 
         if (friendlyPieces.countBits() <= 3 && friendlyPieces.countBits() >= 1)
         {
           int kingsDistance = abs(i % 8 - kingIndices[BLACK_KING] % 8) + abs(i / 8 - kingIndices[BLACK_KING] / 8);
 
-          positionalEvaluation += pieceEvalTables.KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
+          positionalEvaluation += KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
       }
       else if (board[i] == BLACK_KING)
@@ -533,15 +532,15 @@ namespace Chess
 
         float endgameScore = enemyPieces.countBits() / 16.0;
 
-        positionalEvaluation -= pieceEvalTables.KING_EVAL_TABLE[63 - i] * endgameScore;
+        positionalEvaluation -= KING_EVAL_TABLE[63 - i] * endgameScore;
 
-        positionalEvaluation -= pieceEvalTables.KING_ENDGAME_EVAL_TABLE[63 - i] * (1 - endgameScore);
+        positionalEvaluation -= KING_ENDGAME_EVAL_TABLE[63 - i] * (1 - endgameScore);
 
         if (friendlyPieces.countBits() <= 3 && friendlyPieces.countBits() >= 1)
         {
           int kingsDistance = abs(i % 8 - kingIndices[WHITE_KING] % 8) + abs(i / 8 - kingIndices[WHITE_KING] / 8);
 
-          positionalEvaluation -= pieceEvalTables.KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
+          positionalEvaluation -= KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
         }
       }
     }
@@ -808,7 +807,7 @@ namespace Chess
     int evaluation = 0;
 
     evaluation += PIECE_VALUES[move.capturedPiece & TYPE] * (move.flags & CAPTURE);
-    evaluation += PIECE_VALUES[move.promotionPiece & TYPE] * (move.flags & PROMOTION);
+    evaluation += PIECE_VALUES[move.promotionPiece] * (move.flags & PROMOTION);
 
     evaluation += getPiecePositionalEvaluation(move.to, true) - getPiecePositionalEvaluation(move.from, true);
 

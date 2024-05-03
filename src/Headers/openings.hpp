@@ -10,8 +10,6 @@ namespace Chess
   class Openings
   {
   public:
-    Openings() : lastMoveIndex(INVALID) {}
-
     bool inOpeningBook = true;
 
     /**
@@ -66,7 +64,7 @@ namespace Chess
 
     std::vector<int> moves;
 
-    int lastMoveIndex;
+    int lastMoveIndex = INVALID;
 
     /**
      * @brief Gets the next possible "children" moves from the opening book

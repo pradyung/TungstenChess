@@ -3,9 +3,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <array>
 #include <unordered_map>
-#include <stack>
-#include <map>
 
 #include "move.hpp"
 #include "bitboard.hpp"
@@ -110,17 +109,16 @@ namespace Chess
     Piece operator[](int index) { return board[index]; }
 
   private:
-    Piece board[64];
+    std::array<Piece, 64> board;
 
     int hasCastled;
 
     std::unordered_map<ZobristKey, int> positionHistory;
 
     Openings openings;
-    MovesLookup movesLookup;
-    PieceEvalTables pieceEvalTables;
-    MagicMoveGen magicMoveGen;
-    Zobrist zobrist;
+    const Zobrist zobrist = Zobrist::getInstance();
+    const MovesLookup movesLookup = MovesLookup::getInstance();
+    const MagicMoveGen magicMoveGen = MagicMoveGen::getInstance();
 
     BotSettings botSettings;
 
@@ -292,19 +290,19 @@ namespace Chess
       switch (board[pieceIndex] & TYPE)
       {
       case PAWN:
-        positionalEvaluation = pieceEvalTables.PAWN_EVAL_TABLE[lookupIndex];
+        positionalEvaluation = PAWN_EVAL_TABLE[lookupIndex];
         break;
       case KNIGHT:
-        positionalEvaluation = pieceEvalTables.KNIGHT_EVAL_TABLE[lookupIndex];
+        positionalEvaluation = KNIGHT_EVAL_TABLE[lookupIndex];
         break;
       case BISHOP:
-        positionalEvaluation = pieceEvalTables.BISHOP_EVAL_TABLE[lookupIndex];
+        positionalEvaluation = BISHOP_EVAL_TABLE[lookupIndex];
         break;
       case ROOK:
-        positionalEvaluation = pieceEvalTables.ROOK_EVAL_TABLE[lookupIndex];
+        positionalEvaluation = ROOK_EVAL_TABLE[lookupIndex];
         break;
       case QUEEN:
-        positionalEvaluation = pieceEvalTables.QUEEN_EVAL_TABLE[lookupIndex];
+        positionalEvaluation = QUEEN_EVAL_TABLE[lookupIndex];
         break;
       }
 

@@ -59,6 +59,7 @@ namespace Chess
         if (event.type == Event::Closed)
         {
           window->close();
+          return;
         }
 
         if (isThinking)
@@ -80,7 +81,7 @@ namespace Chess
               if (promotionPiece == INVALID || !(promotionPiece & board.sideToMove))
                 continue;
 
-              promotionMove.promotionPiece = promotionPiece;
+              promotionMove.promotionPiece = promotionPiece & TYPE;
 
               draggingPieceIndex = INVALID;
 

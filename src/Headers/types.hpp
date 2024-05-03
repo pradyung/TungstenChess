@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #define FEN_LENGTH 6
 #define NO_EP 8
@@ -16,7 +16,6 @@ namespace Chess
   typedef unsigned long long Magic;
   typedef unsigned long long ZobristKey;
   typedef uint8_t Piece;
-  typedef uint8_t GameState;
   typedef uint8_t Shift;
 
   struct BotSettings
@@ -38,7 +37,7 @@ namespace Chess
     BLACK_QUEENSIDE = 8,
     KINGSIDE = 16,
     QUEENSIDE = 32,
-    CASTLING = KINGSIDE | QUEENSIDE,
+    BOTHSIDES = KINGSIDE | QUEENSIDE,
     WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
     BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
   };
@@ -61,9 +60,9 @@ namespace Chess
 
   enum GameStatus
   {
-    NO_MATE,
-    STALEMATE,
-    LOSE
+    NO_MATE = 0,
+    STALEMATE = 1,
+    LOSE = 2,
   };
 
   enum Flags
@@ -119,7 +118,7 @@ namespace Chess
     BLACK_KING = BLACK | KING
   };
 
-  enum Numbers
+  enum PieceCounts
   {
     PIECE_TYPE_NUMBER = 7,
     PIECE_NUMBER = 23
