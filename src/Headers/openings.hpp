@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <array>
 #include <fstream>
 
 #include "types.hpp"
@@ -23,7 +24,7 @@ namespace Chess
       // read the file 4 bytes at a time into the book array
       for (int i = 0; i < 16552; i++)
       {
-        file.read((char *)&openingBook[i], sizeof(int));
+        file.read((char *)&openingBook[i], sizeof(uint));
       }
 
       file.close();
@@ -34,7 +35,7 @@ namespace Chess
      * @param move The move to add
      * @return Whether the move was added successfully - if false, the move is not in the opening book
      */
-    bool addMove(int move)
+    bool addMove(MoveInt move)
     {
       for (int i = lastMoveIndex + 1;; i++)
       {
@@ -57,21 +58,21 @@ namespace Chess
     /**
      * @brief Gets the next move from the opening book, randomly selected weighted by the frequency of the moves
      */
-    int getNextMove() const { return getWeightedRandomMove(); }
+    MoveInt getNextMove() const { return getWeightedRandomMove(); }
 
   private:
-    int openingBook[16552];
+    std::array<uint, 16552> openingBook;
 
-    std::vector<int> moves;
+    std::vector<MoveInt> moves;
 
     int lastMoveIndex = INVALID;
 
     /**
      * @brief Gets the next possible "children" moves from the opening book
      */
-    std::vector<int> getChildrenMoves() const
+    std::vector<MoveInt> getChildrenMoves() const
     {
-      std::vector<int> childrenMoves;
+      std::vector<MoveInt> childrenMoves;
       int childrenMovesIndex = 0;
 
       for (int i = lastMoveIndex + 1;; i++)
@@ -93,12 +94,12 @@ namespace Chess
     /**
      * @brief Gets a random next move, weighted by the frequency of the children moves
      */
-    int getWeightedRandomMove() const
+    MoveInt getWeightedRandomMove() const
     {
-      std::vector<int> childrenMoves = getChildrenMoves();
+      std::vector<MoveInt> childrenMoves = getChildrenMoves();
 
       if (childrenMoves.size() == 0)
-        return INVALID;
+        return INVALID_MOVE;
 
       int totalWeight = 0;
 

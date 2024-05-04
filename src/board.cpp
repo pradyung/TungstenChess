@@ -377,10 +377,10 @@ namespace Chess
     return isInCheck(color) ? LOSE : STALEMATE;
   }
 
-  Move Board::generateMoveFromInt(int moveInt)
+  Move Board::generateMoveFromInt(MoveInt moveInt)
   {
-    int from = moveInt & 0x3f ^ 0x38;
-    int to = (moveInt >> 6) & 0x3f ^ 0x38;
+    int from = moveInt & 0x3f;
+    int to = (moveInt >> 6) & 0x3f;
 
     int piece = board[from];
     int capturedPiece = board[to];
@@ -424,9 +424,9 @@ namespace Chess
   {
     if (openings.inOpeningBook && botSettings.useOpeningBook)
     {
-      int moveInt = openings.getNextMove();
+      MoveInt moveInt = openings.getNextMove();
 
-      if (moveInt != INVALID)
+      if (moveInt != INVALID_MOVE)
       {
         Move bestMove = generateMoveFromInt(moveInt);
 

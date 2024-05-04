@@ -352,7 +352,7 @@ namespace Chess
      * @brief Generates a move from the integer representation, used for opening book parsing (see Move::toInt())
      * @param moveInt The integer representation of the move
      */
-    Move generateMoveFromInt(int moveInt);
+    Move generateMoveFromInt(MoveInt moveInt);
 
     /**
      * @brief Generates a move using a depth of 1 (not used unless the bot is set to depth 1)

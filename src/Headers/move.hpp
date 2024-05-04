@@ -74,7 +74,7 @@ namespace Chess
     /**
      * Returns an integer representation of the move
      */
-    int toInt() const { return from ^ 0x38 | ((to ^ 0x38) << 6); }
+    int toInt() const { return from | (to << 6); }
 
     /**
      * Returns a UCI string representation of the move

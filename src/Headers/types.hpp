@@ -5,6 +5,7 @@
 #define FEN_LENGTH 6
 #define NO_EP 8
 #define INVALID -1
+#define INVALID_MOVE 0
 #define POSITIVE_INFINITY 1000000
 #define NEGATIVE_INFINITY -1000000
 
@@ -17,6 +18,7 @@ namespace Chess
   typedef unsigned long long ZobristKey;
   typedef uint8_t Piece;
   typedef uint8_t Shift;
+  typedef uint16_t MoveInt;
 
   struct BotSettings
   {
