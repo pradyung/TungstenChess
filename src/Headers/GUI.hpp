@@ -16,7 +16,7 @@ using namespace sf;
 
 namespace Chess
 {
-  const int PLAYER_COLOR = WHITE;
+  const int PLAYER_COLOR = BOTH;
   const bool THREADING = true;
 
   enum Highlights

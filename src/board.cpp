@@ -420,6 +420,89 @@ namespace Chess
     return Move(from, to, piece, capturedPiece, castlingRights, enPassantFile, promotionPieceType);
   }
 
+  std::string Board::getMovePGN(Move move)
+  {
+    std::string pgn = "";
+
+    if (move.flags & CASTLE)
+    {
+      if (move.flags & KSIDE_CASTLE)
+        pgn += "O-O";
+      else
+        pgn += "O-O-O";
+    }
+    else
+    {
+      int pieceType = move.piece & TYPE;
+
+      if (pieceType != PAWN)
+      {
+        pgn += "..NBRQK"[pieceType];
+
+        Bitboard sameTypePieces = bitboards[move.piece] & ~Bitboard(1ULL << move.from);
+        Bitboard ambiguousPieces = Bitboard();
+
+        while (sameTypePieces.bitboard)
+        {
+          int pieceIndex = __builtin_ctzll(sameTypePieces.bitboard);
+
+          sameTypePieces.removeBit(pieceIndex);
+
+          if (getLegalPieceMovesBitboard(pieceIndex).hasBit(move.to))
+            ambiguousPieces.addBit(pieceIndex);
+        }
+
+        if (ambiguousPieces)
+        {
+          if (ambiguousPieces.file(move.from % 8))
+          {
+            if (ambiguousPieces.rank(move.from / 8))
+              pgn += 'a' + (move.from % 8);
+            pgn += '8' - (move.from / 8);
+          }
+          else
+            pgn += 'a' + (move.from % 8);
+        }
+      }
+
+      if (move.flags & (CAPTURE | EP_CAPTURE))
+      {
+        if (pieceType == PAWN)
+        {
+          pgn += 'a' + (move.from & 7);
+        }
+        pgn += 'x';
+      }
+
+      pgn += 'a' + (move.to & 7);
+      pgn += '8' - (move.to / 8);
+
+      if (move.flags & EP_CAPTURE)
+        pgn += " e.p.";
+      else if (move.flags & PROMOTION)
+      {
+        pgn += "=";
+        pgn += ".NBRQ"[move.promotionPieceType];
+      }
+    }
+
+    makeMove(move, true);
+
+    int gameStatus = getGameStatus(sideToMove);
+
+    if (isInCheck(sideToMove))
+    {
+      if (gameStatus == LOSE)
+        pgn += (sideToMove == WHITE ? "#" : "#+");
+      else
+        pgn += "+";
+    }
+
+    unmakeMove(move);
+
+    return pgn;
+  }
+
   Move Board::generateBotMove()
   {
     if (openings.inOpeningBook && botSettings.useOpeningBook)
@@ -431,7 +514,7 @@ namespace Chess
         Move bestMove = generateMoveFromInt(moveInt);
 
         if (botSettings.logSearchInfo)
-          std::cout << "Book move: " << bestMove.getUCI() << std::endl;
+          std::cout << "Book move: " << (botSettings.logPGNMoves ? getMovePGN(bestMove) : bestMove.getUCI()) << std::endl;
 
         return bestMove;
       }
@@ -446,7 +529,7 @@ namespace Chess
     Move bestMove = botSettings.fixedDepthSearch ? generateBestMove(botSettings.maxSearchDepth) : iterativeDeepening(botSettings.maxSearchTime, start);
 
     if (botSettings.logSearchInfo)
-      std::cout << "Move: " << bestMove.getUCI() << ", "
+      std::cout << "Move: " << (botSettings.logPGNMoves ? getMovePGN(bestMove) : bestMove.getUCI()) << ", "
                 << "Depth: " << depthSearched << ", "
                 << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms, "
                 << "Positions evaluated: " << positionsEvaluated << std::endl;

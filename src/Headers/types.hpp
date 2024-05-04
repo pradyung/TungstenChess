@@ -28,6 +28,7 @@ namespace Chess
     int quiesceDepth;
     bool useOpeningBook;
     bool logSearchInfo;
+    bool logPGNMoves; // as opposed to UCI moves
     bool fixedDepthSearch;
   };
 

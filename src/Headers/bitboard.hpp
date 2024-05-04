@@ -42,7 +42,7 @@ namespace Chess
     /**
      * @brief Returns a bitboard with the bits in the given file
      */
-    Bitboard file(int file) const { return *this & (0x8080808080808080ULL >> file); }
+    Bitboard file(int file) const { return *this & (0x0101010101010101ULL >> file); }
 
     /**
      * @brief Returns a bitboard with the bits in the given rank

@@ -23,6 +23,7 @@ namespace Chess
       10,  // quiesce depth
       1,   // use opening book
       1,   // log search info
+      1,   // log PGN moves
       0    // fixed depth search
   };
 
@@ -92,6 +93,12 @@ namespace Chess
      * @param uci The UCI string
      */
     Move generateMoveFromUCI(std::string uci);
+
+    /**
+     * @brief Generates a PGN string from a move
+     * @param move The move to convert
+     */
+    std::string getMovePGN(Move move);
 
     /**
      * @brief Generates the best move for the bot

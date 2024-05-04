@@ -84,9 +84,9 @@ namespace Chess
       std::string uci = "";
 
       uci += 'a' + (from & TYPE);
-      uci += '8' - (from >> 3);
+      uci += '8' - (from / 8);
       uci += 'a' + (to & TYPE);
-      uci += '8' - (to >> 3);
+      uci += '8' - (to / 8);
 
       if (promotionPieceType != EMPTY)
       {
