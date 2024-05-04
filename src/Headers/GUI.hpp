@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <SFML/Graphics.hpp>
 #include <CoreFoundation/CoreFoundation.h>
 #include <string>
@@ -41,6 +42,7 @@ namespace Chess
     }
 
     std::string openingBookPath;
+    uint openingBookSize;
 
     Texture yellowOutlineTexture;
     Texture pieceTextures[PIECE_NUMBER];
@@ -62,6 +64,7 @@ namespace Chess
       CFRelease(resourcesURL);
 
       openingBookPath = resourcePath + "opening_book";
+      openingBookSize = std::ifstream(openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(uint);
 
       yellowOutlineTexture.loadFromFile(resourcePath + "yellow_outline.png");
 

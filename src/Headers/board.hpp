@@ -60,10 +60,11 @@ namespace Chess
     /**
      * @brief Loads the opening book from a file
      * @param path The path to the opening book file
+     * @param openingBookSize The number of entries in the opening book (i.e. the size of the file in bytes divided by 4)
      */
-    void loadOpeningBook(const std::string path)
+    void loadOpeningBook(const std::string path, uint openingBookSize)
     {
-      openings.loadOpeningBook(path);
+      openings.loadOpeningBook(path, openingBookSize);
     }
 
     /**

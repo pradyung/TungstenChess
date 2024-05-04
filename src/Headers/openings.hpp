@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <array>
 #include <fstream>
 
 #include "types.hpp"
@@ -16,13 +15,16 @@ namespace Chess
     /**
      * @brief Loads the opening book from a file
      * @param path The path to the opening book file
+     * @param openingBookSize The number of entries in the opening book (i.e. the size of the file in bytes divided by 4)
      */
-    void loadOpeningBook(const std::string &path)
+    void loadOpeningBook(const std::string &path, uint openingBookSize)
     {
       std::ifstream file(path);
 
+      openingBook.resize(openingBookSize);
+
       // read the file 4 bytes at a time into the book array
-      for (int i = 0; i < 16552; i++)
+      for (int i = 0; i < openingBookSize; i++)
       {
         file.read((char *)&openingBook[i], sizeof(uint));
       }
@@ -61,7 +63,7 @@ namespace Chess
     MoveInt getNextMove() const { return getWeightedRandomMove(); }
 
   private:
-    std::array<uint, 16552> openingBook;
+    std::vector<uint> openingBook;
 
     std::vector<MoveInt> moves;
 
