@@ -159,11 +159,11 @@ namespace Chess
      * @brief Moves a piece from one square to another and handles bitboard and Zobrist key updates
      * @param from The index of the piece to move
      * @param to The index to move the piece to
-     * @param promotionPieceType The piece to promote to (if any)
+     * @param promotionPiece The piece to promote to (if any)
      */
-    void movePiece(int from, int to, int promotionPieceType = EMPTY)
+    void movePiece(int from, int to, int promotionPiece = EMPTY)
     {
-      updatePiece(to, promotionPieceType == EMPTY ? board[from] : (promotionPieceType | sideToMove));
+      updatePiece(to, (promotionPiece & TYPE) == EMPTY ? board[from] : promotionPiece);
       updatePiece(from, EMPTY);
     }
 

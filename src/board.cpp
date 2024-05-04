@@ -97,26 +97,27 @@ namespace Chess
 
     auto [from, to, piece, capturedPiece, promotionPieceType, castlingRights, enPassantFile, flags] = move;
 
-    int pieceType = piece & TYPE, capturedPieceType = capturedPiece & TYPE;
+    int pieceType = piece & TYPE, pieceColor = piece & COLOR;
+    int capturedPieceType = capturedPiece & TYPE, capturedPieceColor = capturedPiece & COLOR;
 
-    movePiece(from, to, (flags & PROMOTION) ? (promotionPieceType | sideToMove) : EMPTY);
+    movePiece(from, to, (flags & PROMOTION) ? (promotionPieceType | pieceColor) : EMPTY);
 
     updateEnPassantFile(flags & PAWN_DOUBLE ? to % 8 : NO_EP);
 
     if (pieceType == KING)
-      removeCastlingRights(sideToMove, BOTHSIDES);
+      removeCastlingRights(pieceColor, BOTHSIDES);
 
     if (pieceType == ROOK && (from == A8 || from == H8 || from == A1 || from == H1))
-      removeCastlingRights(sideToMove, from % 8 == 0 ? QUEENSIDE : KINGSIDE);
+      removeCastlingRights(pieceColor, from % 8 == 0 ? QUEENSIDE : KINGSIDE);
     if (capturedPieceType == ROOK && (to == A8 || to == H8 || to == A1 || to == H1))
-      removeCastlingRights(sideToMove ^ COLOR, to % 8 == 0 ? QUEENSIDE : KINGSIDE);
+      removeCastlingRights(capturedPieceColor, to % 8 == 0 ? QUEENSIDE : KINGSIDE);
 
     if (flags & EP_CAPTURE)
       updatePiece(to + (piece & WHITE ? 8 : -8), EMPTY);
 
     if (flags & CASTLE)
     {
-      hasCastled |= sideToMove;
+      hasCastled |= pieceColor;
 
       if (flags & KSIDE_CASTLE)
         movePiece(to + 1, to - 1);
