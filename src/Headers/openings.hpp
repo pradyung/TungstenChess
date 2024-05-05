@@ -77,7 +77,7 @@ namespace Chess
       std::vector<MoveInt> childrenMoves;
       int childrenMovesIndex = 0;
 
-      for (int i = lastMoveIndex + 1;; i++)
+      for (int i = lastMoveIndex + 1; i < openingBook.size(); i++)
       {
         if (openingBook[i] >> 25 == moves.size())
         {
