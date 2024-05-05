@@ -121,7 +121,7 @@ namespace Chess
 
     int hasCastled;
 
-    std::unordered_map<ZobristKey, int> positionHistory;
+    std::vector<int> positionHistory;
 
     Openings openings;
     const Zobrist zobrist = Zobrist::getInstance();
@@ -143,8 +143,7 @@ namespace Chess
      */
     void updatePiece(int pieceIndex, Piece piece)
     {
-      zobristKey ^= zobrist.pieceKeys[pieceIndex][board[pieceIndex]];
-      zobristKey ^= zobrist.pieceKeys[pieceIndex][piece];
+      zobristKey ^= zobrist.precomputedPieceCombinationKeys[pieceIndex][board[pieceIndex]][piece];
 
       kingIndices[piece] = pieceIndex;
 
@@ -237,16 +236,22 @@ namespace Chess
      * @brief Gets the bitboard of all friendly pieces from the perspective of a color
      * @param color The color to get the bitboard for
      */
-    Bitboard getFriendlyPiecesBitboard(int color) const
+    BitboardInt getFriendlyPiecesBitboard(int color) const
     {
-      return bitboards[color | PAWN] | bitboards[color | KNIGHT] | bitboards[color | BISHOP] | bitboards[color | ROOK] | bitboards[color | QUEEN] | Bitboard(1ULL << kingIndices[color | KING]);
+      return (
+          bitboards[color | PAWN].bitboard |
+          bitboards[color | KNIGHT].bitboard |
+          bitboards[color | BISHOP].bitboard |
+          bitboards[color | ROOK].bitboard |
+          bitboards[color | QUEEN].bitboard |
+          (1ULL << kingIndices[color | KING]));
     }
 
     /**
      * @brief Gets the bitboard of all enemy pieces from the perspective of a color
      * @param color The color to get the bitboard for (WHITE returns bitboard of BLACK pieces and vice versa)
      */
-    Bitboard getEnemyPiecesBitboard(int color) const
+    BitboardInt getEnemyPiecesBitboard(int color) const
     {
       return getFriendlyPiecesBitboard(color ^ COLOR);
     }
@@ -268,7 +273,13 @@ namespace Chess
      */
     int countRepetitions(ZobristKey key)
     {
-      return positionHistory[key];
+      int count = 0;
+
+      for (int i = 0; i < positionHistory.size(); i++)
+        if (positionHistory[i] == key)
+          count++;
+
+      return count;
     }
 
     /**

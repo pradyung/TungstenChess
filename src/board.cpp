@@ -68,7 +68,7 @@ namespace Chess
 
     calculateInitialZobristKey();
 
-    positionHistory[zobristKey] = 1;
+    positionHistory.push_back(zobristKey);
   }
 
   void Board::calculateInitialZobristKey()
@@ -125,12 +125,12 @@ namespace Chess
         movePiece(to - 2, to + 1);
     }
 
-    positionHistory[zobristKey]++;
+    positionHistory.push_back(zobristKey);
   }
 
   void Board::unmakeMove(Move move)
   {
-    positionHistory[zobristKey]--;
+    positionHistory.pop_back();
 
     switchSideToMove();
 
@@ -170,7 +170,7 @@ namespace Chess
         }
       }
 
-      movesBitboard.bitboard |= (movesLookup.WHITE_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(WHITE).bitboard | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 16))));
+      movesBitboard.bitboard |= (movesLookup.WHITE_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(WHITE) | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 16))));
     }
     else if (piece == BLACK_PAWN)
     {
@@ -183,7 +183,7 @@ namespace Chess
         }
       }
 
-      movesBitboard.bitboard |= (movesLookup.BLACK_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(BLACK).bitboard | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 40))));
+      movesBitboard.bitboard |= (movesLookup.BLACK_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(BLACK) | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 40))));
     }
 
     return movesBitboard;
@@ -191,53 +191,53 @@ namespace Chess
 
   Bitboard Board::getKnightMoves(int pieceIndex, bool _, bool __)
   {
-    return Bitboard(movesLookup.KNIGHT_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR).bitboard);
+    return Bitboard(movesLookup.KNIGHT_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR));
   }
 
   Bitboard Board::getBishopMoves(int pieceIndex, bool _, bool __)
   {
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
+    BitboardInt friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
+    BitboardInt blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
 
-    BitboardInt maskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard.bitboard;
+    BitboardInt maskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard;
 
     int magicIndex = (maskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
 
-    return Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][magicIndex]) & ~friendlyPiecesBitboard;
+    return Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][magicIndex] & ~friendlyPiecesBitboard);
   }
 
   Bitboard Board::getRookMoves(int pieceIndex, bool _, bool __)
   {
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
+    BitboardInt friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
+    BitboardInt blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
 
-    BitboardInt maskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard.bitboard;
+    BitboardInt maskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard;
 
     int magicIndex = (maskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
 
-    return Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][magicIndex]) & ~friendlyPiecesBitboard;
+    return Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][magicIndex] & ~friendlyPiecesBitboard);
   }
 
   Bitboard Board::getQueenMoves(int pieceIndex, bool _, bool __)
   {
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
+    BitboardInt friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
+    BitboardInt blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
 
-    BitboardInt bishopMaskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard.bitboard;
-    BitboardInt rookMaskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard.bitboard;
+    BitboardInt bishopMaskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard;
+    BitboardInt rookMaskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard;
 
     int bishopMagicIndex = (bishopMaskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
     int rookMagicIndex = (rookMaskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
 
-    Bitboard bishopMoves = Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][bishopMagicIndex]);
-    Bitboard rookMoves = Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][rookMagicIndex]);
+    BitboardInt bishopMoves = magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][bishopMagicIndex];
+    BitboardInt rookMoves = magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][rookMagicIndex];
 
-    return (bishopMoves | rookMoves) & ~friendlyPiecesBitboard;
+    return Bitboard((bishopMoves | rookMoves) & ~friendlyPiecesBitboard);
   }
 
   Bitboard Board::getKingMoves(int pieceIndex, bool includeCastling, bool __)
   {
-    Bitboard movesBitboard = Bitboard(movesLookup.KING_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR).bitboard);
+    Bitboard movesBitboard = Bitboard(movesLookup.KING_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR));
 
     int piece = board[pieceIndex];
 
@@ -296,13 +296,13 @@ namespace Chess
     std::vector<Move> legalMoves;
     legalMoves.reserve(256);
 
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(color);
+    BitboardInt friendlyPiecesBitboard = getFriendlyPiecesBitboard(color);
 
-    while (friendlyPiecesBitboard.bitboard)
+    while (friendlyPiecesBitboard)
     {
-      int pieceIndex = __builtin_ctzll(friendlyPiecesBitboard.bitboard);
+      int pieceIndex = __builtin_ctzll(friendlyPiecesBitboard);
 
-      friendlyPiecesBitboard.removeBit(pieceIndex);
+      friendlyPiecesBitboard &= ~(1ULL << pieceIndex);
 
       Bitboard movesBitboard = getLegalPieceMovesBitboard(pieceIndex, includeCastling);
 

@@ -25,6 +25,8 @@ namespace Chess
     std::array<ZobristKey, 9> enPassantKeys;
     ZobristKey sideKey;
 
+    std::array<std::array<std::array<ZobristKey, PIECE_NUMBER>, PIECE_NUMBER>, 64> precomputedPieceCombinationKeys;
+
   private:
     /**
      * @brief Populates the pieceKeys, castlingKeys, enPassantKeys, and sideKey vectors with random keys
@@ -36,7 +38,7 @@ namespace Chess
       std::uniform_int_distribution<ZobristKey> dis(0, 0xFFFFFFFFFFFFFFFF);
 
       for (int i = 0; i < 64; i++)
-        for (int j = 0; j < PIECE_NUMBER; j++)
+        for (int j : validPieces)
           pieceKeys[i][j] = dis(gen);
 
       for (int i = 0; i < 16; i++)
@@ -46,6 +48,11 @@ namespace Chess
         enPassantKeys[i] = dis(gen);
 
       sideKey = dis(gen);
+
+      for (int i = 0; i < 64; i++)
+        for (int j : validPieces)
+          for (int k : validPieces)
+            precomputedPieceCombinationKeys[i][j][k] = pieceKeys[i][j] ^ pieceKeys[i][k];
     }
   };
 }

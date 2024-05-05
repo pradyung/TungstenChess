@@ -191,7 +191,7 @@ namespace Chess
   {
     for (int i = 0; i < 64; i++)
     {
-      for (int j = 0; j < PIECE_NUMBER; j++)
+      for (int j : validPieces)
       {
         pieceSprites[j][i].setTexture(resourceManager.pieceTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
