@@ -13,7 +13,7 @@
 
 namespace Chess
 {
-  typedef unsigned long long BitboardInt;
+  typedef unsigned long long Bitboard;
   typedef unsigned long long Magic;
   typedef unsigned long long ZobristKey;
   typedef uint8_t Piece;

@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <unordered_map>
 
 #include "move.hpp"
 #include "bitboard.hpp"
@@ -147,11 +146,11 @@ namespace Chess
 
       kingIndices[piece] = pieceIndex;
 
-      bitboards[board[pieceIndex]].removeBit(pieceIndex);
+      Bitboards::removeBit(bitboards[board[pieceIndex]], pieceIndex);
 
       board[pieceIndex] = piece;
 
-      bitboards[piece].addBit(pieceIndex);
+      Bitboards::addBit(bitboards[piece], pieceIndex);
     }
 
     /**
@@ -236,14 +235,14 @@ namespace Chess
      * @brief Gets the bitboard of all friendly pieces from the perspective of a color
      * @param color The color to get the bitboard for
      */
-    BitboardInt getFriendlyPiecesBitboard(int color) const
+    Bitboard getFriendlyPiecesBitboard(int color) const
     {
       return (
-          bitboards[color | PAWN].bitboard |
-          bitboards[color | KNIGHT].bitboard |
-          bitboards[color | BISHOP].bitboard |
-          bitboards[color | ROOK].bitboard |
-          bitboards[color | QUEEN].bitboard |
+          bitboards[color | PAWN] |
+          bitboards[color | KNIGHT] |
+          bitboards[color | BISHOP] |
+          bitboards[color | ROOK] |
+          bitboards[color | QUEEN] |
           (1ULL << kingIndices[color | KING]));
     }
 
@@ -251,7 +250,7 @@ namespace Chess
      * @brief Gets the bitboard of all enemy pieces from the perspective of a color
      * @param color The color to get the bitboard for (WHITE returns bitboard of BLACK pieces and vice versa)
      */
-    BitboardInt getEnemyPiecesBitboard(int color) const
+    Bitboard getEnemyPiecesBitboard(int color) const
     {
       return getFriendlyPiecesBitboard(color ^ COLOR);
     }

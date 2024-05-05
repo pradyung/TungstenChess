@@ -20,12 +20,12 @@ namespace Chess
       return instance;
     }
 
-    std::array<BitboardInt, 64> KNIGHT_MOVES;
-    std::array<BitboardInt, 64> KING_MOVES;
-    std::array<BitboardInt, 64> WHITE_PAWN_CAPTURE_MOVES;
-    std::array<BitboardInt, 64> BLACK_PAWN_CAPTURE_MOVES;
-    std::array<BitboardInt, 64> BISHOP_MASKS;
-    std::array<BitboardInt, 64> ROOK_MASKS;
+    std::array<Bitboard, 64> KNIGHT_MOVES;
+    std::array<Bitboard, 64> KING_MOVES;
+    std::array<Bitboard, 64> WHITE_PAWN_CAPTURE_MOVES;
+    std::array<Bitboard, 64> BLACK_PAWN_CAPTURE_MOVES;
+    std::array<Bitboard, 64> BISHOP_MASKS;
+    std::array<Bitboard, 64> ROOK_MASKS;
 
   private:
     /**
@@ -47,7 +47,7 @@ namespace Chess
     {
       for (int square = 0; square < 64; square++)
       {
-        BitboardInt position = 1ULL << square;
+        Bitboard position = 1ULL << square;
 
         KNIGHT_MOVES[square] = 0ULL;
 
@@ -77,7 +77,7 @@ namespace Chess
     {
       for (int square = 0; square < 64; square++)
       {
-        BitboardInt position = 1ULL << square;
+        Bitboard position = 1ULL << square;
 
         KING_MOVES[square] = 0ULL;
 
@@ -108,7 +108,7 @@ namespace Chess
     {
       for (int square = 0; square < 64; square++)
       {
-        BitboardInt position = 1ULL << square;
+        Bitboard position = 1ULL << square;
 
         BLACK_PAWN_CAPTURE_MOVES[square] = 0ULL;
         WHITE_PAWN_CAPTURE_MOVES[square] = 0ULL;

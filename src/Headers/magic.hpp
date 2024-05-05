@@ -19,8 +19,8 @@ namespace Chess
       return instance;
     }
 
-    std::array<std::vector<BitboardInt>, 64> ROOK_LOOKUP_TABLES;
-    std::array<std::vector<BitboardInt>, 64> BISHOP_LOOKUP_TABLES;
+    std::array<std::vector<Bitboard>, 64> ROOK_LOOKUP_TABLES;
+    std::array<std::vector<Bitboard>, 64> BISHOP_LOOKUP_TABLES;
 
     const Magic ROOK_MAGICS[64] = {13986269109025151658ULL, 455387236037336319ULL, 4904440556623498340ULL, 4207114460421289512ULL, 14925556156657734592ULL, 4445327252366687504ULL, 13303438595010102933ULL, 9309026126387632697ULL, 5499069074453028043ULL, 12560920730654516989ULL, 12669716721831026133ULL, 5215179849795952099ULL, 917129237152647097ULL, 202287029417635990ULL, 6247609062164340633ULL, 17853144352910636259ULL, 4452280247386076534ULL, 11011540942787492579ULL, 14339532337497002373ULL, 7245789500460358010ULL, 7885866682773708771ULL, 4582403393871527431ULL, 15635027257055869713ULL, 2223134766388218840ULL, 1089095503921861239ULL, 15712190305321630847ULL, 14625925940244155313ULL, 10605314906479771235ULL, 2793202652373093336ULL, 13577567351565191538ULL, 14645509110328724367ULL, 10036264502918288247ULL, 4384321680121366125ULL, 10864723711442536314ULL, 17008551077454199283ULL, 1332410127023292753ULL, 9288242940868138141ULL, 2624779248238288370ULL, 11796151673456193598ULL, 15308857462086270171ULL, 7979311280141582247ULL, 6162926258491406870ULL, 101225447883459661ULL, 6023316291641687875ULL, 12887182588201866524ULL, 2927993501301818265ULL, 252480181497719611ULL, 4924791429223128260ULL, 14250119487115505907ULL, 10577411385707545446ULL, 8199909949195686888ULL, 3541780511067141965ULL, 881564376849180413ULL, 10128850033918239872ULL, 8897753237078436454ULL, 4863094497379876576ULL, 16973873044716488022ULL, 11387510909049023394ULL, 7814565234667942950ULL, 10207090357350467518ULL, 12977269500768131634ULL, 5384924027994243970ULL, 10749459257138363041ULL, 14680491454483763662ULL};
     const Shift ROOK_SHIFTS[64] = {49, 50, 50, 50, 50, 50, 51, 50, 51, 52, 52, 51, 51, 52, 52, 51, 51, 52, 52, 51, 51, 51, 52, 52, 51, 52, 52, 52, 51, 52, 52, 51, 52, 52, 52, 52, 51, 52, 52, 51, 51, 52, 52, 52, 51, 52, 52, 51, 51, 52, 52, 52, 52, 52, 52, 52, 50, 51, 51, 51, 51, 51, 51, 51};
@@ -45,7 +45,7 @@ namespace Chess
      * @param square The square to get blockers for
      * @param mask The mask to get blockers for
      */
-    static std::vector<BitboardInt> getAllBlockers(int square, BitboardInt mask)
+    static std::vector<Bitboard> getAllBlockers(int square, Bitboard mask)
     {
       std::vector<int> setBits = std::vector<int>();
 
@@ -53,11 +53,11 @@ namespace Chess
         if (mask & (1ULL << i))
           setBits.push_back(i);
 
-      std::vector<BitboardInt> blockers = std::vector<BitboardInt>();
+      std::vector<Bitboard> blockers = std::vector<Bitboard>();
 
       for (int i = 0; i < (1 << setBits.size()); i++)
       {
-        BitboardInt blocker = 0;
+        Bitboard blocker = 0;
 
         for (int j = 0; j < setBits.size(); j++)
           if (i & (1 << j))
@@ -76,9 +76,9 @@ namespace Chess
      * @param square The square to get shifted blockers for
      * @param blocks The blocker bitboards to be shifted
      */
-    static std::vector<BitboardInt> getShiftedBlockers(Magic magic, Shift shift, int square, std::vector<BitboardInt> blocks)
+    static std::vector<Bitboard> getShiftedBlockers(Magic magic, Shift shift, int square, std::vector<Bitboard> blocks)
     {
-      std::vector<BitboardInt> shifts = std::vector<BitboardInt>();
+      std::vector<Bitboard> shifts = std::vector<Bitboard>();
 
       for (int i = 0; i < blocks.size(); i++)
         shifts.push_back((magic * blocks[i]) >> shift);
@@ -91,9 +91,9 @@ namespace Chess
      * @param square The square to get moves for
      * @param blockers The blockers to be used for the calculation
      */
-    static BitboardInt getRookMovesBitboard(int square, BitboardInt blockers)
+    static Bitboard getRookMovesBitboard(int square, Bitboard blockers)
     {
-      BitboardInt movesBitboard = 0;
+      Bitboard movesBitboard = 0;
 
       int directions[4] = {-8, -1, 1, 8};
       int rankEdges[4] = {0, -1, -1, 7};
@@ -124,9 +124,9 @@ namespace Chess
      * @param square The square to get moves for
      * @param blockers The blockers to be used for the calculation
      */
-    static BitboardInt getBishopMovesBitboard(int square, BitboardInt blockers)
+    static Bitboard getBishopMovesBitboard(int square, Bitboard blockers)
     {
-      BitboardInt movesBitboard = 0;
+      Bitboard movesBitboard = 0;
 
       int directions[4] = {-9, -7, 7, 9};
       int rankEdges[4] = {0, 0, 7, 7};
@@ -158,9 +158,9 @@ namespace Chess
      * @param blockers The blockers to be used for the calculation
      * @param rook Whether the moves are for a rook or bishop (true for rook, false for bishop)
      */
-    static std::vector<BitboardInt> getAllMovesBitboards(int square, std::vector<BitboardInt> blockers, bool rook)
+    static std::vector<Bitboard> getAllMovesBitboards(int square, std::vector<Bitboard> blockers, bool rook)
     {
-      std::vector<BitboardInt> moves = std::vector<BitboardInt>();
+      std::vector<Bitboard> moves = std::vector<Bitboard>();
 
       for (int i = 0; i < blockers.size(); i++)
       {
@@ -179,20 +179,20 @@ namespace Chess
      * @param square The square to get the lookup table for
      * @param rook Whether the lookup table is for a rook or bishop (true for rook, false for bishop)
      */
-    std::vector<BitboardInt> getMovesLookupTable(MovesLookup &movesLookup, int square, bool rook)
+    std::vector<Bitboard> getMovesLookupTable(MovesLookup &movesLookup, int square, bool rook)
     {
       Magic magic = rook ? ROOK_MAGICS[square] : BISHOP_MAGICS[square];
       Shift shift = rook ? ROOK_SHIFTS[square] : BISHOP_SHIFTS[square];
 
-      std::vector<BitboardInt> blocks = getAllBlockers(square, rook ? movesLookup.ROOK_MASKS[square] : movesLookup.BISHOP_MASKS[square]);
-      std::vector<BitboardInt> shifts = getShiftedBlockers(magic, shift, square, blocks);
-      std::vector<BitboardInt> moves = getAllMovesBitboards(square, blocks, rook);
+      std::vector<Bitboard> blocks = getAllBlockers(square, rook ? movesLookup.ROOK_MASKS[square] : movesLookup.BISHOP_MASKS[square]);
+      std::vector<Bitboard> shifts = getShiftedBlockers(magic, shift, square, blocks);
+      std::vector<Bitboard> moves = getAllMovesBitboards(square, blocks, rook);
 
-      BitboardInt maxShift = 0;
+      Bitboard maxShift = 0;
       for (int i = 0; i < shifts.size(); i++)
         maxShift = std::max(maxShift, shifts[i]);
 
-      std::vector<BitboardInt> lookupTable = std::vector<BitboardInt>(maxShift + 1, 0);
+      std::vector<Bitboard> lookupTable = std::vector<Bitboard>(maxShift + 1, 0);
 
       for (int i = 0; i < shifts.size(); i++)
         lookupTable[shifts[i]] = moves[i];
@@ -206,7 +206,7 @@ namespace Chess
      */
     void initRookLookupTables(MovesLookup &movesLookup)
     {
-      ROOK_LOOKUP_TABLES = std::array<std::vector<BitboardInt>, 64>();
+      ROOK_LOOKUP_TABLES = std::array<std::vector<Bitboard>, 64>();
 
       for (int i = 0; i < 64; i++)
       {
@@ -220,7 +220,7 @@ namespace Chess
      */
     void initBishopLookupTables(MovesLookup &movesLookup)
     {
-      BISHOP_LOOKUP_TABLES = std::array<std::vector<BitboardInt>, 64>();
+      BISHOP_LOOKUP_TABLES = std::array<std::vector<Bitboard>, 64>();
 
       for (int i = 0; i < 64; i++)
       {

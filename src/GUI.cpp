@@ -96,7 +96,7 @@ namespace Chess
             if (draggingPieceIndex == INVALID)
               continue;
 
-            if (!(grayHighlightsBitboard.hasBit(GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y))))
+            if (!Bitboards::hasBit(grayHighlightsBitboard, GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y)))
             {
               draggingPieceIndex = INVALID;
               clearHighlights(GRAY_HIGHLIGHT);
@@ -253,23 +253,15 @@ namespace Chess
   {
     for (int i = 0; i < 64; i++)
     {
-      if (redHighlightsBitboard.hasBit(i))
-      {
+      if (Bitboards::hasBit(redHighlightsBitboard, i))
         window->draw(redHighlightsSprites[i]);
-      }
-      else if (grayHighlightsBitboard.hasBit(i))
-      {
+      else if (Bitboards::hasBit(grayHighlightsBitboard, i))
         window->draw(grayHighlightsSprites[i]);
-      }
-      else if (yellowHighlightsBitboard.hasBit(i) || draggingPieceIndex == i)
-      {
+      else if (Bitboards::hasBit(yellowHighlightsBitboard, i) || draggingPieceIndex == i)
         window->draw(yellowHighlightsSprites[i]);
-      }
 
       if (yellowOutlineIndex == i)
-      {
         window->draw(yellowOutlineSprites[i]);
-      }
     }
   }
 
@@ -290,25 +282,19 @@ namespace Chess
 
   void GUIHandler::clearHighlights()
   {
-    redHighlightsBitboard.bitboard = 0;
-    yellowHighlightsBitboard.bitboard = 0;
-    grayHighlightsBitboard.bitboard = 0;
+    redHighlightsBitboard = 0;
+    yellowHighlightsBitboard = 0;
+    grayHighlightsBitboard = 0;
   }
 
   void GUIHandler::clearHighlights(int highlight)
   {
     if (highlight == RED_HIGHLIGHT)
-    {
-      redHighlightsBitboard.bitboard = 0;
-    }
+      redHighlightsBitboard = 0;
     else if (highlight == YELLOW_HIGHLIGHT)
-    {
-      yellowHighlightsBitboard.bitboard = 0;
-    }
+      yellowHighlightsBitboard = 0;
     else if (highlight == GRAY_HIGHLIGHT)
-    {
-      grayHighlightsBitboard.bitboard = 0;
-    }
+      grayHighlightsBitboard = 0;
   }
 
   void GUIHandler::makeMove(Move move)
@@ -321,7 +307,7 @@ namespace Chess
     clearHighlights();
 
     if (board.isInCheck(board.sideToMove))
-      redHighlightsBitboard.addBit(board.kingIndices[board.sideToMove | KING]);
+      Bitboards::addBit(redHighlightsBitboard, board.kingIndices[board.sideToMove | KING]);
 
     int gameStatus = board.getGameStatus(board.sideToMove);
 
@@ -339,8 +325,8 @@ namespace Chess
       }
     }
 
-    yellowHighlightsBitboard.addBit(move.from);
-    yellowHighlightsBitboard.addBit(move.to);
+    Bitboards::addBit(yellowHighlightsBitboard, move.from);
+    Bitboards::addBit(yellowHighlightsBitboard, move.to);
   }
 
   void GUIHandler::makeBotMove()
