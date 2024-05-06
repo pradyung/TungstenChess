@@ -464,12 +464,12 @@ namespace Chess
       {
         if (pieceType == PAWN)
         {
-          pgn += 'a' + (move.from & 7);
+          pgn += 'a' + (move.from % 8);
         }
         pgn += 'x';
       }
 
-      pgn += 'a' + (move.to & 7);
+      pgn += 'a' + (move.to % 8);
       pgn += '8' - (move.to / 8);
 
       if (move.flags & EP_CAPTURE)
