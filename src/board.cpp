@@ -574,45 +574,57 @@ namespace Chess
   {
     int positionalEvaluation = 0;
 
-    for (int i = 0; i < 64; i++)
+    Bitboard whitePieces = bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN];
+    Bitboard blackPieces = bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN];
+
+    Bitboard allPieces = whitePieces | bitboards[WHITE_PAWN] | blackPieces | bitboards[BLACK_PAWN];
+
+    while (allPieces)
     {
-      positionalEvaluation += getPiecePositionalEvaluation(i);
+      int pieceIndex = __builtin_ctzll(allPieces);
 
-      if (board[i] == WHITE_KING)
+      Bitboards::removeBit(allPieces, pieceIndex);
+
+      positionalEvaluation += getPiecePositionalEvaluation(pieceIndex);
+    }
+
+    {
+      int whiteKingIndex = kingIndices[WHITE_KING];
+
+      Bitboard enemyPieces = blackPieces | bitboards[BLACK_PAWN];
+      Bitboard friendlyPieces = whitePieces;
+
+      float endgameScore = Bitboards::countBits(enemyPieces) / 16.0;
+
+      positionalEvaluation += KING_EVAL_TABLE[whiteKingIndex] * endgameScore;
+
+      positionalEvaluation += KING_ENDGAME_EVAL_TABLE[whiteKingIndex] * (1 - endgameScore);
+
+      if (Bitboards::countBits(friendlyPieces) <= 3 && Bitboards::countBits(friendlyPieces) >= 1)
       {
-        Bitboard enemyPieces = bitboards[BLACK_PAWN] | bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN];
-        Bitboard friendlyPieces = bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN];
+        int kingsDistance = abs(whiteKingIndex % 8 - kingIndices[BLACK_KING] % 8) + abs(whiteKingIndex / 8 - kingIndices[BLACK_KING] / 8);
 
-        float endgameScore = Bitboards::countBits(enemyPieces) / 16.0;
-
-        positionalEvaluation += KING_EVAL_TABLE[i] * endgameScore;
-
-        positionalEvaluation += KING_ENDGAME_EVAL_TABLE[i] * (1 - endgameScore);
-
-        if (Bitboards::countBits(friendlyPieces) <= 3 && Bitboards::countBits(friendlyPieces) >= 1)
-        {
-          int kingsDistance = abs(i % 8 - kingIndices[BLACK_KING] % 8) + abs(i / 8 - kingIndices[BLACK_KING] / 8);
-
-          positionalEvaluation += KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
-        }
+        positionalEvaluation += KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
       }
-      else if (board[i] == BLACK_KING)
+    }
+
+    {
+      int blackKingIndex = kingIndices[BLACK_KING];
+
+      Bitboard enemyPieces = whitePieces | bitboards[WHITE_PAWN];
+      Bitboard friendlyPieces = blackPieces;
+
+      float endgameScore = Bitboards::countBits(enemyPieces) / 16.0;
+
+      positionalEvaluation -= KING_EVAL_TABLE[63 - blackKingIndex] * endgameScore;
+
+      positionalEvaluation -= KING_ENDGAME_EVAL_TABLE[63 - blackKingIndex] * (1 - endgameScore);
+
+      if (Bitboards::countBits(friendlyPieces) <= 3 && Bitboards::countBits(friendlyPieces) >= 1)
       {
-        Bitboard enemyPieces = bitboards[WHITE_PAWN] | bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN];
-        Bitboard friendlyPieces = bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN];
+        int kingsDistance = abs(blackKingIndex % 8 - kingIndices[WHITE_KING] % 8) + abs(blackKingIndex / 8 - kingIndices[WHITE_KING] / 8);
 
-        float endgameScore = Bitboards::countBits(enemyPieces) / 16.0;
-
-        positionalEvaluation -= KING_EVAL_TABLE[63 - i] * endgameScore;
-
-        positionalEvaluation -= KING_ENDGAME_EVAL_TABLE[63 - i] * (1 - endgameScore);
-
-        if (Bitboards::countBits(friendlyPieces) <= 3 && Bitboards::countBits(friendlyPieces) >= 1)
-        {
-          int kingsDistance = abs(i % 8 - kingIndices[WHITE_KING] % 8) + abs(i / 8 - kingIndices[WHITE_KING] / 8);
-
-          positionalEvaluation -= KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
-        }
+        positionalEvaluation -= KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
       }
     }
 

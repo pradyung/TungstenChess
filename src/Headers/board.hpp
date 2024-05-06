@@ -23,7 +23,7 @@ namespace Chess
       1,   // use opening book
       1,   // log search info
       1,   // log PGN moves
-      0    // fixed depth search
+      1    // fixed depth search
   };
 
   const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
@@ -300,31 +300,9 @@ namespace Chess
     {
       int positionalEvaluation = 0;
 
-      if (board[pieceIndex] == EMPTY || (board[pieceIndex] & TYPE) == KING)
-        return 0;
+      positionalEvaluation = PIECE_EVAL_TABLES[board[pieceIndex]][pieceIndex];
 
-      int lookupIndex = (board[pieceIndex] & COLOR) == WHITE ? pieceIndex : 63 - pieceIndex;
-
-      switch (board[pieceIndex] & TYPE)
-      {
-      case PAWN:
-        positionalEvaluation = PAWN_EVAL_TABLE[lookupIndex];
-        break;
-      case KNIGHT:
-        positionalEvaluation = KNIGHT_EVAL_TABLE[lookupIndex];
-        break;
-      case BISHOP:
-        positionalEvaluation = BISHOP_EVAL_TABLE[lookupIndex];
-        break;
-      case ROOK:
-        positionalEvaluation = ROOK_EVAL_TABLE[lookupIndex];
-        break;
-      case QUEEN:
-        positionalEvaluation = QUEEN_EVAL_TABLE[lookupIndex];
-        break;
-      }
-
-      if ((board[pieceIndex] & COLOR) == BLACK && !absolute)
+      if (!absolute && (board[pieceIndex] & BLACK))
         positionalEvaluation = -positionalEvaluation;
 
       return positionalEvaluation;
