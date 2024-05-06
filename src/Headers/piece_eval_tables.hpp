@@ -14,7 +14,7 @@ namespace Chess
     return reverse_impl(a, std::make_index_sequence<N>{});
   }
 
-  const std::array<int, 64> WHITE_PAWN_EVAL_TABLE = {
+  constexpr std::array<int, 64> WHITE_PAWN_EVAL_TABLE = {
       0, 0, 0, 0, 0, 0, 0, 0,
       50, 50, 50, 50, 50, 50, 50, 50,
       10, 10, 20, 30, 30, 20, 10, 10,
@@ -24,7 +24,7 @@ namespace Chess
       5, 10, 10, -20, -20, 10, 10, 5,
       0, 0, 0, 0, 0, 0, 0, 0};
 
-  const std::array<int, 64> WHITE_KNIGHT_EVAL_TABLE = {
+  constexpr std::array<int, 64> WHITE_KNIGHT_EVAL_TABLE = {
       -50, -40, -30, -30, -30, -30, -40, -50,
       -40, -20, 0, 0, 0, 0, -20, -40,
       -30, 0, 10, 15, 15, 10, 0, -30,
@@ -34,7 +34,7 @@ namespace Chess
       -40, -20, 0, 5, 5, 0, -20, -40,
       -50, -40, -30, -30, -30, -30, -40, -50};
 
-  const std::array<int, 64> WHITE_BISHOP_EVAL_TABLE = {
+  constexpr std::array<int, 64> WHITE_BISHOP_EVAL_TABLE = {
       -20, -10, -10, -10, -10, -10, -10, -20,
       -10, 0, 0, 0, 0, 0, 0, -10,
       -10, 0, 5, 10, 10, 5, 0, -10,
@@ -44,7 +44,7 @@ namespace Chess
       -10, 5, 0, 0, 0, 0, 5, -10,
       -20, -10, -10, -10, -10, -10, -10, -20};
 
-  const std::array<int, 64> WHITE_ROOK_EVAL_TABLE = {
+  constexpr std::array<int, 64> WHITE_ROOK_EVAL_TABLE = {
       0, 0, 0, 0, 0, 0, 0, 0,
       5, 10, 10, 10, 10, 10, 10, 5,
       -5, 0, 0, 0, 0, 0, 0, -5,
@@ -54,7 +54,7 @@ namespace Chess
       -5, 0, 0, 0, 0, 0, 0, -5,
       0, 0, 0, 5, 5, 0, 0, 0};
 
-  const std::array<int, 64> WHITE_QUEEN_EVAL_TABLE = {
+  constexpr std::array<int, 64> WHITE_QUEEN_EVAL_TABLE = {
       -20, -10, -10, -5, -5, -10, -10, -20,
       -10, 0, 0, 0, 0, 0, 0, -10,
       -10, 0, 5, 5, 5, 5, 0, -10,
@@ -64,7 +64,7 @@ namespace Chess
       -10, 0, 5, 0, 0, 0, 0, -10,
       -20, -10, -10, -5, -5, -10, -10, -20};
 
-  const std::array<int, 64> KING_EVAL_TABLE = {
+  constexpr std::array<int, 64> KING_EVAL_TABLE = {
       -30, -40, -40, -50, -50, -40, -40, -30,
       -30, -40, -40, -50, -50, -40, -40, -30,
       -30, -40, -40, -50, -50, -40, -40, -30,
@@ -74,7 +74,7 @@ namespace Chess
       20, 20, 0, 0, 0, 0, 20, 20,
       20, 30, 10, 0, 0, 10, 30, 20};
 
-  const std::array<int, 64> KING_ENDGAME_EVAL_TABLE = {
+  constexpr std::array<int, 64> KING_ENDGAME_EVAL_TABLE = {
       -50, -30, -30, -30, -30, -30, -30, -50,
       -30, -30, 0, 0, 0, 0, -30, -30,
       -30, -10, 20, 30, 30, 20, -10, -30,
@@ -84,10 +84,10 @@ namespace Chess
       -30, -20, -10, 0, 0, -10, -20, -30,
       -50, -40, -30, -20, -20, -30, -40, -50};
 
-  const int KINGS_DISTANCE_EVAL_TABLE[16] = {
+  constexpr std::array<int, 16> KINGS_DISTANCE_EVAL_TABLE = {
       0, 0, 70, 70, 50, 30, 20, 0, -10, -20, -30, -40, -50, -60, -70, -70};
 
-  const std::array<int, 64> PIECE_EVAL_TABLES[PIECE_NUMBER] = {
+  constexpr std::array<int, 64> PIECE_EVAL_TABLES[PIECE_NUMBER] = {
       {{0}},
       {{0}},
       {{0}},

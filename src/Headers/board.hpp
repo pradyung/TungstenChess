@@ -120,7 +120,7 @@ namespace Chess
 
     int hasCastled;
 
-    std::vector<int> positionHistory;
+    std::vector<ZobristKey> positionHistory;
 
     Openings openings;
     const Zobrist zobrist = Zobrist::getInstance();

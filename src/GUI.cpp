@@ -193,6 +193,9 @@ namespace Chess
     {
       for (int j : validPieces)
       {
+        if (j == EMPTY)
+          continue;
+
         pieceSprites[j][i].setTexture(resourceManager.pieceTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
         pieceSprites[j][i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
