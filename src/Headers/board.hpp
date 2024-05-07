@@ -8,7 +8,6 @@
 #include "move.hpp"
 #include "bitboard.hpp"
 #include "zobrist.hpp"
-#include "opening_book.hpp"
 #include "magic.hpp"
 #include "move_gen_helpers.hpp"
 #include "piece_eval_tables.hpp"
@@ -19,6 +18,8 @@ namespace Chess
   {
   public:
     Board(std::string fen = START_FEN);
+
+    const bool isDefaultStartPosition; // Whether the board is in the default starting position (used for determining whether opening book can be used)
 
     int sideToMove;
 
@@ -31,7 +32,7 @@ namespace Chess
 
     ZobristKey zobristKey;
 
-    OpeningBook openingBook;
+    std::vector<MoveInt> moveHistory;
 
     // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
     int kingIndices[PIECE_NUMBER];
@@ -43,16 +44,6 @@ namespace Chess
     bool isInCheck(int color)
     {
       return isAttacked(kingIndices[color | KING], color ^ COLOR);
-    }
-
-    /**
-     * @brief Loads the opening book from a file
-     * @param path The path to the opening book file
-     * @param openingBookSize The number of entries in the opening book (i.e. the size of the file in bytes divided by 4)
-     */
-    void loadOpeningBook(const std::string path, uint openingBookSize)
-    {
-      openingBook.loadOpeningBook(path, openingBookSize);
     }
 
     /**

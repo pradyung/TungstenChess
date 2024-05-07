@@ -25,12 +25,23 @@ namespace Chess
     int depthSearched;
 
     /**
+     * @brief Loads the opening book from a file
+     * @param path The path to the opening book file
+     * @param openingBookSize The number of entries in the opening book (i.e. the size of the file in bytes divided by 4)
+     */
+    void loadOpeningBook(const std::string path, uint openingBookSize)
+    {
+      openingBook.loadOpeningBook(path, openingBookSize);
+    }
+
+    /**
      * @brief Generates the best move for the bot
      */
     Move generateBotMove();
 
   private:
     Board &board;
+    OpeningBook openingBook;
 
     const BotSettings botSettings;
 

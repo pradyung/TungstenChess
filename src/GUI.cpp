@@ -19,7 +19,7 @@ namespace Chess
   {
     this->window = &window;
 
-    board.loadOpeningBook(resourceManager.openingBookPath, resourceManager.openingBookSize);
+    bot.loadOpeningBook(resourceManager.openingBookPath, resourceManager.openingBookSize);
 
     loadSquareTextures();
     loadBoardSquares();

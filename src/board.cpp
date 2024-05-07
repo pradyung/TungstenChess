@@ -2,7 +2,7 @@
 
 namespace Chess
 {
-  Board::Board(std::string fen)
+  Board::Board(std::string fen) : isDefaultStartPosition(fen == START_FEN)
   {
     std::string fenParts[FEN_LENGTH];
 
@@ -40,9 +40,6 @@ namespace Chess
         pieceIndex++;
       }
     }
-
-    if (fenParts[BOARD] != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
-      openingBook.inOpeningBook = false;
 
     sideToMove = fenParts[SIDE_TO_MOVE] == "w" ? WHITE : BLACK;
 
@@ -92,8 +89,8 @@ namespace Chess
   {
     switchSideToMove();
 
-    if (!speculative && openingBook.inOpeningBook)
-      openingBook.inOpeningBook = openingBook.addMove(move.toInt());
+    if (!speculative)
+      moveHistory.push_back(move.toInt());
 
     auto [from, to, piece, capturedPiece, promotionPieceType, castlingRights, enPassantFile, flags] = move;
 

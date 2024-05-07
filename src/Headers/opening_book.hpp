@@ -33,6 +33,18 @@ namespace Chess
     }
 
     /**
+     * @brief Updates move history to synchronize with given vector
+     * @param moves The moves to update the history with
+     */
+    void updateMoveHistory(std::vector<MoveInt> newMoves)
+    {
+      for (int i = moves.size(); i < newMoves.size() && inOpeningBook; i++)
+      {
+        inOpeningBook = addMove(newMoves[i]);
+      }
+    }
+
+    /**
      * @brief Adds a move to the move history
      * @param move The move to add
      * @return Whether the move was added successfully - if false, the move is not in the opening book

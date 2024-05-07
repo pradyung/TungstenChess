@@ -15,9 +15,11 @@ namespace Chess
 
   Move Bot::generateBotMove()
   {
-    if (board.openingBook.inOpeningBook && botSettings.useOpeningBook)
+    openingBook.updateMoveHistory(board.moveHistory);
+
+    if (openingBook.inOpeningBook && botSettings.useOpeningBook)
     {
-      MoveInt moveInt = board.openingBook.getNextMove();
+      MoveInt moveInt = openingBook.getNextMove();
 
       if (moveInt != INVALID_MOVE)
       {
@@ -29,7 +31,7 @@ namespace Chess
         return bestMove;
       }
 
-      board.openingBook.inOpeningBook = false;
+      openingBook.inOpeningBook = false;
     }
 
     positionsEvaluated = 0;
