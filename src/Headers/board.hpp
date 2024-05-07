@@ -8,42 +8,30 @@
 #include "move.hpp"
 #include "bitboard.hpp"
 #include "zobrist.hpp"
-#include "openings.hpp"
+#include "opening_book.hpp"
 #include "magic.hpp"
 #include "move_gen_helpers.hpp"
 #include "piece_eval_tables.hpp"
 
 namespace Chess
 {
-  const BotSettings DEFAULT_BOT_SETTINGS = {
-      500, // max search time in ms
-      3,   // min search depth
-      5,   // max search depth
-      10,  // quiesce depth
-      1,   // use opening book
-      1,   // log search info
-      1,   // log PGN moves
-      1    // fixed depth search
-  };
-
-  const int PIECE_VALUES[7] = {0, 100, 300, 300, 500, 900, 0};
-
   class Board
   {
   public:
-    Board(std::string fen = START_FEN, BotSettings settings = DEFAULT_BOT_SETTINGS);
+    Board(std::string fen = START_FEN);
 
     int sideToMove;
 
     int castlingRights;
     int enPassantFile;
 
-    int positionsEvaluated;
-    int depthSearched;
+    int hasCastled;
 
     Bitboard bitboards[PIECE_NUMBER];
 
     ZobristKey zobristKey;
+
+    OpeningBook openingBook;
 
     // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
     int kingIndices[PIECE_NUMBER];
@@ -64,7 +52,7 @@ namespace Chess
      */
     void loadOpeningBook(const std::string path, uint openingBookSize)
     {
-      openings.loadOpeningBook(path, openingBookSize);
+      openingBook.loadOpeningBook(path, openingBookSize);
     }
 
     /**
@@ -79,6 +67,12 @@ namespace Chess
      * @param speculative Whether the move is speculative (used for move tree search and check detection) - MUST BE SET TO FALSE FOR ACTUAL MOVES
      */
     void makeMove(Move move, bool speculative = false);
+
+    /**
+     * @brief Undoes a move, handling all board state changes
+     * @param move The move to undo
+     */
+    void unmakeMove(Move move);
 
     /**
      * @brief Returns the game status for the current side - see enum GameStatus
@@ -100,15 +94,32 @@ namespace Chess
     std::string getMovePGN(Move move);
 
     /**
-     * @brief Generates the best move for the bot
-     */
-    Move generateBotMove();
-
-    /**
      * @brief Counts the number of games that can be played from the current position to a given depth
      * @param depth The depth to search to
      */
     int countGames(int depth);
+
+    /**
+     * @brief Gets the legal moves for a color
+     * @param color The color to get the moves for
+     * @param includeCastling Whether to include castling moves (should be false for quiescence search)
+     */
+    std::vector<Move> getLegalMoves(int color, bool includeCastling = true);
+
+    /**
+     * @brief Counts the number of times a position has been repeated
+     * @param key The Zobrist key of the position to check
+     */
+    int countRepetitions(ZobristKey key)
+    {
+      int count = 0;
+
+      for (int i = 0; i < positionHistory.size(); i++)
+        if (positionHistory[i] == key)
+          count++;
+
+      return count;
+    }
 
     /**
      * @brief Allows indexing the board like an array
@@ -118,11 +129,8 @@ namespace Chess
   private:
     std::array<Piece, 64> board;
 
-    int hasCastled;
-
     std::vector<ZobristKey> positionHistory;
 
-    Openings openings;
     const Zobrist zobrist = Zobrist::getInstance();
     const MovesLookup movesLookup = MovesLookup::getInstance();
     const MagicMoveGen magicMoveGen = MagicMoveGen::getInstance();
@@ -266,54 +274,6 @@ namespace Chess
       return (this->*getPieceMoves[board[pieceIndex] & TYPE])(pieceIndex, includeCastling, onlyCaptures);
     }
 
-    /**
-     * @brief Counts the number of times a position has been repeated
-     * @param key The Zobrist key of the position to check
-     */
-    int countRepetitions(ZobristKey key)
-    {
-      int count = 0;
-
-      for (int i = 0; i < positionHistory.size(); i++)
-        if (positionHistory[i] == key)
-          count++;
-
-      return count;
-    }
-
-    /**
-     * @brief Gets the legal moves for a color, sorted by heuristic evaluation
-     * @param color The color to get the moves for
-     * @param includeCastling Whether to include castling moves (should be false for quiescence search)
-     */
-    std::vector<Move> getSortedLegalMoves(int color, bool includeCastling = true)
-    {
-      return heuristicSortMoves(getLegalMoves(color, includeCastling));
-    }
-
-    /**
-     * @brief Gets the positional evaluation of a single piece
-     * @param pieceIndex The index of the piece
-     * @param absolute Whether to return the value of the evaluation as if the piece was white (true for heuristic evaluation, false for static evaluation)
-     */
-    int getPiecePositionalEvaluation(int pieceIndex, bool absolute = false) const
-    {
-      int positionalEvaluation = 0;
-
-      positionalEvaluation = PIECE_EVAL_TABLES[board[pieceIndex]][pieceIndex];
-
-      if (!absolute && (board[pieceIndex] & BLACK))
-        positionalEvaluation = -positionalEvaluation;
-
-      return positionalEvaluation;
-    }
-
-    /**
-     * @brief Undoes a move, handling all board state changes
-     * @param move The move to undo
-     */
-    void unmakeMove(Move move);
-
     Bitboard getPawnMoves(int pieceIndex, bool _ = false, bool onlyCaptures = false);
     Bitboard getKnightMoves(int pieceIndex, bool _ = false, bool __ = false);
     Bitboard getBishopMoves(int pieceIndex, bool _ = false, bool __ = false);
@@ -336,87 +296,5 @@ namespace Chess
      * @param color The color to check
      */
     bool isAttacked(int square, int color);
-
-    /**
-     * @brief Gets the legal moves for a color
-     * @param color The color to get the moves for
-     * @param includeCastling Whether to include castling moves (should be false for quiescence search)
-     */
-    std::vector<Move> getLegalMoves(int color, bool includeCastling = true);
-
-    /**
-     * @brief Generates a move from the integer representation, used for opening book parsing (see Move::toInt())
-     * @param moveInt The integer representation of the move
-     */
-    Move generateMoveFromInt(MoveInt moveInt);
-
-    /**
-     * @brief Generates a move using a depth of 1 (not used unless the bot is set to depth 1)
-     */
-    Move generateOneDeepMove();
-
-    /**
-     * @brief Generates the best move for the bot
-     * @param depth The depth to search to
-     * @param alpha The alpha value for alpha-beta pruning (should not be set outside of recursive calls)
-     * @param beta The beta value for alpha-beta pruning (should not be set outside of recursive calls)
-     */
-    Move generateBestMove(int depth, int alpha = NEGATIVE_INFINITY, int beta = POSITIVE_INFINITY);
-
-    /**
-     * @brief Uses iterative deepening to find the best move in a constant amount of time
-     * @param time The time in milliseconds to search for (this time is not exact, but the bot will stop after a search is complete AND the time has run out.
-     *             It will not stop in the middle of a search, so the actual time spent may be significantly longer than the time parameter)
-     * @param start The time the search started, used to check if the time has run out
-     */
-    Move iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start);
-
-    /**
-     * @brief Gets the static evaluation of the current position, from the perspective of the side to move
-     */
-    int getStaticEvaluation();
-
-    /**
-     * @brief Gets the material evaluation of the current position, independent of the side to move (positive for white favor, negative for black favor)
-     */
-    int getMaterialEvaluation();
-
-    /**
-     * @brief Gets the positional evaluation of the current position, independent of the side to move (positive for white favor, negative for black favor)
-     */
-    int getPositionalEvaluation();
-
-    /**
-     * @brief Gets the evaluation bonus for the current position, independent of the side to move (positive for white favor, negative for black favor)
-     */
-    int getEvaluationBonus();
-
-    /**
-     * @brief Negamax search with alpha-beta pruning and quiescence search
-     * @param depth The depth to search to
-     * @param alpha The alpha value for alpha-beta pruning
-     * @param beta The beta value for alpha-beta pruning
-     */
-    int negamax(int depth, int alpha, int beta);
-
-    /**
-     * @brief Quiescence search
-     * @param depth The depth to search to
-     * @param alpha The alpha value for alpha-beta pruning
-     * @param beta The beta value for alpha-beta pruning
-     */
-    int quiesce(int depth, int alpha, int beta);
-
-    /**
-     * @brief Heuristic evaluation of a move, used for move ordering to improve alpha-beta pruning
-     * @param move The move to evaluate
-     */
-    int heuristicEvaluation(Move move);
-
-    /**
-     * @brief Sorts moves by heuristic evaluation to improve alpha-beta pruning
-     * @param moves The moves to sort
-     */
-    std::vector<Move> heuristicSortMoves(std::vector<Move> moves);
   };
 }

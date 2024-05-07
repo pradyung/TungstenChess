@@ -7,7 +7,7 @@
 #include <string>
 #include <thread>
 
-#include "board.hpp"
+#include "bot.hpp"
 
 using namespace sf;
 
@@ -109,6 +109,7 @@ namespace Chess
     ResourceManager &resourceManager = ResourceManager::getInstance();
 
     Board board;
+    Bot bot = Bot(board);
 
     Piece bufferBoard[64];
 

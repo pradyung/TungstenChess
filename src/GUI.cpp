@@ -331,7 +331,7 @@ namespace Chess
 
   void GUIHandler::makeBotMove()
   {
-    Move move = board.generateBotMove();
+    Move move = bot.generateBotMove();
 
     makeMove(move);
 

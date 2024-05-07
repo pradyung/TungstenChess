@@ -1,7 +1,11 @@
 #pragma once
 
+#include <array>
+
 namespace Chess
 {
+  constexpr std::array<int, 7> PIECE_VALUES = {0, 100, 300, 300, 500, 900, 0};
+
   template <typename T, std::size_t N, std::size_t... I>
   constexpr std::array<T, N> reverse_impl(const std::array<T, N> &a, std::index_sequence<I...>)
   {

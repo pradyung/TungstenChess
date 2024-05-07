@@ -7,7 +7,7 @@
 
 namespace Chess
 {
-  class Openings
+  class OpeningBook
   {
   public:
     bool inOpeningBook = true;
