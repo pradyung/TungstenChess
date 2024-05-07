@@ -1,4 +1,4 @@
-#include "Headers/bot.hpp"
+#include <bot.hpp>
 
 namespace Chess
 {

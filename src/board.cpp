@@ -1,4 +1,4 @@
-#include "Headers/board.hpp" // See for documentation and helper function implementations
+#include <board.hpp> // See for documentation and helper function implementations
 
 namespace Chess
 {

@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "Headers/board.hpp"
+#include <board.hpp>
 
 using namespace Chess;
 
