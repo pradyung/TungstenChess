@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "board.hpp"
 #include "opening_book.hpp"
 
