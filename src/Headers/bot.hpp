@@ -4,6 +4,7 @@
 
 #include "board.hpp"
 #include "opening_book.hpp"
+#include "piece_eval_tables.hpp"
 
 namespace Chess
 {
@@ -21,7 +22,10 @@ namespace Chess
   class Bot
   {
   public:
-    Bot(Board &board, const BotSettings &settings = DEFAULT_BOT_SETTINGS) : board(board), botSettings(settings) {}
+    Bot(Board &board, const BotSettings &settings = DEFAULT_BOT_SETTINGS) : board(board), botSettings(settings)
+    {
+      openingBook.inOpeningBook = board.isDefaultStartPosition;
+    }
 
     int positionsEvaluated;
     int depthSearched;
