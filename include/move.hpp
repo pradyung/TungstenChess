@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "types.hpp"
 
 namespace Chess

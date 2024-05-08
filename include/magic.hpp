@@ -2,7 +2,6 @@
 
 #include "types.hpp"
 #include "move_gen_helpers.hpp"
-#include "bitboard.hpp"
 
 namespace Chess
 {
