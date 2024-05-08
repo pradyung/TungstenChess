@@ -2,8 +2,6 @@
 
 #include <array>
 
-#include "types.hpp"
-
 namespace Chess
 {
   class MovesLookup

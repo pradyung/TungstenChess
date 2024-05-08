@@ -1,85 +1,7 @@
 #pragma once
 
-#include <cstdint>
-
-#define FEN_LENGTH 6
-#define NO_EP 8
-#define INVALID -1
-#define INVALID_MOVE 0
-#define POSITIVE_INFINITY 1000000
-#define NEGATIVE_INFINITY -1000000
-
-#define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
 namespace Chess
 {
-  typedef unsigned long long Bitboard;
-  typedef unsigned long long Magic;
-  typedef unsigned long long ZobristKey;
-  typedef uint8_t Piece;
-  typedef uint8_t Shift;
-  typedef uint16_t MoveInt;
-
-  struct BotSettings
-  {
-    int maxSearchTime; // In milliseconds, not a hard limit
-    int minSearchDepth;
-    int maxSearchDepth;
-    int quiesceDepth;
-    bool useOpeningBook;
-    bool logSearchInfo;
-    bool logPGNMoves; // as opposed to UCI moves
-    bool fixedDepthSearch;
-  };
-
-  enum CastlingRights
-  {
-    WHITE_KINGSIDE = 1,
-    WHITE_QUEENSIDE = 2,
-    BLACK_KINGSIDE = 4,
-    BLACK_QUEENSIDE = 8,
-    KINGSIDE = 16,
-    QUEENSIDE = 32,
-    BOTHSIDES = KINGSIDE | QUEENSIDE,
-    WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
-    BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
-  };
-
-  enum EvaluationBonus
-  {
-    BISHOP_PAIR_BONUS = 100,
-    CASTLED_KING_BONUS = 25,
-    CAN_CASTLE_BONUS = 25,
-    ROOK_ON_OPEN_FILE_BONUS = 50,
-    ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
-    KNIGHT_OUTPOST_BONUS = 50,
-    PASSED_PAWN_BONUS = 50,
-    DOUBLED_PAWN_PENALTY = 50,
-    ISOLATED_PAWN_PENALTY = 25,
-    BACKWARDS_PAWN_PENALTY = 50,
-    KING_SAFETY_PAWN_SHIELD_BONUS = 50,
-    STALEMATE_PENALTY = 150,
-  };
-
-  enum GameStatus
-  {
-    NO_MATE = 0,
-    STALEMATE = 1,
-    LOSE = 2,
-  };
-
-  enum Flags
-  {
-    NORMAL = 0,
-    CAPTURE = 1,
-    PAWN_DOUBLE = 2,
-    EP_CAPTURE = 4,
-    PROMOTION = 8,
-    KSIDE_CASTLE = 16,
-    QSIDE_CASTLE = 32,
-    CASTLE = KSIDE_CASTLE | QSIDE_CASTLE
-  };
-
   enum PieceMasks
   {
     TYPE = 7,
@@ -94,7 +16,8 @@ namespace Chess
     BISHOP = 3,
     ROOK = 4,
     QUEEN = 5,
-    KING = 6
+    KING = 6,
+    PIECE_TYPE_NUMBER = 7
   };
 
   enum PieceColors
@@ -118,17 +41,8 @@ namespace Chess
     BLACK_BISHOP = BLACK | BISHOP,
     BLACK_ROOK = BLACK | ROOK,
     BLACK_QUEEN = BLACK | QUEEN,
-    BLACK_KING = BLACK | KING
-  };
+    BLACK_KING = BLACK | KING,
 
-  const int validPieces[13] = {
-      EMPTY,
-      WHITE_PAWN, WHITE_KNIGHT, WHITE_BISHOP, WHITE_ROOK, WHITE_QUEEN, WHITE_KING,
-      BLACK_PAWN, BLACK_KNIGHT, BLACK_BISHOP, BLACK_ROOK, BLACK_QUEEN, BLACK_KING};
-
-  enum PieceCounts
-  {
-    PIECE_TYPE_NUMBER = 7,
     PIECE_NUMBER = 23
   };
 
@@ -198,15 +112,5 @@ namespace Chess
     F1 = 61,
     G1 = 62,
     H1 = 63
-  };
-
-  enum FenParts
-  {
-    BOARD = 0,
-    SIDE_TO_MOVE = 1,
-    CASTLING_RIGHTS = 2,
-    EN_PASSANT = 3,
-    HALFMOVE_CLOCK = 4,
-    FULLMOVE_NUMBER = 5
   };
 }

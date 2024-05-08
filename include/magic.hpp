@@ -1,10 +1,12 @@
 #pragma once
 
-#include "types.hpp"
 #include "move_gen_helpers.hpp"
 
 namespace Chess
 {
+  typedef uint64_t Magic;
+  typedef uint8_t Shift;
+
   class MagicMoveGen
   {
   public:

@@ -21,7 +21,7 @@ namespace Chess
     {
       MoveInt moveInt = openingBook.getNextMove();
 
-      if (moveInt != INVALID_MOVE)
+      if (moveInt != NULL_MOVE)
       {
         Move bestMove = generateMoveFromInt(moveInt);
 

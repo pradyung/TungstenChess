@@ -71,7 +71,7 @@ namespace Chess
 
               promotionMove.promotionPieceType = promotionPiece & TYPE;
 
-              draggingPieceIndex = INVALID;
+              draggingPieceIndex = NO_SQUARE;
 
               awaitingPromotion = false;
 
@@ -93,12 +93,12 @@ namespace Chess
         {
           if (event.mouseButton.button == Mouse::Left)
           {
-            if (draggingPieceIndex == INVALID)
+            if (draggingPieceIndex == NO_SQUARE)
               continue;
 
             if (!Bitboards::hasBit(grayHighlightsBitboard, GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y)))
             {
-              draggingPieceIndex = INVALID;
+              draggingPieceIndex = NO_SQUARE;
               clearHighlights(GRAY_HIGHLIGHT);
               continue;
             }
@@ -117,7 +117,7 @@ namespace Chess
               promotionMove = move;
             }
 
-            draggingPieceIndex = INVALID;
+            draggingPieceIndex = NO_SQUARE;
           }
         }
       }
@@ -127,7 +127,7 @@ namespace Chess
       if (x >= 0 && x <= 8 * SQUARE_SIZE && y >= 0 && y <= 8 * SQUARE_SIZE)
         yellowOutlineIndex = getSquareIndex(x, y);
       else
-        yellowOutlineIndex = INVALID;
+        yellowOutlineIndex = NO_SQUARE;
 
       window->clear();
 
@@ -191,7 +191,7 @@ namespace Chess
   {
     for (int i = 0; i < 64; i++)
     {
-      for (int j : validPieces)
+      for (int j = 0; j < PIECE_NUMBER; j++)
       {
         pieceSprites[j][i].setTexture(resourceManager.pieceTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
@@ -241,7 +241,7 @@ namespace Chess
     if (isThinking)
       return;
 
-    if (draggingPieceIndex != INVALID)
+    if (draggingPieceIndex != NO_SQUARE)
     {
       draggingPieceSprite.setTexture(resourceManager.pieceTextures[board[draggingPieceIndex]]);
       draggingPieceSprite.setPosition(Mouse::getPosition(*window).x - SQUARE_SIZE / 2, Mouse::getPosition(*window).y - SQUARE_SIZE / 2);

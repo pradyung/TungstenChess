@@ -4,15 +4,151 @@
 #include <vector>
 #include <array>
 
-#include "move.hpp"
 #include "bitboard.hpp"
 #include "zobrist.hpp"
 #include "magic.hpp"
-#include "move_gen_helpers.hpp"
-#include "piece_eval_tables.hpp"
+#include "types.hpp"
+
+#define NUM_FEN_PARTS 6
+#define NO_EP 8
+
+#define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 namespace Chess
 {
+  typedef uint8_t Piece;
+  typedef uint16_t MoveInt;
+
+  enum CastlingRights
+  {
+    WHITE_KINGSIDE = 1,
+    WHITE_QUEENSIDE = 2,
+    BLACK_KINGSIDE = 4,
+    BLACK_QUEENSIDE = 8,
+    KINGSIDE = 16,
+    QUEENSIDE = 32,
+    BOTHSIDES = KINGSIDE | QUEENSIDE,
+    WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
+    BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
+  };
+
+  enum GameStatus
+  {
+    NO_MATE = 0,
+    STALEMATE = 1,
+    LOSE = 2,
+  };
+
+  enum MoveFlags
+  {
+    NORMAL = 0,
+    CAPTURE = 1,
+    PAWN_DOUBLE = 2,
+    EP_CAPTURE = 4,
+    PROMOTION = 8,
+    KSIDE_CASTLE = 16,
+    QSIDE_CASTLE = 32,
+    CASTLE = KSIDE_CASTLE | QSIDE_CASTLE
+  };
+
+  enum FenParts
+  {
+    BOARD = 0,
+    SIDE_TO_MOVE = 1,
+    CASTLING_RIGHTS = 2,
+    EN_PASSANT = 3,
+    HALFMOVE_CLOCK = 4,
+    FULLMOVE_NUMBER = 5
+  };
+
+  struct Move
+  {
+    Move() : from(0), to(0), piece(0), capturedPiece(0), castlingRights(0), enPassantFile(0), flags(NORMAL) {}
+
+    /**
+     * @param from The square the piece is moving from
+     * @param to The square the piece is moving to
+     * @param piece The piece that is moving
+     * @param capturedPiece The piece that is being captured, if any
+     * @param enPassantFile The current state of the en passant file, used to restore it when the move is unmade
+     * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
+     * @param promotionPieceType The piece that the moving piece is being promoted to, if any (only piece type)
+     */
+    Move(int from, int to, Piece piece, Piece capturedPiece, int castlingRights, int enPassantFile, Piece promotionPieceType = EMPTY)
+        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPieceType(promotionPieceType), flags(NORMAL)
+    {
+      int pieceType = piece & TYPE;
+
+      if (pieceType == KING && from - to == -2)
+      {
+        this->flags |= KSIDE_CASTLE;
+        return;
+      }
+
+      if (pieceType == KING && from - to == 2)
+      {
+        this->flags |= QSIDE_CASTLE;
+        return;
+      }
+
+      if (pieceType == PAWN && (from - to == 16 || from - to == -16))
+      {
+        this->flags |= PAWN_DOUBLE;
+        return;
+      }
+
+      if (pieceType == PAWN && capturedPiece == EMPTY && (to - from) % 8)
+      {
+        this->flags |= EP_CAPTURE;
+        return;
+      }
+
+      if (capturedPiece != EMPTY)
+      {
+        this->flags |= CAPTURE;
+      }
+
+      if (pieceType == PAWN && (to <= 7 || to >= 56))
+      {
+        this->flags |= PROMOTION;
+      }
+    }
+
+    int from;
+    int to;
+    Piece piece;
+    Piece capturedPiece;
+    Piece promotionPieceType;
+
+    int castlingRights;
+    int enPassantFile;
+
+    int flags;
+
+    /**
+     * Returns an integer representation of the move
+     */
+    int toInt() const { return from | (to << 6); }
+
+    /**
+     * Returns a UCI string representation of the move
+     */
+    std::string getUCI() const
+    {
+      std::string uci = "";
+
+      uci += 'a' + (from % 8);
+      uci += '8' - (from / 8);
+      uci += 'a' + (to % 8);
+      uci += '8' - (to / 8);
+
+      if (promotionPieceType != EMPTY)
+        uci += ".pnbrqk"[promotionPieceType];
+
+      return uci;
+    }
+  };
+
   class Board
   {
   public:
@@ -23,7 +159,7 @@ namespace Chess
     int sideToMove;
 
     int castlingRights;
-    int enPassantFile;
+    int enPassantFile = NO_EP;
 
     int hasCastled;
 
@@ -124,8 +260,6 @@ namespace Chess
     const Zobrist zobrist = Zobrist::getInstance();
     const MovesLookup movesLookup = MovesLookup::getInstance();
     const MagicMoveGen magicMoveGen = MagicMoveGen::getInstance();
-
-    BotSettings botSettings;
 
     /**
      * @brief Calculates the Zobrist key for the current position. Should only be called once at board initialization

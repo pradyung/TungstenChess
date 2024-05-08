@@ -4,7 +4,7 @@ namespace Chess
 {
   Board::Board(std::string fen) : isDefaultStartPosition(fen == START_FEN)
   {
-    std::string fenParts[FEN_LENGTH];
+    std::string fenParts[NUM_FEN_PARTS];
 
     int fenPartIndex = 0;
 

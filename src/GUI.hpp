@@ -14,6 +14,8 @@ using namespace sf;
 #define SQUARE_SIZE 100
 #define SPRITE_SIZE 100.0f
 
+#define NO_SQUARE -1
+
 namespace Chess
 {
   const int PLAYER_COLOR = WHITE;
@@ -126,14 +128,14 @@ namespace Chess
     Bitboard yellowHighlightsBitboard;
     Bitboard grayHighlightsBitboard;
 
-    int yellowOutlineIndex = INVALID;
+    int yellowOutlineIndex = NO_SQUARE;
 
     Sprite redHighlightsSprites[64];
     Sprite yellowHighlightsSprites[64];
     Sprite grayHighlightsSprites[64];
     Sprite yellowOutlineSprites[64];
 
-    int draggingPieceIndex = INVALID;
+    int draggingPieceIndex = NO_SQUARE;
     Sprite draggingPieceSprite;
 
     Sprite whitePromotionPieces[4];

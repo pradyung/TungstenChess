@@ -6,26 +6,48 @@
 #include "opening_book.hpp"
 #include "piece_eval_tables.hpp"
 
+#define POSITIVE_INFINITY 1000000
+#define NEGATIVE_INFINITY -1000000
+
 namespace Chess
 {
-  const BotSettings DEFAULT_BOT_SETTINGS = {
-      500, // max search time in ms
-      3,   // min search depth
-      5,   // max search depth
-      10,  // quiesce depth
-      1,   // use opening book
-      1,   // log search info
-      1,   // log PGN moves
-      1    // fixed depth search
+  struct BotSettings
+  {
+    int maxSearchTime = 500; // In milliseconds, not a hard limit
+    int minSearchDepth = 3;
+    int maxSearchDepth = 5;
+    int quiesceDepth = 10;
+    bool useOpeningBook = true;
+    bool logSearchInfo = true;
+    bool logPGNMoves = true; // as opposed to UCI moves
+    bool fixedDepthSearch = true;
+  };
+
+  enum EvaluationBonus
+  {
+    BISHOP_PAIR_BONUS = 100,
+    CASTLED_KING_BONUS = 25,
+    CAN_CASTLE_BONUS = 25,
+    ROOK_ON_OPEN_FILE_BONUS = 50,
+    ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
+    KNIGHT_OUTPOST_BONUS = 50,
+    PASSED_PAWN_BONUS = 50,
+    DOUBLED_PAWN_PENALTY = 50,
+    ISOLATED_PAWN_PENALTY = 25,
+    BACKWARDS_PAWN_PENALTY = 50,
+    KING_SAFETY_PAWN_SHIELD_BONUS = 50,
+    STALEMATE_PENALTY = 150,
   };
 
   class Bot
   {
   public:
-    Bot(Board &board, const BotSettings &settings = DEFAULT_BOT_SETTINGS) : board(board), botSettings(settings)
+    Bot(Board &board, const BotSettings &settings) : board(board), botSettings(settings)
     {
       openingBook.inOpeningBook = board.isDefaultStartPosition;
     }
+
+    Bot(Board &board) : Bot(board, BotSettings()) {}
 
     int positionsEvaluated;
     int depthSearched;

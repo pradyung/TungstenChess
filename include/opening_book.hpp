@@ -3,10 +3,12 @@
 #include <vector>
 #include <fstream>
 
-#include "types.hpp"
+#define NULL_MOVE 0
 
 namespace Chess
 {
+  typedef uint16_t MoveInt;
+
   class OpeningBook
   {
   public:
@@ -79,7 +81,7 @@ namespace Chess
 
     std::vector<MoveInt> moves;
 
-    int lastMoveIndex = INVALID;
+    int lastMoveIndex = -1;
 
     /**
      * @brief Gets the next possible "children" moves from the opening book
@@ -113,7 +115,7 @@ namespace Chess
       std::vector<MoveInt> childrenMoves = getChildrenMoves();
 
       if (childrenMoves.size() == 0)
-        return INVALID_MOVE;
+        return NULL_MOVE;
 
       int totalWeight = 0;
 
