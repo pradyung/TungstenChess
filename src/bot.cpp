@@ -394,12 +394,10 @@ namespace Chess
     return bestMove;
   }
 
-  std::vector<Move> Bot::heuristicSortMoves(std::vector<Move> moves)
+  void Bot::heuristicSortMoves(std::vector<Move> &moves)
   {
     std::sort(moves.begin(), moves.end(), [this](Move a, Move b)
               { return heuristicEvaluation(a) > heuristicEvaluation(b); });
-
-    return moves;
   }
 
   int Bot::heuristicEvaluation(Move move)

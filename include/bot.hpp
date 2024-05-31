@@ -80,7 +80,9 @@ namespace Chess
      */
     std::vector<Move> getSortedLegalMoves(int color, bool includeCastling = true)
     {
-      return heuristicSortMoves(board.getLegalMoves(color, includeCastling));
+      std::vector<Move> moves = board.getLegalMoves(color, includeCastling);
+      heuristicSortMoves(moves);
+      return moves;
     }
 
     /**
@@ -170,9 +172,9 @@ namespace Chess
     int heuristicEvaluation(Move move);
 
     /**
-     * @brief Sorts moves by heuristic evaluation to improve alpha-beta pruning
+     * @brief Sorts moves by heuristic evaluation (in place) to improve alpha-beta pruning
      * @param moves The moves to sort
      */
-    std::vector<Move> heuristicSortMoves(std::vector<Move> moves);
+    void heuristicSortMoves(std::vector<Move> &moves);
   };
 }
