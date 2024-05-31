@@ -32,7 +32,7 @@ namespace Chess
     std::array<ZobristKey, 9> enPassantKeys;
     ZobristKey sideKey;
 
-    std::array<std::array<std::array<ZobristKey, PIECE_NUMBER>, PIECE_NUMBER>, 64> precomputedPieceCombinationKeys;
+    std::array<ZobristKey, 64 * 32 * 32> precomputedPieceCombinationKeys;
 
   private:
     /**
@@ -59,7 +59,8 @@ namespace Chess
       for (int i = 0; i < 64; i++)
         for (int j : validPieces)
           for (int k : validPieces)
-            precomputedPieceCombinationKeys[i][j][k] = pieceKeys[i][j] ^ pieceKeys[i][k];
+            // precomputedPieceCombinationKeys[i][j][k] = pieceKeys[i][j] ^ pieceKeys[i][k];
+            precomputedPieceCombinationKeys[i | (j << 6) | (k << 11)] = pieceKeys[i][j] ^ pieceKeys[i][k];
     }
   };
 }

@@ -63,7 +63,18 @@ namespace Chess
 
   struct Move
   {
-    Move() : from(0), to(0), piece(0), capturedPiece(0), castlingRights(0), enPassantFile(0), flags(NORMAL) {}
+    int from;
+    int to;
+    Piece piece;
+    Piece capturedPiece;
+    Piece promotionPieceType;
+
+    int castlingRights;
+    int enPassantFile;
+
+    int flags;
+
+    Move() = default;
 
     /**
      * @param from The square the piece is moving from
@@ -113,17 +124,6 @@ namespace Chess
         this->flags |= PROMOTION;
       }
     }
-
-    int from;
-    int to;
-    Piece piece;
-    Piece capturedPiece;
-    Piece promotionPieceType;
-
-    int castlingRights;
-    int enPassantFile;
-
-    int flags;
 
     /**
      * Returns an integer representation of the move
@@ -274,7 +274,7 @@ namespace Chess
      */
     void updatePiece(int pieceIndex, Piece piece)
     {
-      zobristKey ^= zobrist.precomputedPieceCombinationKeys[pieceIndex][board[pieceIndex]][piece];
+      zobristKey ^= zobrist.precomputedPieceCombinationKeys[pieceIndex | (board[pieceIndex] << 6) | (piece << 11)];
 
       kingIndices[piece] = pieceIndex;
 
