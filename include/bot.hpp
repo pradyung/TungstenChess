@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <chrono>
+#include <algorithm>
 
 #include "board.hpp"
 #include "opening_book.hpp"
