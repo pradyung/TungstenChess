@@ -151,6 +151,21 @@ namespace TungstenChess
     }
   };
 
+  struct BoardSaveState
+  {
+    int sideToMove;
+    int castlingRights;
+    int enPassantFile;
+    int hasCastled;
+    int halfmoveClock;
+    std::array<Piece, 64> board;
+    std::array<Bitboard, PIECE_NUMBER> bitboards;
+    std::array<int, PIECE_NUMBER> kingIndices;
+    ZobristKey zobristKey;
+    std::vector<MoveInt> moveHistory;
+    std::vector<ZobristKey> positionHistory;
+  };
+
   class Board
   {
   public:
@@ -167,14 +182,14 @@ namespace TungstenChess
 
     int halfmoveClock;
 
-    Bitboard bitboards[PIECE_NUMBER];
+    std::array<Bitboard, PIECE_NUMBER> bitboards;
 
     ZobristKey zobristKey;
 
     std::vector<MoveInt> moveHistory;
 
     // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
-    int kingIndices[PIECE_NUMBER];
+    std::array<int, PIECE_NUMBER> kingIndices;
 
     /**
      * @brief Checks if a color is in check in the current position
@@ -249,6 +264,45 @@ namespace TungstenChess
           count++;
 
       return count;
+    }
+
+    /**
+     * @brief Gets a restorable save state of the board's current state
+     */
+    BoardSaveState getSaveState()
+    {
+      return BoardSaveState{
+          sideToMove,
+          castlingRights,
+          enPassantFile,
+          hasCastled,
+          halfmoveClock,
+          board,
+          bitboards,
+          kingIndices,
+          zobristKey,
+          moveHistory,
+          positionHistory};
+    }
+
+    /**
+     * @brief Restores the board to a previous state
+     * @param saveState The state to restore
+     */
+    void restoreSaveState(BoardSaveState saveState)
+    {
+      sideToMove = saveState.sideToMove;
+      castlingRights = saveState.castlingRights;
+      enPassantFile = saveState.enPassantFile;
+      hasCastled = saveState.hasCastled;
+      halfmoveClock = saveState.halfmoveClock;
+      zobristKey = saveState.zobristKey;
+
+      board = saveState.board;
+      bitboards = saveState.bitboards;
+      kingIndices = saveState.kingIndices;
+      moveHistory = saveState.moveHistory;
+      positionHistory = saveState.positionHistory;
     }
 
     /**

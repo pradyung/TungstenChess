@@ -16,13 +16,13 @@ namespace TungstenChess
   struct BotSettings
   {
     int maxSearchTime = 500; // In milliseconds, not a hard limit
-    int minSearchDepth = 3;
-    int maxSearchDepth = 5;
+    int minSearchDepth = 3;  // for iterative deepening
+    int maxSearchDepth = 5;  // for fixed depth search
     int quiesceDepth = 10;
-    bool useOpeningBook = true;
+    bool useOpeningBook = true; // only used if board starting position is default
     bool logSearchInfo = true;
-    bool logPGNMoves = true; // as opposed to UCI moves
-    bool fixedDepthSearch = true;
+    bool logPGNMoves = true;      // as opposed to UCI moves
+    bool fixedDepthSearch = true; // as opposed to iterative deepening
   };
 
   enum EvaluationBonus
