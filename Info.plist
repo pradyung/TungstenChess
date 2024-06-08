@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>Chess</string>
+    <string>TungstenChess</string>
     <key>CFBundleIconFile</key>
     <string>icon.icns</string>
     <key>CFBundleName</key>
-    <string>Chess</string>
+    <string>TungstenChess</string>
     <key>CFBundleVersion</key>
     <string>1.0</string>
 </dict>

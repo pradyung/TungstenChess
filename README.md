@@ -1,4 +1,4 @@
-# Chess Bot
+# Tungsten Chess
 
 This is a simple but powerful chess AI built using C++ and SFML. The bot uses the negamax algorithm with a minimum depth of 5 moves, and a maximum depth of 15 moves (for quiescence search).
 
@@ -14,13 +14,13 @@ If you already have SFML installed, the makefile will use the system version ins
 
 ## Compile Instructions
 
-After cloning the repository, open a terminal window and navigate into the `ChessBot` folder. Now, run the following commands:
+After cloning the repository, open a terminal window and navigate into the `TungstenChess` folder. Now, run the following commands:
 
 ```zsh
-ChessBot % cd build
+TungstenChess % cd build
 build % cmake ..
 ```
 
 Note: The second command may take a while to run if it needs to build SFML src files. This step only needs to be done once while configuring the project.
 
-After this step, run `make`. It will create a MacOS application bundle called `Chess.app`. You can run the application by double-clicking on the bundle or by running `open Chess.app` in the terminal.
+After this step, run `make`. It will create a MacOS application bundle called `TungstenChess.app`. You can run the application by double-clicking on the bundle or by running `open Chess.app` in the terminal.

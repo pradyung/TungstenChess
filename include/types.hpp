@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Chess
+namespace TungstenChess
 {
   enum PieceMasks
   {

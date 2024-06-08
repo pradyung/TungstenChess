@@ -2,7 +2,7 @@
 
 #include "move_gen_helpers.hpp"
 
-namespace Chess
+namespace TungstenChess
 {
   typedef uint64_t Magic;
   typedef uint8_t Shift;
