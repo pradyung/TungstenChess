@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace Chess
+namespace TungstenChess
 {
   constexpr std::array<int, 7> PIECE_VALUES = {0, 100, 300, 300, 500, 900, 0};
 

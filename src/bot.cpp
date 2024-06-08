@@ -1,6 +1,6 @@
 #include "bot.hpp"
 
-namespace Chess
+namespace TungstenChess
 {
   Move Bot::generateMoveFromInt(MoveInt moveInt)
   {

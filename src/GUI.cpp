@@ -2,9 +2,9 @@
 
 int main()
 {
-  using namespace Chess;
+  using namespace TungstenChess;
 
-  RenderWindow window(VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE * 8), "Chess", sf::Style::Titlebar | sf::Style::Close);
+  RenderWindow window(VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE * 8), "TungstenChess", sf::Style::Titlebar | sf::Style::Close);
 
   GUIHandler gui(window);
 
@@ -13,7 +13,7 @@ int main()
   return 0;
 }
 
-namespace Chess
+namespace TungstenChess
 {
   GUIHandler::GUIHandler(RenderWindow &window)
   {

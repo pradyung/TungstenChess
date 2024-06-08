@@ -4,7 +4,7 @@
 
 #include <board.hpp>
 
-using namespace Chess;
+using namespace TungstenChess;
 
 std::vector<std::string> split(std::string str, std::string delimiter)
 {
@@ -27,7 +27,7 @@ int main()
 {
   Board *board = new Board();
 
-  std::cout << "ChessBot v0.1\n";
+  std::cout << "TungstenChess v1.0\n";
 
   while (true)
   {
@@ -41,7 +41,7 @@ int main()
 
     if (input == "uci")
     {
-      std::cout << "id name ChessBot" << std::endl
+      std::cout << "id name TungstenChess" << std::endl
                 << "id author Pradyun Gaddam" << std::endl
                 << "uciok" << std::endl;
       continue;

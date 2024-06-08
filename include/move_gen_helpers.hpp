@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace Chess
+namespace TungstenChess
 {
   class MovesLookup
   {

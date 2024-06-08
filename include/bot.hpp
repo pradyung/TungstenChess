@@ -11,7 +11,7 @@
 #define POSITIVE_INFINITY 1000000
 #define NEGATIVE_INFINITY -1000000
 
-namespace Chess
+namespace TungstenChess
 {
   struct BotSettings
   {

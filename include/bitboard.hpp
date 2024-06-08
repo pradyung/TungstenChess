@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Chess
+namespace TungstenChess
 {
   typedef uint64_t Bitboard;
 

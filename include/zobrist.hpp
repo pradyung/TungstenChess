@@ -5,7 +5,7 @@
 
 #include "types.hpp"
 
-namespace Chess
+namespace TungstenChess
 {
   typedef uint64_t ZobristKey;
 

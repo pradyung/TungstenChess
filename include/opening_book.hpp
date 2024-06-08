@@ -5,7 +5,7 @@
 
 #define NULL_MOVE 0
 
-namespace Chess
+namespace TungstenChess
 {
   typedef uint16_t MoveInt;
 

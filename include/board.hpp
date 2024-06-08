@@ -14,7 +14,7 @@
 
 #define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-namespace Chess
+namespace TungstenChess
 {
   typedef uint8_t Piece;
   typedef uint16_t MoveInt;
@@ -405,14 +405,14 @@ namespace Chess
     Bitboard getQueenMoves(int pieceIndex, bool _ = false, bool __ = false);
     Bitboard getKingMoves(int pieceIndex, bool includeCastling = true, bool __ = false);
 
-    Bitboard (Chess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, bool, bool) = {
+    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, bool, bool) = {
         nullptr,
-        &Chess::Board::getPawnMoves,
-        &Chess::Board::getKnightMoves,
-        &Chess::Board::getBishopMoves,
-        &Chess::Board::getRookMoves,
-        &Chess::Board::getQueenMoves,
-        &Chess::Board::getKingMoves};
+        &TungstenChess::Board::getPawnMoves,
+        &TungstenChess::Board::getKnightMoves,
+        &TungstenChess::Board::getBishopMoves,
+        &TungstenChess::Board::getRookMoves,
+        &TungstenChess::Board::getQueenMoves,
+        &TungstenChess::Board::getKingMoves};
 
     /**
      * @brief Checks if a square is attacked by a color

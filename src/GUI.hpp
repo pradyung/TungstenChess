@@ -16,7 +16,7 @@ using namespace sf;
 
 #define NO_SQUARE -1
 
-namespace Chess
+namespace TungstenChess
 {
   const int PLAYER_COLOR = WHITE;
   const bool THREADING = true;

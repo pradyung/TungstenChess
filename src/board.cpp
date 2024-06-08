@@ -1,6 +1,6 @@
 #include "board.hpp" // See for documentation and helper function implementations
 
-namespace Chess
+namespace TungstenChess
 {
   Board::Board(std::string fen) : isDefaultStartPosition(fen == START_FEN)
   {
