@@ -72,6 +72,8 @@ namespace TungstenChess
     int castlingRights;
     int enPassantFile;
 
+    int halfmoveClock;
+
     int flags;
 
     Move() = default;
@@ -85,8 +87,8 @@ namespace TungstenChess
      * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
      * @param promotionPieceType The piece that the moving piece is being promoted to, if any (only piece type)
      */
-    Move(int from, int to, Piece piece, Piece capturedPiece, int castlingRights, int enPassantFile, Piece promotionPieceType = EMPTY)
-        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPieceType(promotionPieceType), flags(NORMAL)
+    Move(int from, int to, Piece piece, Piece capturedPiece, int castlingRights, int enPassantFile, int halfmoveClock, Piece promotionPieceType = EMPTY)
+        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPieceType(promotionPieceType), halfmoveClock(halfmoveClock), flags(NORMAL)
     {
       int pieceType = piece & TYPE;
 
@@ -162,6 +164,8 @@ namespace TungstenChess
     int enPassantFile = NO_EP;
 
     int hasCastled;
+
+    int halfmoveClock;
 
     Bitboard bitboards[PIECE_NUMBER];
 

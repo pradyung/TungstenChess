@@ -105,7 +105,7 @@ namespace TungstenChess
 
             int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.castlingRights, board.enPassantFile);
+            Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.castlingRights, board.enPassantFile, board.halfmoveClock);
 
             if (!(move.flags & PROMOTION))
             {

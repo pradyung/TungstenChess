@@ -89,10 +89,15 @@ namespace TungstenChess
   {
     switchSideToMove();
 
+    halfmoveClock++;
+
+    if (board[move.to] || move.piece == PAWN)
+      halfmoveClock = 0;
+
     if (!speculative)
       moveHistory.push_back(move.toInt());
 
-    auto [from, to, piece, capturedPiece, promotionPieceType, castlingRights, enPassantFile, flags] = move;
+    auto [from, to, piece, capturedPiece, promotionPieceType, castlingRights, enPassantFile, halfmoveClock, flags] = move;
 
     int pieceType = piece & TYPE, pieceColor = piece & COLOR;
     int capturedPieceType = capturedPiece & TYPE, capturedPieceColor = capturedPiece & COLOR;
@@ -130,6 +135,8 @@ namespace TungstenChess
     positionHistory.pop_back();
 
     switchSideToMove();
+
+    halfmoveClock = move.halfmoveClock;
 
     unmovePiece(move.from, move.to, move.piece, move.capturedPiece);
 
@@ -269,7 +276,7 @@ namespace TungstenChess
 
       Bitboards::removeBit(pseudoLegalMovesBitboard, toIndex);
 
-      Move move = Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, QUEEN);
+      Move move = Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, halfmoveClock, QUEEN);
 
       makeMove(move, true);
 
@@ -303,14 +310,14 @@ namespace TungstenChess
 
         Bitboards::removeBit(movesBitboard, toIndex);
 
-        legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, EMPTY));
+        legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, halfmoveClock, EMPTY));
 
         if (legalMoves.back().flags & PROMOTION)
         {
           legalMoves.back().promotionPieceType = QUEEN;
-          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, KNIGHT));
-          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, BISHOP));
-          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, ROOK));
+          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, halfmoveClock, KNIGHT));
+          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, halfmoveClock, BISHOP));
+          legalMoves.push_back(Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, halfmoveClock, ROOK));
         }
       }
     }
@@ -363,7 +370,7 @@ namespace TungstenChess
       Bitboards::removeBit(friendlyPiecesBitboard, pieceIndex);
 
       if (getLegalPieceMovesBitboard(pieceIndex))
-        return NO_MATE;
+        return halfmoveClock >= 100 ? STALEMATE : NO_MATE;
     }
 
     return isInCheck(color) ? LOSE : STALEMATE;
@@ -398,7 +405,7 @@ namespace TungstenChess
       }
     }
 
-    return Move(from, to, piece, capturedPiece, castlingRights, enPassantFile, promotionPieceType);
+    return Move(from, to, piece, capturedPiece, castlingRights, enPassantFile, halfmoveClock, promotionPieceType);
   }
 
   std::string Board::getMovePGN(Move move)

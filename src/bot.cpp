@@ -10,7 +10,7 @@ namespace TungstenChess
     int piece = board[from];
     int capturedPiece = board[to];
 
-    return Move(from, to, piece, capturedPiece, board.castlingRights, board.enPassantFile);
+    return Move(from, to, piece, capturedPiece, board.castlingRights, board.enPassantFile, board.halfmoveClock);
   }
 
   Move Bot::generateBotMove()
