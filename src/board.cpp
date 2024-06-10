@@ -479,12 +479,7 @@ namespace TungstenChess
     int gameStatus = getGameStatus(sideToMove);
 
     if (isInCheck(sideToMove))
-    {
-      if (gameStatus == LOSE)
-        pgn += (sideToMove == WHITE ? "#" : "#+");
-      else
-        pgn += "+";
-    }
+      pgn += gameStatus == LOSE ? "#" : "+";
 
     unmakeMove(move);
 

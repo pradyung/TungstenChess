@@ -277,6 +277,9 @@ namespace TungstenChess
     if (board.countRepetitions(board.zobristKey) >= 3)
       return -STALEMATE_PENALTY;
 
+    if (board.halfmoveClock >= 100)
+      return -STALEMATE_PENALTY;
+
     std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove);
 
     int legalMovesCount = legalMoves.size();
@@ -293,10 +296,12 @@ namespace TungstenChess
       board.unmakeMove(legalMoves[i]);
 
       if (evaluation > alpha)
+      {
         alpha = evaluation;
 
-      if (alpha >= beta)
-        return beta;
+        if (alpha >= beta)
+          return beta;
+      }
     }
 
     return alpha;
@@ -318,6 +323,9 @@ namespace TungstenChess
     if (board.countRepetitions(board.zobristKey) >= 3)
       return -STALEMATE_PENALTY;
 
+    if (board.halfmoveClock >= 100)
+      return -STALEMATE_PENALTY;
+
     std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove, false);
 
     int legalMovesCount = legalMoves.size();
@@ -335,10 +343,12 @@ namespace TungstenChess
       board.unmakeMove(legalMoves[i]);
 
       if (evaluation > alpha)
+      {
         alpha = evaluation;
 
-      if (alpha >= beta)
-        return beta;
+        if (alpha >= beta)
+          return beta;
+      }
     }
 
     return alpha;
@@ -367,10 +377,10 @@ namespace TungstenChess
       {
         alpha = evaluation;
         bestMoveIndex = i;
-      }
 
-      if (alpha >= beta)
-        break;
+        if (alpha >= beta)
+          break;
+      }
     }
 
     return legalMoves[bestMoveIndex];
