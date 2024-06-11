@@ -253,7 +253,7 @@ namespace TungstenChess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      board.makeMove(legalMoves[i], true);
+      board.makeMove(legalMoves[i]);
 
       int evaluation = getStaticEvaluation();
 
@@ -289,7 +289,7 @@ namespace TungstenChess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      board.makeMove(legalMoves[i], true);
+      board.makeMove(legalMoves[i]);
 
       int evaluation = -negamax(depth - 1, -beta, -alpha);
 
@@ -338,7 +338,7 @@ namespace TungstenChess
       if (!(legalMoves[i].flags & ~PAWN_DOUBLE))
         continue;
 
-      board.makeMove(legalMoves[i], true);
+      board.makeMove(legalMoves[i]);
       int evaluation = -quiesce(depth - 1, -beta, -alpha);
       board.unmakeMove(legalMoves[i]);
 
@@ -369,7 +369,7 @@ namespace TungstenChess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      board.makeMove(legalMoves[i], true);
+      board.makeMove(legalMoves[i]);
       int evaluation = -negamax(depth - 1, -beta, -alpha);
       board.unmakeMove(legalMoves[i]);
 

@@ -85,7 +85,7 @@ namespace TungstenChess
       zobristKey ^= zobrist.sideKey;
   }
 
-  void Board::makeMove(Move move, bool speculative)
+  void Board::makeMove(Move move)
   {
     switchSideToMove();
 
@@ -94,8 +94,7 @@ namespace TungstenChess
     if (board[move.to] || move.piece == PAWN)
       halfmoveClock = 0;
 
-    if (!speculative)
-      moveHistory.push_back(move.toInt());
+    moveHistory.push_back(move.toInt());
 
     auto [from, to, piece, capturedPiece, promotionPieceType, castlingRights, enPassantFile, halfmoveClock, flags] = move;
 
@@ -133,6 +132,7 @@ namespace TungstenChess
   void Board::unmakeMove(Move move)
   {
     positionHistory.pop_back();
+    moveHistory.pop_back();
 
     switchSideToMove();
 
@@ -278,7 +278,7 @@ namespace TungstenChess
 
       Move move = Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, halfmoveClock, QUEEN);
 
-      makeMove(move, true);
+      makeMove(move);
 
       if (!isInCheck(board[toIndex] & COLOR))
         Bitboards::addBit(legalMovesBitboard, toIndex);
@@ -474,7 +474,7 @@ namespace TungstenChess
       }
     }
 
-    makeMove(move, true);
+    makeMove(move);
 
     int gameStatus = getGameStatus(sideToMove);
 
@@ -502,7 +502,7 @@ namespace TungstenChess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      makeMove(legalMoves[i], true);
+      makeMove(legalMoves[i]);
 
       games += countGames(depth - 1);
 

@@ -209,9 +209,8 @@ namespace TungstenChess
     /**
      * @brief Makes a move on the board
      * @param move The move to make
-     * @param speculative Whether the move is speculative (used for move tree search and check detection) - MUST BE SET TO FALSE FOR ACTUAL MOVES
      */
-    void makeMove(Move move, bool speculative = false);
+    void makeMove(Move move);
 
     /**
      * @brief Undoes a move, handling all board state changes

@@ -33,7 +33,7 @@ namespace TungstenChess
      * @param before The piece that was on the square before
      * @param after The piece that is on the square now
      */
-    ZobristKey getPieceCombinationKey(int square, int before, int after)
+    ZobristKey getPieceCombinationKey(int square, int before, int after) const
     {
       return precomputedPieceCombinationKeys[square | (before << 6) | (after << 11)];
     }
