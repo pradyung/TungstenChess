@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include "bitboard.hpp"
+
 namespace TungstenChess
 {
   class MovesLookup
