@@ -332,7 +332,7 @@ namespace TungstenChess
      */
     void updatePiece(int pieceIndex, Piece piece)
     {
-      zobristKey ^= zobrist.precomputedPieceCombinationKeys[pieceIndex | (board[pieceIndex] << 6) | (piece << 11)];
+      zobristKey ^= zobrist.getPieceCombinationKey(pieceIndex, board[pieceIndex], piece);
 
       kingIndices[piece] = pieceIndex;
 

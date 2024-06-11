@@ -1,5 +1,8 @@
 #pragma once
 
+#include <array>
+#include <vector>
+
 #include "move_gen_helpers.hpp"
 
 namespace TungstenChess

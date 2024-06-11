@@ -27,6 +27,17 @@ namespace TungstenChess
       return instance;
     }
 
+    /**
+     * @brief Get the combined Zobrist key for two pieces on the same square (used for updating the hash for a single square)
+     * @param square The square to get the key for
+     * @param before The piece that was on the square before
+     * @param after The piece that is on the square now
+     */
+    ZobristKey getPieceCombinationKey(int square, int before, int after)
+    {
+      return precomputedPieceCombinationKeys[square | (before << 6) | (after << 11)];
+    }
+
     std::array<std::array<ZobristKey, PIECE_NUMBER>, 64> pieceKeys;
     std::array<ZobristKey, 16> castlingKeys;
     std::array<ZobristKey, 9> enPassantKeys;
@@ -59,7 +70,6 @@ namespace TungstenChess
       for (int i = 0; i < 64; i++)
         for (int j : validPieces)
           for (int k : validPieces)
-            // precomputedPieceCombinationKeys[i][j][k] = pieceKeys[i][j] ^ pieceKeys[i][k];
             precomputedPieceCombinationKeys[i | (j << 6) | (k << 11)] = pieceKeys[i][j] ^ pieceKeys[i][k];
     }
   };
