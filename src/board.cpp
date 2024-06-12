@@ -159,7 +159,7 @@ namespace TungstenChess
 
   Bitboard Board::getPawnMoves(int pieceIndex, bool _, bool onlyCaptures)
   {
-    Bitboard movesBitboard = Bitboard();
+    Bitboard movesBitboard = 0;
 
     int piece = board[pieceIndex];
 
@@ -191,7 +191,7 @@ namespace TungstenChess
 
   Bitboard Board::getKnightMoves(int pieceIndex, bool _, bool __)
   {
-    return Bitboard(movesLookup.KNIGHT_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR));
+    return movesLookup.KNIGHT_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
   }
 
   Bitboard Board::getBishopMoves(int pieceIndex, bool _, bool __)
@@ -203,7 +203,7 @@ namespace TungstenChess
 
     int magicIndex = (maskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
 
-    return Bitboard(magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][magicIndex] & ~friendlyPiecesBitboard);
+    return magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][magicIndex] & ~friendlyPiecesBitboard;
   }
 
   Bitboard Board::getRookMoves(int pieceIndex, bool _, bool __)
@@ -215,7 +215,7 @@ namespace TungstenChess
 
     int magicIndex = (maskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
 
-    return Bitboard(magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][magicIndex] & ~friendlyPiecesBitboard);
+    return magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][magicIndex] & ~friendlyPiecesBitboard;
   }
 
   Bitboard Board::getQueenMoves(int pieceIndex, bool _, bool __)
@@ -232,12 +232,12 @@ namespace TungstenChess
     Bitboard bishopMoves = magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][bishopMagicIndex];
     Bitboard rookMoves = magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][rookMagicIndex];
 
-    return Bitboard((bishopMoves | rookMoves) & ~friendlyPiecesBitboard);
+    return (bishopMoves | rookMoves) & ~friendlyPiecesBitboard;
   }
 
   Bitboard Board::getKingMoves(int pieceIndex, bool includeCastling, bool __)
   {
-    Bitboard movesBitboard = Bitboard(movesLookup.KING_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR));
+    Bitboard movesBitboard = movesLookup.KING_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
 
     int piece = board[pieceIndex];
 
@@ -268,7 +268,7 @@ namespace TungstenChess
   {
     Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, includeCastling);
 
-    Bitboard legalMovesBitboard = Bitboard();
+    Bitboard legalMovesBitboard = 0;
 
     while (pseudoLegalMovesBitboard)
     {
@@ -427,8 +427,8 @@ namespace TungstenChess
       {
         pgn += "..NBRQK"[pieceType];
 
-        Bitboard sameTypePieces = bitboards[move.piece] & ~Bitboard(1ULL << move.from);
-        Bitboard ambiguousPieces = Bitboard();
+        Bitboard sameTypePieces = bitboards[move.piece] & ~(1ULL << move.from);
+        Bitboard ambiguousPieces = 0;
 
         while (sameTypePieces)
         {

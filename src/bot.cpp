@@ -290,9 +290,7 @@ namespace TungstenChess
     for (int i = 0; i < legalMovesCount; i++)
     {
       board.makeMove(legalMoves[i]);
-
       int evaluation = -negamax(depth - 1, -beta, -alpha);
-
       board.unmakeMove(legalMoves[i]);
 
       if (evaluation > alpha)

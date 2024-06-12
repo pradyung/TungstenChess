@@ -314,9 +314,9 @@ namespace TungstenChess
 
     std::vector<ZobristKey> positionHistory;
 
-    const Zobrist zobrist = Zobrist::getInstance();
-    const MovesLookup movesLookup = MovesLookup::getInstance();
-    const MagicMoveGen magicMoveGen = MagicMoveGen::getInstance();
+    const Zobrist &zobrist = Zobrist::getInstance();
+    const MovesLookup &movesLookup = MovesLookup::getInstance();
+    const MagicMoveGen &magicMoveGen = MagicMoveGen::getInstance();
 
     /**
      * @brief Calculates the Zobrist key for the current position. Should only be called once at board initialization
