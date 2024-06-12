@@ -43,7 +43,8 @@ namespace TungstenChess
     BLACK_QUEEN = BLACK | QUEEN,
     BLACK_KING = BLACK | KING,
 
-    PIECE_NUMBER = 23
+    PIECE_NUMBER = 23,
+    ALL_PIECES = 24
   };
 
   enum Squares

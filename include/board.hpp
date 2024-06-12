@@ -159,7 +159,7 @@ namespace TungstenChess
     int hasCastled;
     int halfmoveClock;
     std::array<Piece, 64> board;
-    std::array<Bitboard, PIECE_NUMBER> bitboards;
+    std::array<Bitboard, ALL_PIECES + 1> bitboards;
     std::array<int, PIECE_NUMBER> kingIndices;
     ZobristKey zobristKey;
     std::vector<MoveInt> moveHistory;
@@ -182,7 +182,7 @@ namespace TungstenChess
 
     int halfmoveClock;
 
-    std::array<Bitboard, PIECE_NUMBER> bitboards;
+    std::array<Bitboard, ALL_PIECES + 1> bitboards;
 
     ZobristKey zobristKey;
 
@@ -327,19 +327,32 @@ namespace TungstenChess
     /**
      * @brief Updates the piece at a given index and handles bitboard and Zobrist key updates
      * @param pieceIndex The index of the piece to update
-     * @param piece The new piece
+     * @param newPiece The new piece
      */
-    void updatePiece(int pieceIndex, Piece piece)
+    void updatePiece(int pieceIndex, Piece newPiece)
     {
-      zobristKey ^= zobrist.getPieceCombinationKey(pieceIndex, board[pieceIndex], piece);
+      Piece oldPiece = board[pieceIndex];
 
-      kingIndices[piece] = pieceIndex;
+      zobristKey ^= zobrist.getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
 
-      Bitboards::removeBit(bitboards[board[pieceIndex]], pieceIndex);
+      kingIndices[newPiece] = pieceIndex;
+      board[pieceIndex] = newPiece;
 
-      board[pieceIndex] = piece;
+      Bitboard squareBitboard = 1ULL << pieceIndex;
 
-      Bitboards::addBit(bitboards[piece], pieceIndex);
+      if (oldPiece)
+      {
+        bitboards[oldPiece] ^= squareBitboard;
+        bitboards[oldPiece & COLOR] ^= squareBitboard;
+        bitboards[ALL_PIECES] ^= squareBitboard;
+      }
+
+      if (newPiece)
+      {
+        bitboards[newPiece] |= squareBitboard;
+        bitboards[newPiece & COLOR] |= squareBitboard;
+        bitboards[ALL_PIECES] |= squareBitboard;
+      }
     }
 
     /**
@@ -426,13 +439,7 @@ namespace TungstenChess
      */
     Bitboard getFriendlyPiecesBitboard(int color) const
     {
-      return (
-          bitboards[color | PAWN] |
-          bitboards[color | KNIGHT] |
-          bitboards[color | BISHOP] |
-          bitboards[color | ROOK] |
-          bitboards[color | QUEEN] |
-          (1ULL << kingIndices[color | KING]));
+      return bitboards[color];
     }
 
     /**
@@ -441,7 +448,7 @@ namespace TungstenChess
      */
     Bitboard getEnemyPiecesBitboard(int color) const
     {
-      return getFriendlyPiecesBitboard(color ^ COLOR);
+      return bitboards[color ^ COLOR];
     }
 
     /**

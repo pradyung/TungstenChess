@@ -197,7 +197,7 @@ namespace TungstenChess
   Bitboard Board::getBishopMoves(int pieceIndex, bool _, bool __)
   {
     Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
+    Bitboard blockersBitboard = bitboards[ALL_PIECES];
 
     Bitboard maskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard;
 
@@ -209,7 +209,7 @@ namespace TungstenChess
   Bitboard Board::getRookMoves(int pieceIndex, bool _, bool __)
   {
     Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
+    Bitboard blockersBitboard = bitboards[ALL_PIECES];
 
     Bitboard maskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard;
 
@@ -221,7 +221,7 @@ namespace TungstenChess
   Bitboard Board::getQueenMoves(int pieceIndex, bool _, bool __)
   {
     Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = friendlyPiecesBitboard | getEnemyPiecesBitboard(board[pieceIndex] & COLOR);
+    Bitboard blockersBitboard = bitboards[ALL_PIECES];
 
     Bitboard bishopMaskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard;
     Bitboard rookMaskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard;
