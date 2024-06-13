@@ -169,7 +169,10 @@ namespace TungstenChess
   class Board
   {
   public:
-    Board(std::string fen = START_FEN);
+    Board(std::string fen = START_FEN)
+    {
+      resetBoard(fen);
+    }
 
     const bool isDefaultStartPosition; // Whether the board is in the default starting position (used for determining whether opening book can be used)
 
@@ -190,6 +193,12 @@ namespace TungstenChess
 
     // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
     std::array<int, PIECE_NUMBER> kingIndices;
+
+    /**
+     * @brief Resets the board to the provided fen
+     * @param fen The fen to reset the board to
+     */
+    void resetBoard(std::string fen = START_FEN);
 
     /**
      * @brief Checks if a color is in check in the current position

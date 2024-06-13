@@ -2,7 +2,29 @@
 
 namespace TungstenChess
 {
-  Board::Board(std::string fen) : isDefaultStartPosition(fen == START_FEN)
+  Board::Board(std::string fen)
+  {
+    resetBoard(fen);
+  }
+
+  void Board::calculateInitialZobristKey()
+  {
+    for (int i = 0; i < 64; i++)
+    {
+      if (board[i])
+      {
+        zobristKey ^= zobrist.pieceKeys[i][board[i]];
+      }
+    }
+
+    zobristKey ^= zobrist.castlingKeys[castlingRights];
+    zobristKey ^= zobrist.enPassantKeys[enPassantFile];
+
+    if (sideToMove == WHITE)
+      zobristKey ^= zobrist.sideKey;
+  }
+
+  void Board::resetBoard(std::string fen)
   {
     std::string fenParts[NUM_FEN_PARTS];
 
@@ -22,6 +44,9 @@ namespace TungstenChess
     castlingRights = 0;
     enPassantFile = NO_EP;
 
+    for (int i = 0; i < ALL_PIECES + 1; i++)
+      bitboards[i] = 0;
+
     sideToMove = WHITE;
 
     int pieceIndex = 0;
@@ -30,7 +55,13 @@ namespace TungstenChess
       if (fen[i] == '/')
         continue;
       else if (isdigit(fen[i]))
-        pieceIndex += fen[i] - '0';
+      {
+        for (int j = 0; j < fen[i] - '0'; j++)
+        {
+          board[pieceIndex] = EMPTY;
+          pieceIndex++;
+        }
+      }
       else
       {
         board[pieceIndex] = std::string("PNBRQK..pnbrqk").find(fen[i]) + WHITE_PAWN;
@@ -63,26 +94,13 @@ namespace TungstenChess
       enPassantFile = fenParts[EN_PASSANT][0] - 'a';
     }
 
+    zobristKey = 0;
+
     calculateInitialZobristKey();
 
     positionHistory.push_back(zobristKey);
-  }
 
-  void Board::calculateInitialZobristKey()
-  {
-    for (int i = 0; i < 64; i++)
-    {
-      if (board[i])
-      {
-        zobristKey ^= zobrist.pieceKeys[i][board[i]];
-      }
-    }
-
-    zobristKey ^= zobrist.castlingKeys[castlingRights];
-    zobristKey ^= zobrist.enPassantKeys[enPassantFile];
-
-    if (sideToMove == WHITE)
-      zobristKey ^= zobrist.sideKey;
+    moveHistory.clear();
   }
 
   void Board::makeMove(Move move)

@@ -2,7 +2,8 @@
 #include <string>
 #include <vector>
 
-#include <board.hpp>
+#include "board.hpp"
+#include "bot.hpp"
 
 using namespace TungstenChess;
 
@@ -25,7 +26,9 @@ std::vector<std::string> split(std::string str, std::string delimiter)
 
 int main()
 {
-  Board *board = new Board();
+  Board board(START_FEN);
+
+  Bot bot(board);
 
   std::cout << "TungstenChess v1.0\n";
 
@@ -55,7 +58,7 @@ int main()
 
     if (input == "ucinewgame")
     {
-      board = new Board();
+      board.resetBoard();
       continue;
     }
 
@@ -70,7 +73,7 @@ int main()
         }
 
         std::cout << "| "
-                  << " ........PNBRQK..pnbrqk"[(*board)[i]] << " ";
+                  << " ........PNBRQK..pnbrqk"[board[i]] << " ";
 
         if (i % 8 == 7)
         {
@@ -81,15 +84,15 @@ int main()
       std::cout << " +---+---+---+---+---+---+---+---+\n";
       std::cout << "   a   b   c   d   e   f   g   h\n\n";
 
-      std::cout << "Side to move: " << (board->sideToMove == WHITE ? "White" : "Black") << "\n";
-      std::cout << "Zobrist key: " << board->zobristKey << "\n";
+      std::cout << "Side to move: " << (board.sideToMove == WHITE ? "White" : "Black") << "\n";
+      std::cout << "Zobrist key: " << board.zobristKey << "\n";
     }
 
     std::vector<std::string> splitInput = split(input, " ");
 
     if (splitInput[0] == "go")
     {
-      Move bestMove = board->generateBotMove();
+      Move bestMove = bot.generateBotMove();
       std::cout << "bestmove " << bestMove.getUCI() << "\n";
       continue;
     }
@@ -98,7 +101,7 @@ int main()
     {
       if (splitInput[1] == "startpos")
       {
-        board = new Board();
+        board.resetBoard();
       }
       else if (splitInput[1] == "fen")
       {
@@ -107,14 +110,14 @@ int main()
         {
           fen += splitInput[i] + " ";
         }
-        board = new Board(fen);
+        board.resetBoard(fen);
       }
 
       if (splitInput.size() > 2 && splitInput[2] == "moves")
       {
         for (int i = 3; i < splitInput.size(); i++)
         {
-          board->makeMove(board->generateMoveFromUCI(splitInput[i]));
+          board.makeMove(board.generateMoveFromUCI(splitInput[i]));
         }
       }
     }
@@ -123,7 +126,7 @@ int main()
     {
       for (int i = 1; i < splitInput.size(); i++)
       {
-        board->makeMove(board->generateMoveFromUCI(splitInput[i]));
+        board.makeMove(board.generateMoveFromUCI(splitInput[i]));
       }
     }
   }
