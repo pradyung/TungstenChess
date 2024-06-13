@@ -169,7 +169,7 @@ namespace TungstenChess
   class Board
   {
   public:
-    Board(std::string fen = START_FEN)
+    Board(std::string fen = START_FEN) : isDefaultStartPosition(fen == START_FEN)
     {
       resetBoard(fen);
     }

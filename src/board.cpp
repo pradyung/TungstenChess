@@ -2,11 +2,6 @@
 
 namespace TungstenChess
 {
-  Board::Board(std::string fen)
-  {
-    resetBoard(fen);
-  }
-
   void Board::calculateInitialZobristKey()
   {
     for (int i = 0; i < 64; i++)
