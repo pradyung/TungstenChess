@@ -39,7 +39,7 @@ namespace TungstenChess
      * @param square The square to get moves for
      * @param allPieces The blockers to be used for the calculation (these are unmasked)
      */
-    Bitboard getBishopMoves(int square, Bitboard allPieces)
+    Bitboard getBishopMoves(int square, Bitboard allPieces) const
     {
       return BISHOP_LOOKUP_TABLES[square][((BISHOP_MAGICS[square] * (allPieces & movesLookup.BISHOP_MASKS[square])) >> BISHOP_SHIFTS[square])];
     }
@@ -49,7 +49,7 @@ namespace TungstenChess
      * @param square The square to get moves for
      * @param allPieces The blockers to be used for the calculation (these are unmasked)
      */
-    Bitboard getRookMoves(int square, Bitboard allPieces)
+    Bitboard getRookMoves(int square, Bitboard allPieces) const
     {
       return ROOK_LOOKUP_TABLES[square][((ROOK_MAGICS[square] * (allPieces & movesLookup.ROOK_MASKS[square])) >> ROOK_SHIFTS[square])];
     }

@@ -15,10 +15,10 @@ namespace TungstenChess
 
   Move Bot::generateBotMove()
   {
-    openingBook.updateMoveHistory(board.moveHistory);
-
     if (openingBook.inOpeningBook && botSettings.useOpeningBook)
     {
+      openingBook.updateMoveHistory(board.moveHistory);
+
       MoveInt moveInt = openingBook.getNextMove();
 
       if (moveInt != NULL_MOVE)

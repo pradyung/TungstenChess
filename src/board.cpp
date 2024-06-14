@@ -45,7 +45,7 @@ namespace TungstenChess
     sideToMove = WHITE;
 
     int pieceIndex = 0;
-    for (int i = 0; i < fenParts[BOARD].length(); i++)
+    for (int i = 0; i < fenParts[FEN_BOARD].length(); i++)
     {
       if (fen[i] == '/')
         continue;
@@ -67,26 +67,26 @@ namespace TungstenChess
       }
     }
 
-    sideToMove = fenParts[SIDE_TO_MOVE] == "w" ? WHITE : BLACK;
+    sideToMove = fenParts[FEN_SIDE_TO_MOVE] == "w" ? WHITE : BLACK;
 
-    if (fenParts[CASTLING_RIGHTS] != "-")
+    if (fenParts[FEN_CASTLING_RIGHTS] != "-")
     {
-      for (int i = 0; i < fenParts[CASTLING_RIGHTS].length(); i++)
+      for (int i = 0; i < fenParts[FEN_CASTLING_RIGHTS].length(); i++)
       {
-        if (fenParts[CASTLING_RIGHTS][i] == 'K')
+        if (fenParts[FEN_CASTLING_RIGHTS][i] == 'K')
           castlingRights |= WHITE_KINGSIDE;
-        else if (fenParts[CASTLING_RIGHTS][i] == 'Q')
+        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'Q')
           castlingRights |= WHITE_QUEENSIDE;
-        else if (fenParts[CASTLING_RIGHTS][i] == 'k')
+        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'k')
           castlingRights |= BLACK_KINGSIDE;
-        else if (fenParts[CASTLING_RIGHTS][i] == 'q')
+        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'q')
           castlingRights |= BLACK_QUEENSIDE;
       }
     }
 
-    if (fenParts[EN_PASSANT] != "-")
+    if (fenParts[FEN_EN_PASSANT] != "-")
     {
-      enPassantFile = fenParts[EN_PASSANT][0] - 'a';
+      enPassantFile = fenParts[FEN_EN_PASSANT][0] - 'a';
     }
 
     zobristKey = 0;
@@ -225,7 +225,7 @@ namespace TungstenChess
 
   Bitboard Board::getKingMoves(int pieceIndex, Piece color, bool includeCastling, bool __)
   {
-    Bitboard movesBitboard = movesLookup.KING_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(color);
+    Bitboard movesBitboard = movesLookup.KING_MOVES[pieceIndex] & ~bitboards[color];
 
     if (includeCastling && castlingRights)
     {
@@ -262,14 +262,12 @@ namespace TungstenChess
 
       Bitboards::removeBit(pseudoLegalMovesBitboard, toIndex);
 
-      Move move = Move(pieceIndex, toIndex, board[pieceIndex], board[toIndex], castlingRights, enPassantFile, halfmoveClock, QUEEN);
+      MoveFlags flag = quickMakeMove(pieceIndex, toIndex);
 
-      makeMove(move);
-
-      if (!isInCheck(board[toIndex] & COLOR))
+      if (!isInCheck(color))
         Bitboards::addBit(legalMovesBitboard, toIndex);
 
-      unmakeMove(move);
+      quickUnmakeMove(pieceIndex, toIndex, flag);
     }
 
     return legalMovesBitboard;
@@ -280,7 +278,7 @@ namespace TungstenChess
     std::vector<Move> legalMoves;
     legalMoves.reserve(256);
 
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(color);
+    Bitboard friendlyPiecesBitboard = bitboards[color];
 
     while (friendlyPiecesBitboard)
     {
@@ -339,7 +337,7 @@ namespace TungstenChess
     if (countRepetitions(zobristKey) >= 3)
       return STALEMATE;
 
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(color);
+    Bitboard friendlyPiecesBitboard = bitboards[color];
 
     while (friendlyPiecesBitboard)
     {
@@ -448,7 +446,7 @@ namespace TungstenChess
       else if (move.flags & PROMOTION)
       {
         pgn += "=";
-        pgn += ".NBRQ"[move.promotionPieceType];
+        pgn += "..NBRQ"[move.promotionPieceType];
       }
     }
 
@@ -472,9 +470,6 @@ namespace TungstenChess
     std::vector<Move> legalMoves = getLegalMoves(sideToMove);
 
     int legalMovesCount = legalMoves.size();
-
-    if (depth == 1 || legalMovesCount == 0)
-      return legalMovesCount;
 
     int games = 0;
 

@@ -53,12 +53,12 @@ namespace TungstenChess
 
   enum FenParts
   {
-    BOARD = 0,
-    SIDE_TO_MOVE = 1,
-    CASTLING_RIGHTS = 2,
-    EN_PASSANT = 3,
-    HALFMOVE_CLOCK = 4,
-    FULLMOVE_NUMBER = 5
+    FEN_BOARD = 0,
+    FEN_SIDE_TO_MOVE = 1,
+    FEN_CASTLING_RIGHTS = 2,
+    FEN_EN_PASSANT = 3,
+    FEN_HALFMOVE_CLOCK = 4,
+    FEN_FULLMOVE_NUMBER = 5
   };
 
   struct Move
@@ -337,19 +337,13 @@ namespace TungstenChess
     void calculateInitialZobristKey();
 
     /**
-     * @brief Updates the piece at a given index and handles bitboard and Zobrist key updates
-     * @param pieceIndex The index of the piece to update
+     * @brief Updates bitboards for a single changing piece
+     * @param pieceIndex The index of the piece
+     * @param oldPiece The old piece
      * @param newPiece The new piece
      */
-    void updatePiece(int pieceIndex, Piece newPiece)
+    void updateBitboards(int pieceIndex, Piece oldPiece, Piece newPiece)
     {
-      Piece oldPiece = board[pieceIndex];
-
-      zobristKey ^= zobrist.getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
-
-      kingIndices[newPiece] = pieceIndex;
-      board[pieceIndex] = newPiece;
-
       Bitboard squareBitboard = 1ULL << pieceIndex;
 
       if (oldPiece)
@@ -365,6 +359,113 @@ namespace TungstenChess
         bitboards[newPiece & COLOR] |= squareBitboard;
         bitboards[ALL_PIECES] |= squareBitboard;
       }
+    }
+
+    /**
+     * @brief Quickly makes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array or Zobrist key
+     * @param from The index of the piece to move
+     * @param to The index to move the piece to
+     * @return MoveFlags returns flag only if move was en passant, kingside castle, or queenside castle
+     */
+    MoveFlags quickMakeMove(int from, int to)
+    {
+      Piece fromPiece = board[from];
+      Piece toPiece = board[to];
+
+      updateBitboards(from, fromPiece, EMPTY);
+      updateBitboards(to, toPiece, fromPiece);
+
+      if ((fromPiece & TYPE) == PAWN)
+      {
+        if (!toPiece && to % 8 != from % 8)
+        {
+          Piece color = fromPiece & COLOR;
+          int epSquare = to + (color & WHITE ? 8 : -8);
+          updateBitboards(epSquare, (color ^ COLOR) | PAWN, EMPTY);
+
+          return EP_CAPTURE;
+        }
+      }
+
+      else if ((fromPiece & TYPE) == KING)
+      {
+        kingIndices[fromPiece] = to;
+
+        if (to - from == 2)
+        {
+          Piece rook = (fromPiece & COLOR) | ROOK;
+          updateBitboards(from + 3, rook, EMPTY);
+          updateBitboards(from + 1, EMPTY, rook);
+
+          return KSIDE_CASTLE;
+        }
+        else if (from - to == 2)
+        {
+          Piece rook = (fromPiece & COLOR) | ROOK;
+          updateBitboards(from - 4, rook, EMPTY);
+          updateBitboards(from - 1, EMPTY, rook);
+
+          return QSIDE_CASTLE;
+        }
+      }
+
+      return NORMAL;
+    }
+
+    /**
+     * @brief Quickly unmakes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array or Zobrist key
+     * @param from The index of the piece to move
+     * @param to The index to move the piece to
+     * @param flag The flag returned by quickMakeMove
+     */
+    void quickUnmakeMove(int from, int to, MoveFlags flag)
+    {
+      Piece fromPiece = board[from];
+      Piece toPiece = board[to];
+
+      updateBitboards(to, fromPiece, toPiece);
+      updateBitboards(from, EMPTY, fromPiece);
+
+      if ((fromPiece & TYPE) == KING)
+        kingIndices[fromPiece] = from;
+
+      if (flag & EP_CAPTURE)
+      {
+        Piece color = fromPiece & COLOR;
+        int epSquare = to + (color & WHITE ? 8 : -8);
+        updateBitboards(epSquare, EMPTY, (color ^ COLOR) | PAWN);
+      }
+
+      else if (flag & KSIDE_CASTLE)
+      {
+        Piece rook = (fromPiece & COLOR) | ROOK;
+        updateBitboards(from + 3, EMPTY, rook);
+        updateBitboards(from + 1, rook, EMPTY);
+      }
+
+      else if (flag & QSIDE_CASTLE)
+      {
+        Piece rook = (fromPiece & COLOR) | ROOK;
+        updateBitboards(from - 4, EMPTY, rook);
+        updateBitboards(from - 1, rook, EMPTY);
+      }
+    }
+
+    /**
+     * @brief Updates the piece at a given index and handles bitboard and Zobrist key updates
+     * @param pieceIndex The index of the piece to update
+     * @param newPiece The new piece
+     */
+    void updatePiece(int pieceIndex, Piece newPiece)
+    {
+      Piece oldPiece = board[pieceIndex];
+
+      zobristKey ^= zobrist.getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
+
+      kingIndices[newPiece] = pieceIndex;
+      board[pieceIndex] = newPiece;
+
+      updateBitboards(pieceIndex, oldPiece, newPiece);
     }
 
     /**
