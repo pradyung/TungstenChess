@@ -213,7 +213,10 @@ namespace TungstenChess
      * @brief Returns the bitboard of the squares a piece can move to
      * @param pieceIndex The index of the piece
      */
-    Bitboard getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling = true);
+    Bitboard getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling = true)
+    {
+      return getLegalPieceMovesBitboard(pieceIndex, board[pieceIndex] & COLOR, includeCastling);
+    }
 
     /**
      * @brief Makes a move on the board
@@ -466,19 +469,26 @@ namespace TungstenChess
      * @param includeCastling Whether to include castling moves (should be false when checking for attacks on the king)
      * @param onlyCaptures Whether to only include capture moves (should be true when checking for attacks on the king)
      */
-    Bitboard getPseudoLegalPieceMoves(int pieceIndex, bool includeCastling = true, bool onlyCaptures = false)
+    Bitboard getPseudoLegalPieceMoves(int pieceIndex, Piece color, bool includeCastling = true, bool onlyCaptures = false)
     {
-      return (this->*getPieceMoves[board[pieceIndex] & TYPE])(pieceIndex, includeCastling, onlyCaptures);
+      return (this->*getPieceMoves[board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling, onlyCaptures);
     }
 
-    Bitboard getPawnMoves(int pieceIndex, bool _ = false, bool onlyCaptures = false);
-    Bitboard getKnightMoves(int pieceIndex, bool _ = false, bool __ = false);
-    Bitboard getBishopMoves(int pieceIndex, bool _ = false, bool __ = false);
-    Bitboard getRookMoves(int pieceIndex, bool _ = false, bool __ = false);
-    Bitboard getQueenMoves(int pieceIndex, bool _ = false, bool __ = false);
-    Bitboard getKingMoves(int pieceIndex, bool includeCastling = true, bool __ = false);
+    /**
+     * @brief Returns the bitboard of the squares a piece can move to
+     * @param pieceIndex The index of the piece
+     * @param color The color of the piece
+     */
+    Bitboard getLegalPieceMovesBitboard(int pieceIndex, Piece color, bool includeCastling = true);
 
-    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, bool, bool) = {
+    Bitboard getPawnMoves(int pieceIndex, Piece color, bool _ = false, bool onlyCaptures = false);
+    Bitboard getKnightMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);
+    Bitboard getBishopMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);
+    Bitboard getRookMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);
+    Bitboard getQueenMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);
+    Bitboard getKingMoves(int pieceIndex, Piece color, bool includeCastling = true, bool __ = false);
+
+    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, Piece, bool, bool) = {
         nullptr,
         &TungstenChess::Board::getPawnMoves,
         &TungstenChess::Board::getKnightMoves,

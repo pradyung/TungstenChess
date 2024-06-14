@@ -170,13 +170,11 @@ namespace TungstenChess
       updatePiece((move.piece & WHITE) ? move.to + 8 : move.to - 8, move.piece ^ COLOR);
   }
 
-  Bitboard Board::getPawnMoves(int pieceIndex, bool _, bool onlyCaptures)
+  Bitboard Board::getPawnMoves(int pieceIndex, Piece color, bool _, bool onlyCaptures)
   {
     Bitboard movesBitboard = 0;
 
-    int piece = board[pieceIndex];
-
-    if (piece == WHITE_PAWN)
+    if (color & WHITE)
     {
       if (!board[pieceIndex - 8] && !onlyCaptures)
       {
@@ -185,9 +183,9 @@ namespace TungstenChess
           Bitboards::addBit(movesBitboard, pieceIndex - 16);
       }
 
-      movesBitboard |= (movesLookup.WHITE_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(WHITE) | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 16))));
+      movesBitboard |= (movesLookup.WHITE_PAWN_CAPTURE_MOVES[pieceIndex] & (bitboards[BLACK] | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 16))));
     }
-    else if (piece == BLACK_PAWN)
+    else if (color & BLACK)
     {
       if (!board[pieceIndex + 8] && !onlyCaptures)
       {
@@ -196,67 +194,42 @@ namespace TungstenChess
           Bitboards::addBit(movesBitboard, pieceIndex + 16);
       }
 
-      movesBitboard |= (movesLookup.BLACK_PAWN_CAPTURE_MOVES[pieceIndex] & (getEnemyPiecesBitboard(BLACK) | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 40))));
+      movesBitboard |= (movesLookup.BLACK_PAWN_CAPTURE_MOVES[pieceIndex] & (bitboards[WHITE] | (enPassantFile == NO_EP ? 0 : 1ULL << (enPassantFile + 40))));
     }
 
     return movesBitboard;
   }
 
-  Bitboard Board::getKnightMoves(int pieceIndex, bool _, bool __)
+  Bitboard Board::getKnightMoves(int pieceIndex, Piece color, bool _, bool __)
   {
-    return movesLookup.KNIGHT_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
+    return movesLookup.KNIGHT_MOVES[pieceIndex] & ~bitboards[color];
   }
 
-  Bitboard Board::getBishopMoves(int pieceIndex, bool _, bool __)
+  Bitboard Board::getBishopMoves(int pieceIndex, Piece color, bool _, bool __)
   {
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = bitboards[ALL_PIECES];
-
-    Bitboard maskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard;
-
-    int magicIndex = (maskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
-
-    return magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][magicIndex] & ~friendlyPiecesBitboard;
+    return magicMoveGen.getBishopMoves(pieceIndex, bitboards[ALL_PIECES]) & ~bitboards[color];
   }
 
-  Bitboard Board::getRookMoves(int pieceIndex, bool _, bool __)
+  Bitboard Board::getRookMoves(int pieceIndex, Piece color, bool _, bool __)
   {
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = bitboards[ALL_PIECES];
-
-    Bitboard maskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard;
-
-    int magicIndex = (maskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
-
-    return magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][magicIndex] & ~friendlyPiecesBitboard;
+    return magicMoveGen.getRookMoves(pieceIndex, bitboards[ALL_PIECES]) & ~bitboards[color];
   }
 
-  Bitboard Board::getQueenMoves(int pieceIndex, bool _, bool __)
+  Bitboard Board::getQueenMoves(int pieceIndex, Piece color, bool _, bool __)
   {
-    Bitboard friendlyPiecesBitboard = getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-    Bitboard blockersBitboard = bitboards[ALL_PIECES];
+    Bitboard bishopMoves = magicMoveGen.getBishopMoves(pieceIndex, bitboards[ALL_PIECES]);
+    Bitboard rookMoves = magicMoveGen.getRookMoves(pieceIndex, bitboards[ALL_PIECES]);
 
-    Bitboard bishopMaskedBlockers = movesLookup.BISHOP_MASKS[pieceIndex] & blockersBitboard;
-    Bitboard rookMaskedBlockers = movesLookup.ROOK_MASKS[pieceIndex] & blockersBitboard;
-
-    int bishopMagicIndex = (bishopMaskedBlockers * magicMoveGen.BISHOP_MAGICS[pieceIndex]) >> magicMoveGen.BISHOP_SHIFTS[pieceIndex];
-    int rookMagicIndex = (rookMaskedBlockers * magicMoveGen.ROOK_MAGICS[pieceIndex]) >> magicMoveGen.ROOK_SHIFTS[pieceIndex];
-
-    Bitboard bishopMoves = magicMoveGen.BISHOP_LOOKUP_TABLES[pieceIndex][bishopMagicIndex];
-    Bitboard rookMoves = magicMoveGen.ROOK_LOOKUP_TABLES[pieceIndex][rookMagicIndex];
-
-    return (bishopMoves | rookMoves) & ~friendlyPiecesBitboard;
+    return (bishopMoves | rookMoves) & ~bitboards[color];
   }
 
-  Bitboard Board::getKingMoves(int pieceIndex, bool includeCastling, bool __)
+  Bitboard Board::getKingMoves(int pieceIndex, Piece color, bool includeCastling, bool __)
   {
-    Bitboard movesBitboard = movesLookup.KING_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(board[pieceIndex] & COLOR);
-
-    int piece = board[pieceIndex];
+    Bitboard movesBitboard = movesLookup.KING_MOVES[pieceIndex] & ~getFriendlyPiecesBitboard(color);
 
     if (includeCastling && castlingRights)
     {
-      if (piece == WHITE_KING)
+      if (color & WHITE)
       {
         if (castlingRights & WHITE_KINGSIDE && !board[F1] && !board[G1] && !isInCheck(WHITE) && !isAttacked(F1, BLACK))
           Bitboards::addBit(movesBitboard, G1);
@@ -264,7 +237,7 @@ namespace TungstenChess
         if (castlingRights & WHITE_QUEENSIDE && !board[D1] && !board[C1] && !board[B1] && !isInCheck(WHITE) && !isAttacked(D1, BLACK))
           Bitboards::addBit(movesBitboard, C1);
       }
-      else if (piece == BLACK_KING)
+      else if (color & BLACK)
       {
         if (castlingRights & BLACK_KINGSIDE && !board[F8] && !board[G8] && !isInCheck(BLACK) && !isAttacked(F8, WHITE))
           Bitboards::addBit(movesBitboard, G8);
@@ -277,9 +250,9 @@ namespace TungstenChess
     return movesBitboard;
   }
 
-  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling)
+  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, Piece color, bool includeCastling)
   {
-    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, includeCastling);
+    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, color, includeCastling);
 
     Bitboard legalMovesBitboard = 0;
 
@@ -315,7 +288,7 @@ namespace TungstenChess
 
       friendlyPiecesBitboard &= ~(1ULL << pieceIndex);
 
-      Bitboard movesBitboard = getLegalPieceMovesBitboard(pieceIndex, includeCastling);
+      Bitboard movesBitboard = getLegalPieceMovesBitboard(pieceIndex, color, includeCastling);
 
       while (movesBitboard)
       {
@@ -340,33 +313,25 @@ namespace TungstenChess
 
   bool Board::isAttacked(int square, int color)
   {
-    int piece = board[square];
+    if (color & BLACK && movesLookup.WHITE_PAWN_CAPTURE_MOVES[square] & bitboards[BLACK_PAWN])
+      return true;
 
-    if (!piece)
-      board[square] = (color | PAWN) ^ COLOR;
+    else if (color & WHITE && movesLookup.BLACK_PAWN_CAPTURE_MOVES[square] & bitboards[WHITE_PAWN])
+      return true;
 
-    bool attacked = false;
+    else if (movesLookup.KNIGHT_MOVES[square] & bitboards[color | KNIGHT])
+      return true;
 
-    if (piece & WHITE && movesLookup.WHITE_PAWN_CAPTURE_MOVES[square] & bitboards[BLACK_PAWN])
-      attacked = true;
+    else if (movesLookup.KING_MOVES[square] & bitboards[color | KING])
+      return true;
 
-    else if (piece & BLACK && movesLookup.BLACK_PAWN_CAPTURE_MOVES[square] & bitboards[WHITE_PAWN])
-      attacked = true;
+    else if (getBishopMoves(square, color ^ COLOR) & (bitboards[color | BISHOP] | bitboards[color | QUEEN]))
+      return true;
 
-    else if (movesLookup.KNIGHT_MOVES[square] & bitboards[(color) | KNIGHT])
-      attacked = true;
+    else if (getRookMoves(square, color ^ COLOR) & (bitboards[color | ROOK] | bitboards[color | QUEEN]))
+      return true;
 
-    else if (movesLookup.KING_MOVES[square] & bitboards[(color) | KING])
-      attacked = true;
-
-    else if (getBishopMoves(square) & (bitboards[(color) | BISHOP] | bitboards[(color) | QUEEN]))
-      attacked = true;
-
-    else if (getRookMoves(square) & (bitboards[(color) | ROOK] | bitboards[(color) | QUEEN]))
-      attacked = true;
-
-    board[square] = piece;
-    return attacked;
+    return false;
   }
 
   int Board::getGameStatus(int color)
