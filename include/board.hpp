@@ -547,24 +547,6 @@ namespace TungstenChess
     }
 
     /**
-     * @brief Gets the bitboard of all friendly pieces from the perspective of a color
-     * @param color The color to get the bitboard for
-     */
-    Bitboard getFriendlyPiecesBitboard(int color) const
-    {
-      return bitboards[color];
-    }
-
-    /**
-     * @brief Gets the bitboard of all enemy pieces from the perspective of a color
-     * @param color The color to get the bitboard for (WHITE returns bitboard of BLACK pieces and vice versa)
-     */
-    Bitboard getEnemyPiecesBitboard(int color) const
-    {
-      return bitboards[color ^ COLOR];
-    }
-
-    /**
      * @brief Gets a bitboard of pseudo-legal moves for a piece (does not check for pins or checks)
      * @param pieceIndex The index of the piece
      * @param includeCastling Whether to include castling moves (should be false when checking for attacks on the king)
