@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <iostream>
 
 #include "bitboard.hpp"
 #include "zobrist.hpp"
@@ -252,8 +253,9 @@ namespace TungstenChess
     /**
      * @brief Counts the number of games that can be played from the current position to a given depth
      * @param depth The depth to search to
+     * @param verbose Whether to print the number of games found after each 1-deep move
      */
-    int countGames(int depth);
+    int countGames(int depth, bool verbose = true);
 
     /**
      * @brief Gets the legal moves for a color
@@ -365,7 +367,7 @@ namespace TungstenChess
      * @brief Quickly makes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array or Zobrist key
      * @param from The index of the piece to move
      * @param to The index to move the piece to
-     * @return MoveFlags returns flag only if move was en passant, kingside castle, or queenside castle
+     * @return MoveFlags returns flag only if move was en passant, promotion, kingside castle, or queenside castle
      */
     MoveFlags quickMakeMove(int from, int to)
     {
@@ -385,6 +387,9 @@ namespace TungstenChess
 
           return EP_CAPTURE;
         }
+
+        if (to <= 7 || to >= 56)
+          return PROMOTION;
       }
 
       else if ((fromPiece & TYPE) == KING)
@@ -563,6 +568,15 @@ namespace TungstenChess
      * @param color The color of the piece
      */
     Bitboard getLegalPieceMovesBitboard(int pieceIndex, Piece color, bool includeCastling = true);
+
+    /**
+     * @brief Returns the bitboard of pieces that can move to a given square. Does not include kings for technical reasons
+     * @param targetSquare The square to check
+     * @param targetPiece The piece on the target square
+     * @param color The color of the pieces moving
+     * @param capturesOnly Whether to only include capture moves
+     */
+    Bitboard getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, Piece color, bool onlyCaptures = false);
 
     Bitboard getPawnMoves(int pieceIndex, Piece color, bool _ = false, bool onlyCaptures = false);
     Bitboard getKnightMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);

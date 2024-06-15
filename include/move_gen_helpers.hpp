@@ -21,10 +21,12 @@ namespace TungstenChess
 
     std::array<Bitboard, 64> KNIGHT_MOVES;
     std::array<Bitboard, 64> KING_MOVES;
-    std::array<Bitboard, 64> WHITE_PAWN_CAPTURE_MOVES;
-    std::array<Bitboard, 64> BLACK_PAWN_CAPTURE_MOVES;
     std::array<Bitboard, 64> BISHOP_MASKS;
     std::array<Bitboard, 64> ROOK_MASKS;
+
+    std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_CAPTURE_MOVES;
+    std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_SINGLE_MOVES;
+    std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_DOUBLE_MOVES;
 
   private:
     /**
@@ -34,7 +36,7 @@ namespace TungstenChess
     {
       initKnightMoves();
       initKingMoves();
-      initPawnCaptureMoves();
+      initPawnMoves();
       initBishopMasks();
       initRookMasks();
     }
@@ -101,26 +103,46 @@ namespace TungstenChess
     }
 
     /**
-     * @brief Initializes the pawn capture move lookup table
+     * @brief Initializes the pawn move lookup tables
      */
-    void initPawnCaptureMoves()
+    void initPawnMoves()
     {
       for (int square = 0; square < 64; square++)
       {
         Bitboard position = 1ULL << square;
 
-        BLACK_PAWN_CAPTURE_MOVES[square] = 0ULL;
-        WHITE_PAWN_CAPTURE_MOVES[square] = 0ULL;
+        PAWN_CAPTURE_MOVES[WHITE_PAWN][square] = 0ULL;
+        PAWN_CAPTURE_MOVES[BLACK_PAWN][square] = 0ULL;
 
-        if (square < 56 && square % 8 > 0)
-          BLACK_PAWN_CAPTURE_MOVES[square] |= position << 7;
-        if (square < 56 && square % 8 < 7)
-          BLACK_PAWN_CAPTURE_MOVES[square] |= position << 9;
         if (square > 7 && square % 8 > 0)
-          WHITE_PAWN_CAPTURE_MOVES[square] |= position >> 9;
+          PAWN_CAPTURE_MOVES[WHITE_PAWN][square] |= position >> 9;
         if (square > 7 && square % 8 < 7)
-          WHITE_PAWN_CAPTURE_MOVES[square] |= position >> 7;
+          PAWN_CAPTURE_MOVES[WHITE_PAWN][square] |= position >> 7;
+        if (square < 56 && square % 8 > 0)
+          PAWN_CAPTURE_MOVES[BLACK_PAWN][square] |= position << 7;
+        if (square < 56 && square % 8 < 7)
+          PAWN_CAPTURE_MOVES[BLACK_PAWN][square] |= position << 9;
+
+        PAWN_REVERSE_SINGLE_MOVES[WHITE_PAWN][square] = position << 8;
+        PAWN_REVERSE_SINGLE_MOVES[BLACK_PAWN][square] = position >> 8;
+
+        PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN][square] = 0ULL;
+        PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN][square] = 0ULL;
+
+        if (square / 8 == 4)
+          PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN][square] = position << 16;
+        else if (square / 8 == 3)
+          PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN][square] = position >> 16;
       }
+
+      PAWN_CAPTURE_MOVES[WHITE] = PAWN_CAPTURE_MOVES[WHITE_PAWN];
+      PAWN_CAPTURE_MOVES[BLACK] = PAWN_CAPTURE_MOVES[BLACK_PAWN];
+
+      PAWN_REVERSE_SINGLE_MOVES[WHITE] = PAWN_REVERSE_SINGLE_MOVES[WHITE_PAWN];
+      PAWN_REVERSE_SINGLE_MOVES[BLACK] = PAWN_REVERSE_SINGLE_MOVES[BLACK_PAWN];
+
+      PAWN_REVERSE_DOUBLE_MOVES[WHITE] = PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN];
+      PAWN_REVERSE_DOUBLE_MOVES[BLACK] = PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN];
     }
 
     /**
