@@ -121,9 +121,9 @@ namespace TungstenChess
     if (pieceType == KING)
       removeCastlingRights(pieceColor, BOTHSIDES);
 
-    if (pieceType == ROOK && (from == A8 || from == H8 || from == A1 || from == H1))
+    if (pieceType == ROOK && ((pieceColor == WHITE && (from == A1 || from == H1)) || (pieceColor == BLACK && (from == A8 || from == H8))))
       removeCastlingRights(pieceColor, from % 8 == 0 ? QUEENSIDE : KINGSIDE);
-    if (capturedPieceType == ROOK && (to == A8 || to == H8 || to == A1 || to == H1))
+    if (capturedPieceType == ROOK && ((capturedPieceColor == WHITE && (to == A1 || to == H1)) || (capturedPieceColor == BLACK && (to == A8 || to == H8))))
       removeCastlingRights(capturedPieceColor, to % 8 == 0 ? QUEENSIDE : KINGSIDE);
 
     if (flags & EP_CAPTURE)
