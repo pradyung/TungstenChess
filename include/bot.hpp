@@ -46,7 +46,7 @@ namespace TungstenChess
   public:
     Bot(Board &board, const BotSettings &settings) : board(board), botSettings(settings)
     {
-      openingBook.inOpeningBook = board.isDefaultStartPosition;
+      openingBook.inOpeningBook = board.isDefaultStartPosition();
     }
 
     Bot(Board &board) : Bot(board, BotSettings()) {}

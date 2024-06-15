@@ -169,31 +169,52 @@ namespace TungstenChess
 
   class Board
   {
+  private:
+    std::array<Piece, 64> m_board;
+
+    int m_sideToMove;
+
+    int m_castlingRights;
+    int m_enPassantFile = NO_EP;
+
+    int m_hasCastled;
+
+    int m_halfmoveClock;
+
+    std::array<Bitboard, ALL_PIECES + 1> m_bitboards;
+
+    ZobristKey m_zobristKey;
+
+    std::vector<MoveInt> m_moveHistory;
+
+    const bool m_isDefaultStartPosition; // Whether the board is in the default starting position (used for determining whether opening book can be used)
+
+    std::array<int, PIECE_NUMBER> m_kingIndices; // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
+
+    std::vector<ZobristKey> m_positionHistory;
+
+    const Zobrist &zobrist = Zobrist::getInstance();
+    const MovesLookup &movesLookup = MovesLookup::getInstance();
+    const MagicMoveGen &magicMoveGen = MagicMoveGen::getInstance();
+
   public:
-    Board(std::string fen = START_FEN) : isDefaultStartPosition(fen == START_FEN)
+    Board(std::string fen = START_FEN) : m_isDefaultStartPosition(fen == START_FEN)
     {
       resetBoard(fen);
     }
 
-    const bool isDefaultStartPosition; // Whether the board is in the default starting position (used for determining whether opening book can be used)
-
-    int sideToMove;
-
-    int castlingRights;
-    int enPassantFile = NO_EP;
-
-    int hasCastled;
-
-    int halfmoveClock;
-
-    std::array<Bitboard, ALL_PIECES + 1> bitboards;
-
-    ZobristKey zobristKey;
-
-    std::vector<MoveInt> moveHistory;
-
-    // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
-    std::array<int, PIECE_NUMBER> kingIndices;
+    // Accessor methods
+    Piece operator[](int index) { return m_board[index]; }
+    int sideToMove() { return m_sideToMove; }
+    int castlingRights() { return m_castlingRights; }
+    int enPassantFile() { return m_enPassantFile; }
+    int hasCastled() { return m_hasCastled; }
+    int halfmoveClock() { return m_halfmoveClock; }
+    Bitboard bitboard(int piece) { return m_bitboards[piece]; }
+    ZobristKey zobristKey() { return m_zobristKey; }
+    std::vector<MoveInt> moveHistory() { return m_moveHistory; }
+    bool isDefaultStartPosition() { return m_isDefaultStartPosition; }
+    int kingIndex(int piece) { return m_kingIndices[piece]; }
 
     /**
      * @brief Resets the board to the provided fen
@@ -207,7 +228,7 @@ namespace TungstenChess
      */
     bool isInCheck(int color)
     {
-      return isAttacked(kingIndices[color | KING], color ^ COLOR);
+      return isAttacked(m_kingIndices[color | KING], color ^ COLOR);
     }
 
     /**
@@ -216,7 +237,7 @@ namespace TungstenChess
      */
     Bitboard getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling = true)
     {
-      return getLegalPieceMovesBitboard(pieceIndex, board[pieceIndex] & COLOR, includeCastling);
+      return getLegalPieceMovesBitboard(pieceIndex, m_board[pieceIndex] & COLOR, includeCastling);
     }
 
     /**
@@ -272,8 +293,8 @@ namespace TungstenChess
     {
       int count = 0;
 
-      for (int i = 0; i < positionHistory.size(); i++)
-        if (positionHistory[i] == key)
+      for (int i = 0; i < m_positionHistory.size(); i++)
+        if (m_positionHistory[i] == key)
           count++;
 
       return count;
@@ -285,17 +306,17 @@ namespace TungstenChess
     BoardSaveState getSaveState()
     {
       return BoardSaveState{
-          sideToMove,
-          castlingRights,
-          enPassantFile,
-          hasCastled,
-          halfmoveClock,
-          board,
-          bitboards,
-          kingIndices,
-          zobristKey,
-          moveHistory,
-          positionHistory};
+          m_sideToMove,
+          m_castlingRights,
+          m_enPassantFile,
+          m_hasCastled,
+          m_halfmoveClock,
+          m_board,
+          m_bitboards,
+          m_kingIndices,
+          m_zobristKey,
+          m_moveHistory,
+          m_positionHistory};
     }
 
     /**
@@ -304,34 +325,21 @@ namespace TungstenChess
      */
     void restoreSaveState(BoardSaveState saveState)
     {
-      sideToMove = saveState.sideToMove;
-      castlingRights = saveState.castlingRights;
-      enPassantFile = saveState.enPassantFile;
-      hasCastled = saveState.hasCastled;
-      halfmoveClock = saveState.halfmoveClock;
-      zobristKey = saveState.zobristKey;
+      m_sideToMove = saveState.sideToMove;
+      m_castlingRights = saveState.castlingRights;
+      m_enPassantFile = saveState.enPassantFile;
+      m_hasCastled = saveState.hasCastled;
+      m_halfmoveClock = saveState.halfmoveClock;
+      m_zobristKey = saveState.zobristKey;
 
-      board = saveState.board;
-      bitboards = saveState.bitboards;
-      kingIndices = saveState.kingIndices;
-      moveHistory = saveState.moveHistory;
-      positionHistory = saveState.positionHistory;
+      m_board = saveState.board;
+      m_bitboards = saveState.bitboards;
+      m_kingIndices = saveState.kingIndices;
+      m_moveHistory = saveState.moveHistory;
+      m_positionHistory = saveState.positionHistory;
     }
 
-    /**
-     * @brief Allows indexing the board like an array
-     */
-    Piece operator[](int index) { return board[index]; }
-
   private:
-    std::array<Piece, 64> board;
-
-    std::vector<ZobristKey> positionHistory;
-
-    const Zobrist &zobrist = Zobrist::getInstance();
-    const MovesLookup &movesLookup = MovesLookup::getInstance();
-    const MagicMoveGen &magicMoveGen = MagicMoveGen::getInstance();
-
     /**
      * @brief Calculates the Zobrist key for the current position. Should only be called once at board initialization
      *        After, the key is updated incrementally with updatePiece, updateCastlingRights, etc
@@ -350,16 +358,16 @@ namespace TungstenChess
 
       if (oldPiece)
       {
-        bitboards[oldPiece] ^= squareBitboard;
-        bitboards[oldPiece & COLOR] ^= squareBitboard;
-        bitboards[ALL_PIECES] ^= squareBitboard;
+        m_bitboards[oldPiece] ^= squareBitboard;
+        m_bitboards[oldPiece & COLOR] ^= squareBitboard;
+        m_bitboards[ALL_PIECES] ^= squareBitboard;
       }
 
       if (newPiece)
       {
-        bitboards[newPiece] |= squareBitboard;
-        bitboards[newPiece & COLOR] |= squareBitboard;
-        bitboards[ALL_PIECES] |= squareBitboard;
+        m_bitboards[newPiece] |= squareBitboard;
+        m_bitboards[newPiece & COLOR] |= squareBitboard;
+        m_bitboards[ALL_PIECES] |= squareBitboard;
       }
     }
 
@@ -371,8 +379,8 @@ namespace TungstenChess
      */
     MoveFlags quickMakeMove(int from, int to)
     {
-      Piece fromPiece = board[from];
-      Piece toPiece = board[to];
+      Piece fromPiece = m_board[from];
+      Piece toPiece = m_board[to];
 
       updateBitboards(from, fromPiece, EMPTY);
       updateBitboards(to, toPiece, fromPiece);
@@ -394,7 +402,7 @@ namespace TungstenChess
 
       else if ((fromPiece & TYPE) == KING)
       {
-        kingIndices[fromPiece] = to;
+        m_kingIndices[fromPiece] = to;
 
         if (to - from == 2)
         {
@@ -425,14 +433,14 @@ namespace TungstenChess
      */
     void quickUnmakeMove(int from, int to, MoveFlags flag)
     {
-      Piece fromPiece = board[from];
-      Piece toPiece = board[to];
+      Piece fromPiece = m_board[from];
+      Piece toPiece = m_board[to];
 
       updateBitboards(to, fromPiece, toPiece);
       updateBitboards(from, EMPTY, fromPiece);
 
       if ((fromPiece & TYPE) == KING)
-        kingIndices[fromPiece] = from;
+        m_kingIndices[fromPiece] = from;
 
       if (flag & EP_CAPTURE)
       {
@@ -463,12 +471,12 @@ namespace TungstenChess
      */
     void updatePiece(int pieceIndex, Piece newPiece)
     {
-      Piece oldPiece = board[pieceIndex];
+      Piece oldPiece = m_board[pieceIndex];
 
-      zobristKey ^= zobrist.getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
+      m_zobristKey ^= zobrist.getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
 
-      kingIndices[newPiece] = pieceIndex;
-      board[pieceIndex] = newPiece;
+      m_kingIndices[newPiece] = pieceIndex;
+      m_board[pieceIndex] = newPiece;
 
       updateBitboards(pieceIndex, oldPiece, newPiece);
     }
@@ -481,7 +489,7 @@ namespace TungstenChess
      */
     void movePiece(int from, int to, int promotionPiece = EMPTY)
     {
-      updatePiece(to, (promotionPiece & TYPE) == EMPTY ? board[from] : promotionPiece);
+      updatePiece(to, (promotionPiece & TYPE) == EMPTY ? m_board[from] : promotionPiece);
       updatePiece(from, EMPTY);
     }
 
@@ -495,7 +503,7 @@ namespace TungstenChess
      */
     void unmovePiece(int from, int to, int movedPiece = EMPTY, int capturedPiece = EMPTY)
     {
-      updatePiece(from, movedPiece == EMPTY ? board[to] : movedPiece);
+      updatePiece(from, movedPiece == EMPTY ? m_board[to] : movedPiece);
       updatePiece(to, capturedPiece);
     }
 
@@ -505,9 +513,9 @@ namespace TungstenChess
      */
     void removeCastlingRights(int rights)
     {
-      zobristKey ^= zobrist.castlingKeys[castlingRights];
-      castlingRights &= ~rights;
-      zobristKey ^= zobrist.castlingKeys[castlingRights];
+      m_zobristKey ^= zobrist.castlingKeys[m_castlingRights];
+      m_castlingRights &= ~rights;
+      m_zobristKey ^= zobrist.castlingKeys[m_castlingRights];
     }
 
     /**
@@ -526,9 +534,9 @@ namespace TungstenChess
      */
     void updateEnPassantFile(int file)
     {
-      zobristKey ^= zobrist.enPassantKeys[enPassantFile];
-      enPassantFile = file;
-      zobristKey ^= zobrist.enPassantKeys[file];
+      m_zobristKey ^= zobrist.enPassantKeys[m_enPassantFile];
+      m_enPassantFile = file;
+      m_zobristKey ^= zobrist.enPassantKeys[file];
     }
 
     /**
@@ -537,9 +545,9 @@ namespace TungstenChess
      */
     void updateCastlingRights(int rights)
     {
-      zobristKey ^= zobrist.castlingKeys[castlingRights];
-      castlingRights = rights;
-      zobristKey ^= zobrist.castlingKeys[castlingRights];
+      m_zobristKey ^= zobrist.castlingKeys[m_castlingRights];
+      m_castlingRights = rights;
+      m_zobristKey ^= zobrist.castlingKeys[rights];
     }
 
     /**
@@ -547,8 +555,8 @@ namespace TungstenChess
      */
     void switchSideToMove()
     {
-      sideToMove ^= COLOR;
-      zobristKey ^= zobrist.sideKey;
+      m_sideToMove ^= COLOR;
+      m_zobristKey ^= zobrist.sideKey;
     }
 
     /**
@@ -559,7 +567,7 @@ namespace TungstenChess
      */
     Bitboard getPseudoLegalPieceMoves(int pieceIndex, Piece color, bool includeCastling = true, bool onlyCaptures = false)
     {
-      return (this->*getPieceMoves[board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling, onlyCaptures);
+      return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling, onlyCaptures);
     }
 
     /**

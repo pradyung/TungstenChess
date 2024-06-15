@@ -36,7 +36,7 @@ namespace TungstenChess
     {
       Event event;
 
-      if (!(board.sideToMove & PLAYER_COLOR) && !gameOver)
+      if (!(board.sideToMove() & PLAYER_COLOR) && !gameOver)
       {
         if (!isThinking)
           startThinking();
@@ -59,14 +59,14 @@ namespace TungstenChess
           {
             int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            if (!(board.sideToMove & board[index]) && !awaitingPromotion)
+            if (!(board.sideToMove() & board[index]) && !awaitingPromotion)
               continue;
 
             if (awaitingPromotion)
             {
               int promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
-              if (promotionPiece == EMPTY || !(promotionPiece & board.sideToMove))
+              if (promotionPiece == EMPTY || !(promotionPiece & board.sideToMove()))
                 continue;
 
               promotionMove.promotionPieceType = promotionPiece & TYPE;
@@ -79,7 +79,7 @@ namespace TungstenChess
             }
             else
             {
-              if (!(board.sideToMove & board[index]))
+              if (!(board.sideToMove() & board[index]))
                 continue;
 
               grayHighlightsBitboard = board.getLegalPieceMovesBitboard(index);
@@ -105,7 +105,7 @@ namespace TungstenChess
 
             int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.castlingRights, board.enPassantFile, board.halfmoveClock);
+            Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.castlingRights(), board.enPassantFile(), board.halfmoveClock());
 
             if (!(move.flags & PROMOTION))
             {
@@ -269,7 +269,7 @@ namespace TungstenChess
   {
     for (int i = 0; i < 4; i++)
     {
-      if (board.sideToMove == WHITE)
+      if (board.sideToMove() == WHITE)
       {
         window->draw(whitePromotionPieces[i]);
       }
@@ -306,10 +306,10 @@ namespace TungstenChess
 
     clearHighlights();
 
-    if (board.isInCheck(board.sideToMove))
-      Bitboards::addBit(redHighlightsBitboard, board.kingIndices[board.sideToMove | KING]);
+    if (board.isInCheck(board.sideToMove()))
+      Bitboards::addBit(redHighlightsBitboard, board.kingIndex(board.sideToMove() | KING));
 
-    int gameStatus = board.getGameStatus(board.sideToMove);
+    int gameStatus = board.getGameStatus(board.sideToMove());
 
     if (gameStatus)
     {

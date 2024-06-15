@@ -10,14 +10,14 @@ namespace TungstenChess
     int piece = board[from];
     int capturedPiece = board[to];
 
-    return Move(from, to, piece, capturedPiece, board.castlingRights, board.enPassantFile, board.halfmoveClock);
+    return Move(from, to, piece, capturedPiece, board.castlingRights(), board.enPassantFile(), board.halfmoveClock());
   }
 
   Move Bot::generateBotMove()
   {
     if (openingBook.inOpeningBook && botSettings.useOpeningBook)
     {
-      openingBook.updateMoveHistory(board.moveHistory);
+      openingBook.updateMoveHistory(board.moveHistory());
 
       MoveInt moveInt = openingBook.getNextMove();
 
@@ -53,7 +53,7 @@ namespace TungstenChess
   {
     positionsEvaluated++;
 
-    int gameStatus = board.getGameStatus(board.sideToMove);
+    int gameStatus = board.getGameStatus(board.sideToMove());
 
     if (gameStatus != NO_MATE)
     {
@@ -65,24 +65,24 @@ namespace TungstenChess
 
     int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
 
-    return board.sideToMove == WHITE ? staticEvaluation : -staticEvaluation;
+    return board.sideToMove() == WHITE ? staticEvaluation : -staticEvaluation;
   }
 
   int Bot::getMaterialEvaluation()
   {
     int materialEvaluation = 0;
 
-    materialEvaluation += Bitboards::countBits(board.bitboards[WHITE_PAWN]) * PIECE_VALUES[PAWN];
-    materialEvaluation += Bitboards::countBits(board.bitboards[WHITE_KNIGHT]) * PIECE_VALUES[KNIGHT];
-    materialEvaluation += Bitboards::countBits(board.bitboards[WHITE_BISHOP]) * PIECE_VALUES[BISHOP];
-    materialEvaluation += Bitboards::countBits(board.bitboards[WHITE_ROOK]) * PIECE_VALUES[ROOK];
-    materialEvaluation += Bitboards::countBits(board.bitboards[WHITE_QUEEN]) * PIECE_VALUES[QUEEN];
+    materialEvaluation += Bitboards::countBits(board.bitboard(WHITE_PAWN)) * PIECE_VALUES[PAWN];
+    materialEvaluation += Bitboards::countBits(board.bitboard(WHITE_KNIGHT)) * PIECE_VALUES[KNIGHT];
+    materialEvaluation += Bitboards::countBits(board.bitboard(WHITE_BISHOP)) * PIECE_VALUES[BISHOP];
+    materialEvaluation += Bitboards::countBits(board.bitboard(WHITE_ROOK)) * PIECE_VALUES[ROOK];
+    materialEvaluation += Bitboards::countBits(board.bitboard(WHITE_QUEEN)) * PIECE_VALUES[QUEEN];
 
-    materialEvaluation -= Bitboards::countBits(board.bitboards[BLACK_PAWN]) * PIECE_VALUES[PAWN];
-    materialEvaluation -= Bitboards::countBits(board.bitboards[BLACK_KNIGHT]) * PIECE_VALUES[KNIGHT];
-    materialEvaluation -= Bitboards::countBits(board.bitboards[BLACK_BISHOP]) * PIECE_VALUES[BISHOP];
-    materialEvaluation -= Bitboards::countBits(board.bitboards[BLACK_ROOK]) * PIECE_VALUES[ROOK];
-    materialEvaluation -= Bitboards::countBits(board.bitboards[BLACK_QUEEN]) * PIECE_VALUES[QUEEN];
+    materialEvaluation -= Bitboards::countBits(board.bitboard(BLACK_PAWN)) * PIECE_VALUES[PAWN];
+    materialEvaluation -= Bitboards::countBits(board.bitboard(BLACK_KNIGHT)) * PIECE_VALUES[KNIGHT];
+    materialEvaluation -= Bitboards::countBits(board.bitboard(BLACK_BISHOP)) * PIECE_VALUES[BISHOP];
+    materialEvaluation -= Bitboards::countBits(board.bitboard(BLACK_ROOK)) * PIECE_VALUES[ROOK];
+    materialEvaluation -= Bitboards::countBits(board.bitboard(BLACK_QUEEN)) * PIECE_VALUES[QUEEN];
 
     return materialEvaluation;
   }
@@ -91,10 +91,10 @@ namespace TungstenChess
   {
     int positionalEvaluation = 0;
 
-    Bitboard whitePieces = board.bitboards[WHITE_KNIGHT] | board.bitboards[WHITE_BISHOP] | board.bitboards[WHITE_ROOK] | board.bitboards[WHITE_QUEEN];
-    Bitboard blackPieces = board.bitboards[BLACK_KNIGHT] | board.bitboards[BLACK_BISHOP] | board.bitboards[BLACK_ROOK] | board.bitboards[BLACK_QUEEN];
+    Bitboard whitePieces = board.bitboard(WHITE_KNIGHT) | board.bitboard(WHITE_BISHOP) | board.bitboard(WHITE_ROOK) | board.bitboard(WHITE_QUEEN);
+    Bitboard blackPieces = board.bitboard(BLACK_KNIGHT) | board.bitboard(BLACK_BISHOP) | board.bitboard(BLACK_ROOK) | board.bitboard(BLACK_QUEEN);
 
-    Bitboard allPieces = whitePieces | board.bitboards[WHITE_PAWN] | blackPieces | board.bitboards[BLACK_PAWN];
+    Bitboard allPieces = whitePieces | board.bitboard(WHITE_PAWN) | blackPieces | board.bitboard(BLACK_PAWN);
 
     while (allPieces)
     {
@@ -106,9 +106,9 @@ namespace TungstenChess
     }
 
     {
-      int whiteKingIndex = board.kingIndices[WHITE_KING];
+      int whiteKingIndex = board.kingIndex(WHITE_KING);
 
-      Bitboard enemyPieces = blackPieces | board.bitboards[BLACK_PAWN];
+      Bitboard enemyPieces = blackPieces | board.bitboard(BLACK_PAWN);
       Bitboard friendlyPieces = whitePieces;
 
       float endgameScore = Bitboards::countBits(enemyPieces) / 16.0;
@@ -119,16 +119,16 @@ namespace TungstenChess
 
       if (Bitboards::countBits(friendlyPieces) <= 3 && Bitboards::countBits(friendlyPieces) >= 1)
       {
-        int kingsDistance = abs(whiteKingIndex % 8 - board.kingIndices[BLACK_KING] % 8) + abs(whiteKingIndex / 8 - board.kingIndices[BLACK_KING] / 8);
+        int kingsDistance = abs(whiteKingIndex % 8 - board.kingIndex(BLACK_KING) % 8) + abs(whiteKingIndex / 8 - board.kingIndex(BLACK_KING) / 8);
 
         positionalEvaluation += KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
       }
     }
 
     {
-      int blackKingIndex = board.kingIndices[BLACK_KING];
+      int blackKingIndex = board.kingIndex(BLACK_KING);
 
-      Bitboard enemyPieces = whitePieces | board.bitboards[WHITE_PAWN];
+      Bitboard enemyPieces = whitePieces | board.bitboard(WHITE_PAWN);
       Bitboard friendlyPieces = blackPieces;
 
       float endgameScore = Bitboards::countBits(enemyPieces) / 16.0;
@@ -139,7 +139,7 @@ namespace TungstenChess
 
       if (Bitboards::countBits(friendlyPieces) <= 3 && Bitboards::countBits(friendlyPieces) >= 1)
       {
-        int kingsDistance = abs(blackKingIndex % 8 - board.kingIndices[WHITE_KING] % 8) + abs(blackKingIndex / 8 - board.kingIndices[WHITE_KING] / 8);
+        int kingsDistance = abs(blackKingIndex % 8 - board.kingIndex(WHITE_KING) % 8) + abs(blackKingIndex / 8 - board.kingIndex(WHITE_KING) / 8);
 
         positionalEvaluation -= KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
       }
@@ -152,23 +152,23 @@ namespace TungstenChess
   {
     int evaluationBonus = 0;
 
-    if (Bitboards::countBits(board.bitboards[WHITE_BISHOP]) >= 2)
+    if (Bitboards::countBits(board.bitboard(WHITE_BISHOP)) >= 2)
       evaluationBonus += BISHOP_PAIR_BONUS;
-    if (Bitboards::countBits(board.bitboards[BLACK_BISHOP]) >= 2)
+    if (Bitboards::countBits(board.bitboard(BLACK_BISHOP)) >= 2)
       evaluationBonus -= BISHOP_PAIR_BONUS;
 
-    if (board.castlingRights & WHITE_KINGSIDE)
+    if (board.castlingRights() & WHITE_KINGSIDE)
       evaluationBonus += CAN_CASTLE_BONUS;
-    if (board.castlingRights & BLACK_KINGSIDE)
+    if (board.castlingRights() & BLACK_KINGSIDE)
       evaluationBonus -= CAN_CASTLE_BONUS;
-    if (board.castlingRights & WHITE_QUEENSIDE)
+    if (board.castlingRights() & WHITE_QUEENSIDE)
       evaluationBonus += CAN_CASTLE_BONUS;
-    if (board.castlingRights & BLACK_QUEENSIDE)
+    if (board.castlingRights() & BLACK_QUEENSIDE)
       evaluationBonus -= CAN_CASTLE_BONUS;
 
-    if (board.hasCastled & WHITE)
+    if (board.hasCastled() & WHITE)
       evaluationBonus += CASTLED_KING_BONUS;
-    if (board.hasCastled & BLACK)
+    if (board.hasCastled() & BLACK)
       evaluationBonus -= CASTLED_KING_BONUS;
 
     for (int i = 0; i < 64; i++)
@@ -178,23 +178,23 @@ namespace TungstenChess
 
       if (rank == 0)
       {
-        if (Bitboards::countBits(Bitboards::file(board.bitboards[WHITE_PAWN], file)) > 1)
+        if (Bitboards::countBits(Bitboards::file(board.bitboard(WHITE_PAWN), file)) > 1)
           evaluationBonus -= DOUBLED_PAWN_PENALTY;
-        if (Bitboards::countBits(Bitboards::file(board.bitboards[BLACK_PAWN], file)) > 1)
+        if (Bitboards::countBits(Bitboards::file(board.bitboard(BLACK_PAWN), file)) > 1)
           evaluationBonus += DOUBLED_PAWN_PENALTY;
 
-        if (Bitboards::file(board.bitboards[WHITE_PAWN], file))
+        if (Bitboards::file(board.bitboard(WHITE_PAWN), file))
         {
-          if (!Bitboards::file(board.bitboards[BLACK_PAWN], file - 1) && !Bitboards::file(board.bitboards[BLACK_PAWN], file + 1))
+          if (!Bitboards::file(board.bitboard(BLACK_PAWN), file - 1) && !Bitboards::file(board.bitboard(BLACK_PAWN), file + 1))
             evaluationBonus += PASSED_PAWN_BONUS;
-          if (!Bitboards::file(board.bitboards[WHITE_PAWN], file - 1) && !Bitboards::file(board.bitboards[WHITE_PAWN], file + 1))
+          if (!Bitboards::file(board.bitboard(WHITE_PAWN), file - 1) && !Bitboards::file(board.bitboard(WHITE_PAWN), file + 1))
             evaluationBonus -= ISOLATED_PAWN_PENALTY;
         }
-        if (Bitboards::file(board.bitboards[BLACK_PAWN], file))
+        if (Bitboards::file(board.bitboard(BLACK_PAWN), file))
         {
-          if (!Bitboards::file(board.bitboards[WHITE_PAWN], file - 1) && !Bitboards::file(board.bitboards[WHITE_PAWN], file + 1))
+          if (!Bitboards::file(board.bitboard(WHITE_PAWN), file - 1) && !Bitboards::file(board.bitboard(WHITE_PAWN), file + 1))
             evaluationBonus -= PASSED_PAWN_BONUS;
-          if (!Bitboards::file(board.bitboards[BLACK_PAWN], file - 1) && !Bitboards::file(board.bitboards[BLACK_PAWN], file + 1))
+          if (!Bitboards::file(board.bitboard(BLACK_PAWN), file - 1) && !Bitboards::file(board.bitboard(BLACK_PAWN), file + 1))
             evaluationBonus += ISOLATED_PAWN_PENALTY;
         }
       }
@@ -204,22 +204,22 @@ namespace TungstenChess
 
       if (board[i] == WHITE_ROOK)
       {
-        Bitboard pawns = board.bitboards[WHITE_PAWN] | board.bitboards[BLACK_PAWN];
+        Bitboard pawns = board.bitboard(WHITE_PAWN) | board.bitboard(BLACK_PAWN);
 
         if (!Bitboards::file(pawns, file))
           evaluationBonus += ROOK_ON_OPEN_FILE_BONUS;
-        else if (!Bitboards::file(board.bitboards[BLACK_PAWN], file))
+        else if (!Bitboards::file(board.bitboard(BLACK_PAWN), file))
           evaluationBonus += ROOK_ON_SEMI_OPEN_FILE_BONUS;
 
         continue;
       }
       if (board[i] == BLACK_ROOK)
       {
-        Bitboard pawns = board.bitboards[WHITE_PAWN] | board.bitboards[BLACK_PAWN];
+        Bitboard pawns = board.bitboard(WHITE_PAWN) | board.bitboard(BLACK_PAWN);
 
         if (!Bitboards::file(pawns, file))
           evaluationBonus -= ROOK_ON_OPEN_FILE_BONUS;
-        else if (!Bitboards::file(board.bitboards[WHITE_PAWN], file))
+        else if (!Bitboards::file(board.bitboard(WHITE_PAWN), file))
           evaluationBonus -= ROOK_ON_SEMI_OPEN_FILE_BONUS;
 
         continue;
@@ -227,13 +227,13 @@ namespace TungstenChess
 
       if (board[i] == WHITE_KNIGHT)
       {
-        if (file > 0 && file < 7 && !Bitboards::file(board.bitboards[BLACK_PAWN], file - 1) && !Bitboards::file(board.bitboards[BLACK_PAWN], file + 1))
+        if (file > 0 && file < 7 && !Bitboards::file(board.bitboard(BLACK_PAWN), file - 1) && !Bitboards::file(board.bitboard(BLACK_PAWN), file + 1))
           evaluationBonus += KNIGHT_OUTPOST_BONUS;
         continue;
       }
       if (board[i] == BLACK_KNIGHT)
       {
-        if (file > 0 && file < 7 && !Bitboards::file(board.bitboards[WHITE_PAWN], file - 1) && !Bitboards::file(board.bitboards[WHITE_PAWN], file + 1))
+        if (file > 0 && file < 7 && !Bitboards::file(board.bitboard(WHITE_PAWN), file - 1) && !Bitboards::file(board.bitboard(WHITE_PAWN), file + 1))
           evaluationBonus -= KNIGHT_OUTPOST_BONUS;
         continue;
       }
@@ -244,7 +244,7 @@ namespace TungstenChess
 
   Move Bot::generateOneDeepMove()
   {
-    std::vector<Move> legalMoves = board.getLegalMoves(board.sideToMove);
+    std::vector<Move> legalMoves = board.getLegalMoves(board.sideToMove());
 
     int legalMovesCount = legalMoves.size();
 
@@ -274,18 +274,18 @@ namespace TungstenChess
     if (depth == 0)
       return quiesce(botSettings.quiesceDepth, alpha, beta);
 
-    if (board.countRepetitions(board.zobristKey) >= 3)
+    if (board.countRepetitions(board.zobristKey()) >= 3)
       return -STALEMATE_PENALTY;
 
-    if (board.halfmoveClock >= 100)
+    if (board.halfmoveClock() >= 100)
       return -STALEMATE_PENALTY;
 
-    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove);
+    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove());
 
     int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
-      return board.isInCheck(board.sideToMove) ? NEGATIVE_INFINITY : -STALEMATE_PENALTY;
+      return board.isInCheck(board.sideToMove()) ? NEGATIVE_INFINITY : -STALEMATE_PENALTY;
 
     for (int i = 0; i < legalMovesCount; i++)
     {
@@ -318,13 +318,13 @@ namespace TungstenChess
     if (alpha >= beta)
       return beta;
 
-    if (board.countRepetitions(board.zobristKey) >= 3)
+    if (board.countRepetitions(board.zobristKey()) >= 3)
       return -STALEMATE_PENALTY;
 
-    if (board.halfmoveClock >= 100)
+    if (board.halfmoveClock() >= 100)
       return -STALEMATE_PENALTY;
 
-    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove, false);
+    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove(), false);
 
     int legalMovesCount = legalMoves.size();
 
@@ -359,7 +359,7 @@ namespace TungstenChess
     if (depth == 0)
       return generateOneDeepMove();
 
-    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove);
+    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove());
 
     int legalMovesCount = legalMoves.size();
 
