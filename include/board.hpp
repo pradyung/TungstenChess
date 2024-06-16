@@ -68,13 +68,12 @@ namespace TungstenChess
     int to;
     Piece piece;
     Piece capturedPiece;
+    Piece promotionPieceType;
 
     int castlingRights;
     int enPassantFile;
 
     int halfmoveClock;
-
-    Piece promotionPieceType;
 
     int flags;
 
