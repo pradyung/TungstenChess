@@ -25,7 +25,7 @@ namespace TungstenChess
 
     int fenPartIndex = 0;
 
-    for (int i = 0; i < fen.length(); i++)
+    for (size_t i = 0; i < fen.length(); i++)
     {
       if (fen[i] == ' ')
       {
@@ -45,7 +45,7 @@ namespace TungstenChess
     m_sideToMove = WHITE;
 
     int pieceIndex = 0;
-    for (int i = 0; i < fenParts[FEN_BOARD].length(); i++)
+    for (size_t i = 0; i < fenParts[FEN_BOARD].length(); i++)
     {
       if (fen[i] == '/')
         continue;
@@ -71,7 +71,7 @@ namespace TungstenChess
 
     if (fenParts[FEN_CASTLING_RIGHTS] != "-")
     {
-      for (int i = 0; i < fenParts[FEN_CASTLING_RIGHTS].length(); i++)
+      for (size_t i = 0; i < fenParts[FEN_CASTLING_RIGHTS].length(); i++)
       {
         if (fenParts[FEN_CASTLING_RIGHTS][i] == 'K')
           m_castlingRights |= WHITE_KINGSIDE;
@@ -343,12 +343,12 @@ namespace TungstenChess
       else if (attackingDiagonalSliders)
       {
         movablePiecesBitboard = m_bitboards[color | KING];
-        targetSquaresBitboard = diagonalMoves & movesLookup.BISHOP_MASKS[__builtin_ctzll(attackingDiagonalSliders)] | attackingDiagonalSliders;
+        targetSquaresBitboard = (diagonalMoves & movesLookup.BISHOP_MASKS[__builtin_ctzll(attackingDiagonalSliders)]) | attackingDiagonalSliders;
       }
       else
       {
         movablePiecesBitboard = m_bitboards[color | KING];
-        targetSquaresBitboard = orthogonalMoves & movesLookup.ROOK_MASKS[__builtin_ctzll(attackingOrthogonalSliders)] | attackingOrthogonalSliders;
+        targetSquaresBitboard = (orthogonalMoves & movesLookup.ROOK_MASKS[__builtin_ctzll(attackingOrthogonalSliders)]) | attackingOrthogonalSliders;
       }
     }
 

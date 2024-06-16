@@ -84,7 +84,7 @@ namespace TungstenChess
       {
         Bitboard blocker = 0;
 
-        for (int j = 0; j < setBits.size(); j++)
+        for (size_t j = 0; j < setBits.size(); j++)
           if (i & (1 << j))
             blocker |= 1ULL << setBits[j];
 
@@ -105,7 +105,7 @@ namespace TungstenChess
     {
       std::vector<Bitboard> shifts = std::vector<Bitboard>();
 
-      for (int i = 0; i < blocks.size(); i++)
+      for (size_t i = 0; i < blocks.size(); i++)
         shifts.push_back((magic * blocks[i]) >> shift);
 
       return shifts;
@@ -187,7 +187,7 @@ namespace TungstenChess
     {
       std::vector<Bitboard> moves = std::vector<Bitboard>();
 
-      for (int i = 0; i < blockers.size(); i++)
+      for (size_t i = 0; i < blockers.size(); i++)
       {
         if (rook)
           moves.push_back(getRookMovesBitboard(square, blockers[i]));
@@ -213,12 +213,12 @@ namespace TungstenChess
       std::vector<Bitboard> moves = getAllMovesBitboards(square, blocks, rook);
 
       Bitboard maxShift = 0;
-      for (int i = 0; i < shifts.size(); i++)
+      for (size_t i = 0; i < shifts.size(); i++)
         maxShift = std::max(maxShift, shifts[i]);
 
       std::vector<Bitboard> lookupTable = std::vector<Bitboard>(maxShift + 1, 0);
 
-      for (int i = 0; i < shifts.size(); i++)
+      for (size_t i = 0; i < shifts.size(); i++)
         lookupTable[shifts[i]] = moves[i];
 
       return lookupTable;

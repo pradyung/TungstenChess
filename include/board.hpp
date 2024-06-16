@@ -68,12 +68,13 @@ namespace TungstenChess
     int to;
     Piece piece;
     Piece capturedPiece;
-    Piece promotionPieceType;
 
     int castlingRights;
     int enPassantFile;
 
     int halfmoveClock;
+
+    Piece promotionPieceType;
 
     int flags;
 
@@ -89,7 +90,7 @@ namespace TungstenChess
      * @param promotionPieceType The piece that the moving piece is being promoted to, if any (only piece type)
      */
     Move(int from, int to, Piece piece, Piece capturedPiece, int castlingRights, int enPassantFile, int halfmoveClock, Piece promotionPieceType = EMPTY)
-        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), promotionPieceType(promotionPieceType), halfmoveClock(halfmoveClock), flags(NORMAL)
+        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), halfmoveClock(halfmoveClock), promotionPieceType(promotionPieceType), flags(NORMAL)
     {
       int pieceType = piece & TYPE;
 
@@ -293,7 +294,7 @@ namespace TungstenChess
     {
       int count = 0;
 
-      for (int i = 0; i < m_positionHistory.size(); i++)
+      for (size_t i = 0; i < m_positionHistory.size(); i++)
         if (m_positionHistory[i] == key)
           count++;
 
