@@ -274,10 +274,7 @@ namespace TungstenChess
     if (depth == 0)
       return quiesce(botSettings.quiesceDepth, alpha, beta);
 
-    if (board.countRepetitions(board.zobristKey()) >= 3)
-      return -STALEMATE_PENALTY;
-
-    if (board.halfmoveClock() >= 100)
+    if (board.countRepetitions(board.zobristKey()) >= 3 || board.halfmoveClock() >= 100)
       return -STALEMATE_PENALTY;
 
     std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove());
@@ -318,10 +315,7 @@ namespace TungstenChess
     if (alpha >= beta)
       return beta;
 
-    if (board.countRepetitions(board.zobristKey()) >= 3)
-      return -STALEMATE_PENALTY;
-
-    if (board.halfmoveClock() >= 100)
+    if (board.countRepetitions(board.zobristKey()) >= 3 || board.halfmoveClock() >= 100)
       return -STALEMATE_PENALTY;
 
     std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove(), false);

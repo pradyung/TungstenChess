@@ -84,8 +84,8 @@ int main()
       std::cout << " +---+---+---+---+---+---+---+---+\n";
       std::cout << "   a   b   c   d   e   f   g   h\n\n";
 
-      std::cout << "Side to move: " << (board.sideToMove == WHITE ? "White" : "Black") << "\n";
-      std::cout << "Zobrist key: " << board.zobristKey << "\n";
+      std::cout << "Side to move: " << (board.sideToMove() == WHITE ? "White" : "Black") << "\n";
+      std::cout << "Zobrist key: " << board.zobristKey() << "\n";
     }
 
     std::vector<std::string> splitInput = split(input, " ");

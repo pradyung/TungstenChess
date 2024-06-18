@@ -170,13 +170,13 @@ namespace TungstenChess
       updatePiece((move.piece & WHITE) ? move.to + 8 : move.to - 8, move.piece ^ COLOR);
   }
 
-  Bitboard Board::getPawnMoves(int pieceIndex, Piece color, bool _, bool onlyCaptures)
+  Bitboard Board::getPawnMoves(int pieceIndex, Piece color, bool _)
   {
     Bitboard movesBitboard = 0;
 
     if (color & WHITE)
     {
-      if (!m_board[pieceIndex - 8] && !onlyCaptures)
+      if (!m_board[pieceIndex - 8])
       {
         Bitboards::addBit(movesBitboard, pieceIndex - 8);
         if (pieceIndex >= A2 && pieceIndex <= H2 && !m_board[pieceIndex - 16])
@@ -187,7 +187,7 @@ namespace TungstenChess
     }
     else if (color & BLACK)
     {
-      if (!m_board[pieceIndex + 8] && !onlyCaptures)
+      if (!m_board[pieceIndex + 8])
       {
         Bitboards::addBit(movesBitboard, pieceIndex + 8);
         if (pieceIndex >= A7 && pieceIndex <= H7 && !m_board[pieceIndex + 16])
@@ -200,22 +200,22 @@ namespace TungstenChess
     return movesBitboard;
   }
 
-  Bitboard Board::getKnightMoves(int pieceIndex, Piece color, bool _, bool __)
+  Bitboard Board::getKnightMoves(int pieceIndex, Piece color, bool _)
   {
     return movesLookup.KNIGHT_MOVES[pieceIndex] & ~m_bitboards[color];
   }
 
-  Bitboard Board::getBishopMoves(int pieceIndex, Piece color, bool _, bool __)
+  Bitboard Board::getBishopMoves(int pieceIndex, Piece color, bool _)
   {
     return magicMoveGen.getBishopMoves(pieceIndex, m_bitboards[ALL_PIECES]) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getRookMoves(int pieceIndex, Piece color, bool _, bool __)
+  Bitboard Board::getRookMoves(int pieceIndex, Piece color, bool _)
   {
     return magicMoveGen.getRookMoves(pieceIndex, m_bitboards[ALL_PIECES]) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getQueenMoves(int pieceIndex, Piece color, bool _, bool __)
+  Bitboard Board::getQueenMoves(int pieceIndex, Piece color, bool _)
   {
     Bitboard bishopMoves = magicMoveGen.getBishopMoves(pieceIndex, m_bitboards[ALL_PIECES]);
     Bitboard rookMoves = magicMoveGen.getRookMoves(pieceIndex, m_bitboards[ALL_PIECES]);
@@ -223,7 +223,7 @@ namespace TungstenChess
     return (bishopMoves | rookMoves) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getKingMoves(int pieceIndex, Piece color, bool includeCastling, bool __)
+  Bitboard Board::getKingMoves(int pieceIndex, Piece color, bool includeCastling)
   {
     Bitboard movesBitboard = movesLookup.KING_MOVES[pieceIndex] & ~m_bitboards[color];
 

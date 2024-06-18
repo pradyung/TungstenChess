@@ -565,9 +565,9 @@ namespace TungstenChess
      * @param includeCastling Whether to include castling moves (should be false when checking for attacks on the king)
      * @param onlyCaptures Whether to only include capture moves (should be true when checking for attacks on the king)
      */
-    Bitboard getPseudoLegalPieceMoves(int pieceIndex, Piece color, bool includeCastling = true, bool onlyCaptures = false)
+    Bitboard getPseudoLegalPieceMoves(int pieceIndex, Piece color, bool includeCastling = true)
     {
-      return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling, onlyCaptures);
+      return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling);
     }
 
     /**
@@ -586,14 +586,14 @@ namespace TungstenChess
      */
     Bitboard getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, Piece color, bool onlyCaptures = false);
 
-    Bitboard getPawnMoves(int pieceIndex, Piece color, bool _ = false, bool onlyCaptures = false);
-    Bitboard getKnightMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);
-    Bitboard getBishopMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);
-    Bitboard getRookMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);
-    Bitboard getQueenMoves(int pieceIndex, Piece color, bool _ = false, bool __ = false);
-    Bitboard getKingMoves(int pieceIndex, Piece color, bool includeCastling = true, bool __ = false);
+    Bitboard getPawnMoves(int pieceIndex, Piece color, bool _ = false);
+    Bitboard getKnightMoves(int pieceIndex, Piece color, bool _ = false);
+    Bitboard getBishopMoves(int pieceIndex, Piece color, bool _ = false);
+    Bitboard getRookMoves(int pieceIndex, Piece color, bool _ = false);
+    Bitboard getQueenMoves(int pieceIndex, Piece color, bool _ = false);
+    Bitboard getKingMoves(int pieceIndex, Piece color, bool includeCastling = true);
 
-    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, Piece, bool, bool) = {
+    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, Piece, bool) = {
         nullptr,
         &TungstenChess::Board::getPawnMoves,
         &TungstenChess::Board::getKnightMoves,
