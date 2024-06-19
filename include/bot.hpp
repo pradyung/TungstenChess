@@ -78,11 +78,11 @@ namespace TungstenChess
     /**
      * @brief Gets the legal moves for a color, sorted by heuristic evaluation
      * @param color The color to get the moves for
-     * @param includeCastling Whether to include castling moves (should be false for quiescence search)
+     * @param onlyCaptures Whether to only get captures
      */
-    std::vector<Move> getSortedLegalMoves(int color, bool includeCastling = true)
+    std::vector<Move> getSortedLegalMoves(int color, bool onlyCaptures = false)
     {
-      std::vector<Move> moves = board.getLegalMoves(color, includeCastling);
+      std::vector<Move> moves = board.getLegalMoves(color, onlyCaptures);
       heuristicSortMoves(moves);
       return moves;
     }

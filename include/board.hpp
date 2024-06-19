@@ -152,21 +152,6 @@ namespace TungstenChess
     }
   };
 
-  struct BoardSaveState
-  {
-    int sideToMove;
-    int castlingRights;
-    int enPassantFile;
-    int hasCastled;
-    int halfmoveClock;
-    std::array<Piece, 64> board;
-    std::array<Bitboard, ALL_PIECES + 1> bitboards;
-    std::array<int, PIECE_NUMBER> kingIndices;
-    ZobristKey zobristKey;
-    std::vector<MoveInt> moveHistory;
-    std::vector<ZobristKey> positionHistory;
-  };
-
   class Board
   {
   private:
@@ -235,9 +220,9 @@ namespace TungstenChess
      * @brief Returns the bitboard of the squares a piece can move to
      * @param pieceIndex The index of the piece
      */
-    Bitboard getLegalPieceMovesBitboard(int pieceIndex, bool includeCastling = true)
+    Bitboard getLegalPieceMovesBitboard(int pieceIndex)
     {
-      return getLegalPieceMovesBitboard(pieceIndex, m_board[pieceIndex] & COLOR, includeCastling);
+      return getLegalPieceMovesBitboard(pieceIndex, m_board[pieceIndex] & COLOR);
     }
 
     /**
@@ -281,9 +266,9 @@ namespace TungstenChess
     /**
      * @brief Gets the legal moves for a color
      * @param color The color to get the moves for
-     * @param includeCastling Whether to include castling moves (should be false for quiescence search)
+     * @param onlyCaptures Whether to only include capture moves
      */
-    std::vector<Move> getLegalMoves(int color, bool includeCastling = true);
+    std::vector<Move> getLegalMoves(int color, bool onlyCaptures = false);
 
     /**
      * @brief Counts the number of times a position has been repeated
@@ -298,45 +283,6 @@ namespace TungstenChess
           count++;
 
       return count;
-    }
-
-    /**
-     * @brief Gets a restorable save state of the board's current state
-     */
-    BoardSaveState getSaveState()
-    {
-      return BoardSaveState{
-          m_sideToMove,
-          m_castlingRights,
-          m_enPassantFile,
-          m_hasCastled,
-          m_halfmoveClock,
-          m_board,
-          m_bitboards,
-          m_kingIndices,
-          m_zobristKey,
-          m_moveHistory,
-          m_positionHistory};
-    }
-
-    /**
-     * @brief Restores the board to a previous state
-     * @param saveState The state to restore
-     */
-    void restoreSaveState(BoardSaveState saveState)
-    {
-      m_sideToMove = saveState.sideToMove;
-      m_castlingRights = saveState.castlingRights;
-      m_enPassantFile = saveState.enPassantFile;
-      m_hasCastled = saveState.hasCastled;
-      m_halfmoveClock = saveState.halfmoveClock;
-      m_zobristKey = saveState.zobristKey;
-
-      m_board = saveState.board;
-      m_bitboards = saveState.bitboards;
-      m_kingIndices = saveState.kingIndices;
-      m_moveHistory = saveState.moveHistory;
-      m_positionHistory = saveState.positionHistory;
     }
 
   private:
@@ -563,7 +509,6 @@ namespace TungstenChess
      * @brief Gets a bitboard of pseudo-legal moves for a piece (does not check for pins or checks)
      * @param pieceIndex The index of the piece
      * @param includeCastling Whether to include castling moves (should be false when checking for attacks on the king)
-     * @param onlyCaptures Whether to only include capture moves (should be true when checking for attacks on the king)
      */
     Bitboard getPseudoLegalPieceMoves(int pieceIndex, Piece color, bool includeCastling = true)
     {
@@ -575,16 +520,15 @@ namespace TungstenChess
      * @param pieceIndex The index of the piece
      * @param color The color of the piece
      */
-    Bitboard getLegalPieceMovesBitboard(int pieceIndex, Piece color, bool includeCastling = true);
+    Bitboard getLegalPieceMovesBitboard(int pieceIndex, Piece color, bool onlyCaptures = false);
 
     /**
      * @brief Returns the bitboard of pieces that can move to a given square. Does not include kings for technical reasons
      * @param targetSquare The square to check
      * @param targetPiece The piece on the target square
      * @param color The color of the pieces moving
-     * @param capturesOnly Whether to only include capture moves
      */
-    Bitboard getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, Piece color, bool onlyCaptures = false);
+    Bitboard getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, Piece color);
 
     Bitboard getPawnMoves(int pieceIndex, Piece color, bool _ = false);
     Bitboard getKnightMoves(int pieceIndex, Piece color, bool _ = false);

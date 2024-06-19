@@ -250,9 +250,12 @@ namespace TungstenChess
     return movesBitboard;
   }
 
-  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, Piece color, bool includeCastling)
+  Bitboard Board::getLegalPieceMovesBitboard(int pieceIndex, Piece color, bool onlyCaptures)
   {
-    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, color, includeCastling);
+    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, color, !onlyCaptures);
+
+    if (onlyCaptures)
+      pseudoLegalMovesBitboard &= m_bitboards[color ^ COLOR];
 
     Bitboard legalMovesBitboard = 0;
 
@@ -273,7 +276,7 @@ namespace TungstenChess
     return legalMovesBitboard;
   }
 
-  Bitboard Board::getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, Piece color, bool onlyCaptures)
+  Bitboard Board::getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, Piece color)
   {
     Bitboard attackingPiecesBitboard = 0;
 
@@ -311,7 +314,7 @@ namespace TungstenChess
     return attackingPiecesBitboard;
   }
 
-  std::vector<Move> Board::getLegalMoves(int color, bool includeCastling)
+  std::vector<Move> Board::getLegalMoves(int color, bool onlyCaptures)
   {
     std::vector<Move> legalMoves;
     legalMoves.reserve(256);
@@ -338,19 +341,18 @@ namespace TungstenChess
 
       if (!(attackingDiagonalSliders | attackingOrthogonalSliders))
         movablePiecesBitboard = m_bitboards[color];
-      else if (Bitboards::countBits(attackingDiagonalSliders | attackingOrthogonalSliders) > 1)
-        movablePiecesBitboard = m_bitboards[color | KING];
-      else if (attackingDiagonalSliders)
-      {
-        movablePiecesBitboard = m_bitboards[color | KING];
-        targetSquaresBitboard = (diagonalMoves & movesLookup.BISHOP_MASKS[__builtin_ctzll(attackingDiagonalSliders)]) | attackingDiagonalSliders;
-      }
       else
       {
         movablePiecesBitboard = m_bitboards[color | KING];
-        targetSquaresBitboard = (orthogonalMoves & movesLookup.ROOK_MASKS[__builtin_ctzll(attackingOrthogonalSliders)]) | attackingOrthogonalSliders;
+        if (attackingDiagonalSliders)
+          targetSquaresBitboard = (diagonalMoves & movesLookup.BISHOP_MASKS[__builtin_ctzll(attackingDiagonalSliders)]) | attackingDiagonalSliders;
+        else if (attackingOrthogonalSliders)
+          targetSquaresBitboard = (orthogonalMoves & movesLookup.ROOK_MASKS[__builtin_ctzll(attackingOrthogonalSliders)]) | attackingOrthogonalSliders;
       }
     }
+
+    if (onlyCaptures)
+      targetSquaresBitboard &= m_bitboards[color ^ COLOR];
 
     while (movablePiecesBitboard)
     {
@@ -358,7 +360,7 @@ namespace TungstenChess
 
       Bitboards::removeBit(movablePiecesBitboard, pieceIndex);
 
-      Bitboard movesBitboard = getLegalPieceMovesBitboard(pieceIndex, color, includeCastling);
+      Bitboard movesBitboard = getLegalPieceMovesBitboard(pieceIndex, color, onlyCaptures);
 
       while (movesBitboard)
       {
@@ -386,7 +388,7 @@ namespace TungstenChess
 
       Piece targetPiece = m_board[targetSquare];
 
-      Bitboard attackersBitboard = getAttackingPiecesBitboard(targetSquare, targetPiece, color, true);
+      Bitboard attackersBitboard = getAttackingPiecesBitboard(targetSquare, targetPiece, color);
 
       while (attackersBitboard)
       {

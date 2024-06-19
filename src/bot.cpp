@@ -318,7 +318,7 @@ namespace TungstenChess
     if (board.countRepetitions(board.zobristKey()) >= 3 || board.halfmoveClock() >= 100)
       return -STALEMATE_PENALTY;
 
-    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove(), false);
+    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove(), true);
 
     int legalMovesCount = legalMoves.size();
 
@@ -327,9 +327,6 @@ namespace TungstenChess
 
     for (int i = 0; i < legalMovesCount; i++)
     {
-      if (!(legalMoves[i].flags & ~PAWN_DOUBLE))
-        continue;
-
       board.makeMove(legalMoves[i]);
       int evaluation = -quiesce(depth - 1, -beta, -alpha);
       board.unmakeMove(legalMoves[i]);
