@@ -7,7 +7,7 @@ namespace TungstenChess
     int from = moveInt & 0x3f;
     int to = (moveInt >> 6) & 0x3f;
 
-    int piece = board[from];
+    Piece piece = board[from];
     int capturedPiece = board[to];
 
     return Move(from, to, piece, capturedPiece, board.castlingRights(), board.enPassantFile(), board.halfmoveClock());
@@ -98,9 +98,7 @@ namespace TungstenChess
 
     while (allPieces)
     {
-      int pieceIndex = __builtin_ctzll(allPieces);
-
-      Bitboards::removeBit(allPieces, pieceIndex);
+      int pieceIndex = Bitboards::popBit(allPieces);
 
       positionalEvaluation += getPiecePositionalEvaluation(pieceIndex);
     }

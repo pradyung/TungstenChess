@@ -80,7 +80,7 @@ namespace TungstenChess
      * @param color The color to get the moves for
      * @param onlyCaptures Whether to only get captures
      */
-    std::vector<Move> getSortedLegalMoves(int color, bool onlyCaptures = false)
+    std::vector<Move> getSortedLegalMoves(PieceColor color, bool onlyCaptures = false)
     {
       std::vector<Move> moves = board.getLegalMoves(color, onlyCaptures);
       heuristicSortMoves(moves);

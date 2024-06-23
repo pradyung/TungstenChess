@@ -18,6 +18,8 @@
 namespace TungstenChess
 {
   typedef uint8_t Piece;
+  typedef uint8_t PieceColor;
+  typedef uint8_t PieceType;
   typedef uint16_t MoveInt;
 
   enum CastlingRights
@@ -68,7 +70,7 @@ namespace TungstenChess
     int to;
     Piece piece;
     Piece capturedPiece;
-    Piece promotionPieceType;
+    PieceType promotionPieceType;
 
     int castlingRights;
     int enPassantFile;
@@ -88,10 +90,10 @@ namespace TungstenChess
      * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
      * @param promotionPieceType The piece that the moving piece is being promoted to, if any (only piece type)
      */
-    Move(int from, int to, Piece piece, Piece capturedPiece, int castlingRights, int enPassantFile, int halfmoveClock, Piece promotionPieceType = EMPTY)
+    Move(int from, int to, Piece piece, Piece capturedPiece, int castlingRights, int enPassantFile, int halfmoveClock, PieceType promotionPieceType = EMPTY)
         : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), halfmoveClock(halfmoveClock), promotionPieceType(promotionPieceType), flags(NORMAL)
     {
-      int pieceType = piece & TYPE;
+      PieceType pieceType = piece & TYPE;
 
       if (pieceType == KING && from - to == -2)
       {
@@ -129,9 +131,15 @@ namespace TungstenChess
     }
 
     /**
+     * @param move The move to copy
+     * @param promotionPieceType The new promotion piece type
+     */
+    Move(const Move &move, PieceType promotionPieceType) : from(move.from), to(move.to), piece(move.piece), capturedPiece(move.capturedPiece), castlingRights(move.castlingRights), enPassantFile(move.enPassantFile), halfmoveClock(move.halfmoveClock), promotionPieceType(promotionPieceType), flags(move.flags) {}
+
+    /**
      * Returns an integer representation of the move
      */
-    int toInt() const { return from | (to << 6); }
+    MoveInt toInt() const { return from | (to << 6); }
 
     /**
      * Returns a UCI string representation of the move
@@ -157,7 +165,7 @@ namespace TungstenChess
   private:
     std::array<Piece, 64> m_board;
 
-    int m_sideToMove;
+    PieceColor m_sideToMove;
 
     int m_castlingRights;
     int m_enPassantFile = NO_EP;
@@ -190,16 +198,16 @@ namespace TungstenChess
 
     // Accessor methods
     Piece operator[](int index) { return m_board[index]; }
-    int sideToMove() { return m_sideToMove; }
+    PieceColor sideToMove() { return m_sideToMove; }
     int castlingRights() { return m_castlingRights; }
     int enPassantFile() { return m_enPassantFile; }
     int hasCastled() { return m_hasCastled; }
     int halfmoveClock() { return m_halfmoveClock; }
-    Bitboard bitboard(int piece) { return m_bitboards[piece]; }
+    Bitboard bitboard(Piece piece) { return m_bitboards[piece]; }
     ZobristKey zobristKey() { return m_zobristKey; }
     std::vector<MoveInt> moveHistory() { return m_moveHistory; }
     bool isDefaultStartPosition() { return m_isDefaultStartPosition; }
-    int kingIndex(int piece) { return m_kingIndices[piece]; }
+    int kingIndex(Piece piece) { return m_kingIndices[piece]; }
 
     /**
      * @brief Resets the board to the provided fen
@@ -211,7 +219,7 @@ namespace TungstenChess
      * @brief Checks if a color is in check in the current position
      * @param color The color to check
      */
-    bool isInCheck(int color)
+    bool isInCheck(PieceColor color)
     {
       return isAttacked(m_kingIndices[color | KING], color ^ COLOR);
     }
@@ -242,7 +250,7 @@ namespace TungstenChess
      * @param color The color to check
      * @return int - Note: returns NO_MATE even if "color" has won, only returns LOSE if "color" has lost
      */
-    int getGameStatus(int color);
+    int getGameStatus(PieceColor color);
 
     /**
      * @brief Generates a move from a UCI string
@@ -268,7 +276,7 @@ namespace TungstenChess
      * @param color The color to get the moves for
      * @param onlyCaptures Whether to only include capture moves
      */
-    std::vector<Move> getLegalMoves(int color, bool onlyCaptures = false);
+    std::vector<Move> getLegalMoves(PieceColor color, bool onlyCaptures = false);
 
     /**
      * @brief Counts the number of times a position has been repeated
@@ -335,7 +343,7 @@ namespace TungstenChess
       {
         if (!toPiece && to % 8 != from % 8)
         {
-          Piece color = fromPiece & COLOR;
+          PieceColor color = fromPiece & COLOR;
           int epSquare = to + (color & WHITE ? 8 : -8);
           updateBitboards(epSquare, (color ^ COLOR) | PAWN, EMPTY);
 
@@ -390,7 +398,7 @@ namespace TungstenChess
 
       if (flag & EP_CAPTURE)
       {
-        Piece color = fromPiece & COLOR;
+        PieceColor color = fromPiece & COLOR;
         int epSquare = to + (color & WHITE ? 8 : -8);
         updateBitboards(epSquare, EMPTY, (color ^ COLOR) | PAWN);
       }
@@ -447,7 +455,7 @@ namespace TungstenChess
      * @param movedPiece The piece that was moved (Used for undoing promotions)
      * @param capturedPiece The piece that was captured (Used for undoing captures)
      */
-    void unmovePiece(int from, int to, int movedPiece = EMPTY, int capturedPiece = EMPTY)
+    void unmovePiece(int from, int to, Piece movedPiece = EMPTY, Piece capturedPiece = EMPTY)
     {
       updatePiece(from, movedPiece == EMPTY ? m_board[to] : movedPiece);
       updatePiece(to, capturedPiece);
@@ -469,7 +477,7 @@ namespace TungstenChess
      * @param color The color to remove the rights from
      * @param side The side to remove the rights from, see enum CastlingRights (KINGSIDE/QUEENSIDE/CASTLING)
      */
-    void removeCastlingRights(int color, int side)
+    void removeCastlingRights(PieceColor color, int side)
     {
       removeCastlingRights(color == WHITE ? side >> 4 : side >> 2);
     }
@@ -510,7 +518,7 @@ namespace TungstenChess
      * @param pieceIndex The index of the piece
      * @param includeCastling Whether to include castling moves (should be false when checking for attacks on the king)
      */
-    Bitboard getPseudoLegalPieceMoves(int pieceIndex, Piece color, bool includeCastling = true)
+    Bitboard getPseudoLegalPieceMoves(int pieceIndex, PieceColor color, bool includeCastling = true)
     {
       return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling);
     }
@@ -520,7 +528,7 @@ namespace TungstenChess
      * @param pieceIndex The index of the piece
      * @param color The color of the piece
      */
-    Bitboard getLegalPieceMovesBitboard(int pieceIndex, Piece color, bool onlyCaptures = false);
+    Bitboard getLegalPieceMovesBitboard(int pieceIndex, PieceColor color, bool onlyCaptures = false);
 
     /**
      * @brief Returns the bitboard of pieces that can move to a given square. Does not include kings for technical reasons
@@ -528,16 +536,16 @@ namespace TungstenChess
      * @param targetPiece The piece on the target square
      * @param color The color of the pieces moving
      */
-    Bitboard getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, Piece color);
+    Bitboard getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, PieceColor color);
 
-    Bitboard getPawnMoves(int pieceIndex, Piece color, bool _ = false);
-    Bitboard getKnightMoves(int pieceIndex, Piece color, bool _ = false);
-    Bitboard getBishopMoves(int pieceIndex, Piece color, bool _ = false);
-    Bitboard getRookMoves(int pieceIndex, Piece color, bool _ = false);
-    Bitboard getQueenMoves(int pieceIndex, Piece color, bool _ = false);
-    Bitboard getKingMoves(int pieceIndex, Piece color, bool includeCastling = true);
+    Bitboard getPawnMoves(int pieceIndex, PieceColor color, bool _ = false);
+    Bitboard getKnightMoves(int pieceIndex, PieceColor color, bool _ = false);
+    Bitboard getBishopMoves(int pieceIndex, PieceColor color, bool _ = false);
+    Bitboard getRookMoves(int pieceIndex, PieceColor color, bool _ = false);
+    Bitboard getQueenMoves(int pieceIndex, PieceColor color, bool _ = false);
+    Bitboard getKingMoves(int pieceIndex, PieceColor color, bool includeCastling = true);
 
-    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, Piece, bool) = {
+    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, PieceColor, bool) = {
         nullptr,
         &TungstenChess::Board::getPawnMoves,
         &TungstenChess::Board::getKnightMoves,
@@ -551,6 +559,6 @@ namespace TungstenChess
      * @param square The square to check
      * @param color The color to check
      */
-    bool isAttacked(int square, int color);
+    bool isAttacked(int square, PieceColor color);
   };
 }
