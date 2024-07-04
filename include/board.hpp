@@ -66,18 +66,18 @@ namespace TungstenChess
 
   struct Move
   {
-    int from;
-    int to;
+    uint from;
+    uint to;
     Piece piece;
     Piece capturedPiece;
     PieceType promotionPieceType;
 
-    int castlingRights;
-    int enPassantFile;
+    uint castlingRights;
+    uint enPassantFile;
 
-    int halfmoveClock;
+    uint halfmoveClock;
 
-    int flags;
+    uint flags;
 
     Move() = default;
 
