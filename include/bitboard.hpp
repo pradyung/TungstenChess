@@ -1,9 +1,9 @@
 #pragma once
 
+#include "types.hpp"
+
 namespace TungstenChess
 {
-  typedef uint64_t Bitboard;
-
   class Bitboards
   {
   public:

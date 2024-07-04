@@ -3,12 +3,10 @@
 #include <vector>
 #include <fstream>
 
-#define NULL_MOVE 0
+#include "types.hpp"
 
 namespace TungstenChess
 {
-  typedef uint16_t MoveInt;
-
   class OpeningBook
   {
   public:
