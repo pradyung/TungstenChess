@@ -20,28 +20,33 @@ namespace TungstenChess
   {
   public:
     /**
-     * @brief Get the instance of the MagicMoveGen singleton
-     * @return MagicMoveGen&
+     * @brief Initializes the magic move generation lookup tables
      */
-    static MagicMoveGen &getInstance()
+    static void init()
     {
-      static MagicMoveGen instance;
-      return instance;
+      static bool initialized = false;
+
+      if (initialized)
+        return;
+      initialized = true;
+
+      MovesLookup::init();
+
+      initRookLookupTables();
+      initBishopLookupTables();
     }
 
-    std::array<std::vector<Bitboard>, 64> ROOK_LOOKUP_TABLES;
-    std::array<std::vector<Bitboard>, 64> BISHOP_LOOKUP_TABLES;
-
-    MovesLookup &movesLookup = MovesLookup::getInstance();
+    static inline std::array<std::vector<Bitboard>, 64> ROOK_LOOKUP_TABLES = {};
+    static inline std::array<std::vector<Bitboard>, 64> BISHOP_LOOKUP_TABLES = {};
 
     /**
      * @brief Gets the bishop moves bitboard for a given square and pieces bitboard
      * @param square The square to get moves for
      * @param allPieces The blockers to be used for the calculation (these are unmasked)
      */
-    Bitboard getBishopMoves(int square, Bitboard allPieces) const
+    static Bitboard getBishopMoves(int square, Bitboard allPieces)
     {
-      return BISHOP_LOOKUP_TABLES[square][((BISHOP_MAGICS[square] * (allPieces & movesLookup.BISHOP_MASKS[square])) >> BISHOP_SHIFTS[square])];
+      return BISHOP_LOOKUP_TABLES[square][((BISHOP_MAGICS[square] * (allPieces & MovesLookup::BISHOP_MASKS[square])) >> BISHOP_SHIFTS[square])];
     }
 
     /**
@@ -49,22 +54,12 @@ namespace TungstenChess
      * @param square The square to get moves for
      * @param allPieces The blockers to be used for the calculation (these are unmasked)
      */
-    Bitboard getRookMoves(int square, Bitboard allPieces) const
+    static Bitboard getRookMoves(int square, Bitboard allPieces)
     {
-      return ROOK_LOOKUP_TABLES[square][((ROOK_MAGICS[square] * (allPieces & movesLookup.ROOK_MASKS[square])) >> ROOK_SHIFTS[square])];
+      return ROOK_LOOKUP_TABLES[square][((ROOK_MAGICS[square] * (allPieces & MovesLookup::ROOK_MASKS[square])) >> ROOK_SHIFTS[square])];
     }
 
   private:
-    /**
-     * @brief Initializes the magic move generation lookup tables
-     * @param movesLookup The move generation helper object with populated mask lookup tables
-     */
-    MagicMoveGen()
-    {
-      initRookLookupTables();
-      initBishopLookupTables();
-    }
-
     /**
      * @brief Gets all possible blocker bitboards for a given square and mask
      * @param square The square to get blockers for
@@ -203,12 +198,12 @@ namespace TungstenChess
      * @param square The square to get the lookup table for
      * @param rook Whether the lookup table is for a rook or bishop (true for rook, false for bishop)
      */
-    std::vector<Bitboard> getMovesLookupTable(int square, bool rook)
+    static std::vector<Bitboard> getMovesLookupTable(int square, bool rook)
     {
       Magic magic = rook ? ROOK_MAGICS[square] : BISHOP_MAGICS[square];
       Shift shift = rook ? ROOK_SHIFTS[square] : BISHOP_SHIFTS[square];
 
-      std::vector<Bitboard> blocks = getAllBlockers(square, rook ? movesLookup.ROOK_MASKS[square] : movesLookup.BISHOP_MASKS[square]);
+      std::vector<Bitboard> blocks = getAllBlockers(square, rook ? MovesLookup::ROOK_MASKS[square] : MovesLookup::BISHOP_MASKS[square]);
       std::vector<Bitboard> shifts = getShiftedBlockers(magic, shift, square, blocks);
       std::vector<Bitboard> moves = getAllMovesBitboards(square, blocks, rook);
 
@@ -227,7 +222,7 @@ namespace TungstenChess
     /**
      * @brief Initializes the rook lookup tables
      */
-    void initRookLookupTables()
+    static void initRookLookupTables()
     {
       ROOK_LOOKUP_TABLES = std::array<std::vector<Bitboard>, 64>();
 
@@ -240,7 +235,7 @@ namespace TungstenChess
     /**
      * @brief Initializes the bishop lookup tables
      */
-    void initBishopLookupTables()
+    static void initBishopLookupTables()
     {
       BISHOP_LOOKUP_TABLES = std::array<std::vector<Bitboard>, 64>();
 

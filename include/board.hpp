@@ -186,13 +186,13 @@ namespace TungstenChess
 
     std::vector<ZobristKey> m_positionHistory;
 
-    const Zobrist &zobrist = Zobrist::getInstance();
-    const MovesLookup &movesLookup = MovesLookup::getInstance();
-    const MagicMoveGen &magicMoveGen = MagicMoveGen::getInstance();
-
   public:
     Board(std::string fen = START_FEN) : m_isDefaultStartPosition(fen == START_FEN)
     {
+      Zobrist::init();
+      MovesLookup::init();
+      MagicMoveGen::init();
+
       resetBoard(fen);
     }
 
@@ -427,7 +427,7 @@ namespace TungstenChess
     {
       Piece oldPiece = m_board[pieceIndex];
 
-      m_zobristKey ^= zobrist.getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
+      m_zobristKey ^= Zobrist::getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
 
       m_kingIndices[newPiece] = pieceIndex;
       m_board[pieceIndex] = newPiece;
@@ -467,9 +467,9 @@ namespace TungstenChess
      */
     void removeCastlingRights(int rights)
     {
-      m_zobristKey ^= zobrist.castlingKeys[m_castlingRights];
+      m_zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
       m_castlingRights &= ~rights;
-      m_zobristKey ^= zobrist.castlingKeys[m_castlingRights];
+      m_zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
     }
 
     /**
@@ -488,9 +488,9 @@ namespace TungstenChess
      */
     void updateEnPassantFile(int file)
     {
-      m_zobristKey ^= zobrist.enPassantKeys[m_enPassantFile];
+      m_zobristKey ^= Zobrist::enPassantKeys[m_enPassantFile];
       m_enPassantFile = file;
-      m_zobristKey ^= zobrist.enPassantKeys[file];
+      m_zobristKey ^= Zobrist::enPassantKeys[file];
     }
 
     /**
@@ -499,9 +499,9 @@ namespace TungstenChess
      */
     void updateCastlingRights(int rights)
     {
-      m_zobristKey ^= zobrist.castlingKeys[m_castlingRights];
+      m_zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
       m_castlingRights = rights;
-      m_zobristKey ^= zobrist.castlingKeys[rights];
+      m_zobristKey ^= Zobrist::castlingKeys[rights];
     }
 
     /**
@@ -510,7 +510,7 @@ namespace TungstenChess
     void switchSideToMove()
     {
       m_sideToMove ^= COLOR;
-      m_zobristKey ^= zobrist.sideKey;
+      m_zobristKey ^= Zobrist::sideKey;
     }
 
     /**

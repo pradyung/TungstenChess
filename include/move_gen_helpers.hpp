@@ -10,30 +10,16 @@ namespace TungstenChess
   {
   public:
     /**
-     * @brief Get the instance of the MovesLookup singleton
-     * @return MovesLookup&
-     */
-    static MovesLookup &getInstance()
-    {
-      static MovesLookup instance;
-      return instance;
-    }
-
-    std::array<Bitboard, 64> KNIGHT_MOVES;
-    std::array<Bitboard, 64> KING_MOVES;
-    std::array<Bitboard, 64> BISHOP_MASKS;
-    std::array<Bitboard, 64> ROOK_MASKS;
-
-    std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_CAPTURE_MOVES;
-    std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_SINGLE_MOVES;
-    std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_DOUBLE_MOVES;
-
-  private:
-    /**
      * @brief Initializes the move lookup tables
      */
-    MovesLookup()
+    static void init()
     {
+      static bool initialized = false;
+
+      if (initialized)
+        return;
+      initialized = true;
+
       initKnightMoves();
       initKingMoves();
       initPawnMoves();
@@ -41,10 +27,20 @@ namespace TungstenChess
       initRookMasks();
     }
 
+    static inline std::array<Bitboard, 64> KNIGHT_MOVES = {};
+    static inline std::array<Bitboard, 64> KING_MOVES = {};
+    static inline std::array<Bitboard, 64> BISHOP_MASKS = {};
+    static inline std::array<Bitboard, 64> ROOK_MASKS = {};
+
+    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_CAPTURE_MOVES = {};
+    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_SINGLE_MOVES = {};
+    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_DOUBLE_MOVES = {};
+
+  private:
     /**
      * @brief Initializes the knight move lookup table
      */
-    void initKnightMoves()
+    static void initKnightMoves()
     {
       for (int square = 0; square < 64; square++)
       {
@@ -74,7 +70,7 @@ namespace TungstenChess
     /**
      * @brief Initializes the king move lookup table
      */
-    void initKingMoves()
+    static void initKingMoves()
     {
       for (int square = 0; square < 64; square++)
       {
@@ -105,7 +101,7 @@ namespace TungstenChess
     /**
      * @brief Initializes the pawn move lookup tables
      */
-    void initPawnMoves()
+    static void initPawnMoves()
     {
       for (int square = 0; square < 64; square++)
       {
@@ -148,7 +144,7 @@ namespace TungstenChess
     /**
      * @brief Initializes the bishop mask lookup tables
      */
-    void initBishopMasks()
+    static void initBishopMasks()
     {
       for (int square = 0; square < 64; square++)
       {
@@ -180,7 +176,7 @@ namespace TungstenChess
     /**
      * @brief Initializes the rook mask lookup table
      */
-    void initRookMasks()
+    static void initRookMasks()
     {
       for (int square = 0; square < 64; square++)
       {

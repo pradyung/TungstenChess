@@ -19,7 +19,7 @@ namespace TungstenChess
     int minSearchDepth = 3;  // for iterative deepening
     int maxSearchDepth = 5;  // for fixed depth search
     int quiesceDepth = 10;
-    bool useOpeningBook = true; // only used if board starting position is default
+    bool useOpeningBook = false; // only used if board starting position is default
     bool logSearchInfo = true;
     bool logPGNMoves = true;      // as opposed to UCI moves
     bool fixedDepthSearch = true; // as opposed to iterative deepening

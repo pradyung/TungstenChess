@@ -18,39 +18,16 @@ namespace TungstenChess
   {
   public:
     /**
-     * @brief Get the instance of the Zobrist singleton
-     * @return Zobrist&
-     */
-    static Zobrist &getInstance()
-    {
-      static Zobrist instance;
-      return instance;
-    }
-
-    /**
-     * @brief Get the combined Zobrist key for two pieces on the same square (used for updating the hash for a single square)
-     * @param square The square to get the key for
-     * @param before The piece that was on the square before
-     * @param after The piece that is on the square now
-     */
-    ZobristKey getPieceCombinationKey(int square, int before, int after) const
-    {
-      return precomputedPieceCombinationKeys[square | (before << 6) | (after << 11)];
-    }
-
-    std::array<std::array<ZobristKey, PIECE_NUMBER>, 64> pieceKeys;
-    std::array<ZobristKey, 16> castlingKeys;
-    std::array<ZobristKey, 9> enPassantKeys;
-    ZobristKey sideKey;
-
-    std::array<ZobristKey, 64 * 32 * 32> precomputedPieceCombinationKeys;
-
-  private:
-    /**
      * @brief Populates the pieceKeys, castlingKeys, enPassantKeys, and sideKey vectors with random keys
      */
-    Zobrist()
+    static void init()
     {
+      static bool initialized = false;
+
+      if (initialized)
+        return;
+      initialized = true;
+
       std::random_device rd;
       std::mt19937_64 gen(rd());
       std::uniform_int_distribution<ZobristKey> dis(0, 0xFFFFFFFFFFFFFFFF);
@@ -72,5 +49,23 @@ namespace TungstenChess
           for (int k : validPieces)
             precomputedPieceCombinationKeys[i | (j << 6) | (k << 11)] = pieceKeys[i][j] ^ pieceKeys[i][k];
     }
+
+    /**
+     * @brief Get the combined Zobrist key for two pieces on the same square (used for updating the hash for a single square)
+     * @param square The square to get the key for
+     * @param before The piece that was on the square before
+     * @param after The piece that is on the square now
+     */
+    static ZobristKey getPieceCombinationKey(int square, int before, int after)
+    {
+      return precomputedPieceCombinationKeys[square | (before << 6) | (after << 11)];
+    }
+
+    static inline std::array<std::array<ZobristKey, PIECE_NUMBER>, 64> pieceKeys = {};
+    static inline std::array<ZobristKey, 16> castlingKeys = {};
+    static inline std::array<ZobristKey, 9> enPassantKeys = {};
+    static inline ZobristKey sideKey = 0;
+
+    static inline std::array<ZobristKey, 64 * 32 * 32> precomputedPieceCombinationKeys = {};
   };
 }
