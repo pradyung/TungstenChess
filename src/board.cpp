@@ -2,21 +2,25 @@
 
 namespace TungstenChess
 {
-  void Board::calculateInitialZobristKey()
+  ZobristKey Board::calculateInitialZobristKey() const
   {
+    ZobristKey zobristKey = 0;
+
     for (int i = 0; i < 64; i++)
     {
       if (m_board[i])
       {
-        m_zobristKey ^= Zobrist::pieceKeys[i][m_board[i]];
+        zobristKey ^= Zobrist::pieceKeys[i][m_board[i]];
       }
     }
 
-    m_zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
-    m_zobristKey ^= Zobrist::enPassantKeys[m_enPassantFile];
+    zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
+    zobristKey ^= Zobrist::enPassantKeys[m_enPassantFile];
 
     if (m_sideToMove == WHITE)
-      m_zobristKey ^= Zobrist::sideKey;
+      zobristKey ^= Zobrist::sideKey;
+
+    return zobristKey;
   }
 
   void Board::resetBoard(std::string fen)
@@ -89,9 +93,7 @@ namespace TungstenChess
       m_enPassantFile = fenParts[FEN_EN_PASSANT][0] - 'a';
     }
 
-    m_zobristKey = 0;
-
-    calculateInitialZobristKey();
+    m_zobristKey = calculateInitialZobristKey();
 
     m_positionHistory.push_back(m_zobristKey);
 
@@ -172,7 +174,7 @@ namespace TungstenChess
       updatePiece((move.piece & WHITE) ? move.to + 8 : move.to - 8, move.piece ^ COLOR);
   }
 
-  Bitboard Board::getPawnMoves(int pieceIndex, PieceColor color, bool _)
+  Bitboard Board::getPawnMoves(int pieceIndex, PieceColor color, bool _) const
   {
     Bitboard movesBitboard = 0;
 
@@ -202,22 +204,22 @@ namespace TungstenChess
     return movesBitboard;
   }
 
-  Bitboard Board::getKnightMoves(int pieceIndex, PieceColor color, bool _)
+  Bitboard Board::getKnightMoves(int pieceIndex, PieceColor color, bool _) const
   {
     return MovesLookup::KNIGHT_MOVES[pieceIndex] & ~m_bitboards[color];
   }
 
-  Bitboard Board::getBishopMoves(int pieceIndex, PieceColor color, bool _)
+  Bitboard Board::getBishopMoves(int pieceIndex, PieceColor color, bool _) const
   {
     return MagicMoveGen::getBishopMoves(pieceIndex, m_bitboards[ALL_PIECES]) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getRookMoves(int pieceIndex, PieceColor color, bool _)
+  Bitboard Board::getRookMoves(int pieceIndex, PieceColor color, bool _) const
   {
     return MagicMoveGen::getRookMoves(pieceIndex, m_bitboards[ALL_PIECES]) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getQueenMoves(int pieceIndex, PieceColor color, bool _)
+  Bitboard Board::getQueenMoves(int pieceIndex, PieceColor color, bool _) const
   {
     Bitboard bishopMoves = MagicMoveGen::getBishopMoves(pieceIndex, m_bitboards[ALL_PIECES]);
     Bitboard rookMoves = MagicMoveGen::getRookMoves(pieceIndex, m_bitboards[ALL_PIECES]);
@@ -225,7 +227,7 @@ namespace TungstenChess
     return (bishopMoves | rookMoves) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getKingMoves(int pieceIndex, PieceColor color, bool includeCastling)
+  Bitboard Board::getKingMoves(int pieceIndex, PieceColor color, bool includeCastling) const
   {
     Bitboard movesBitboard = MovesLookup::KING_MOVES[pieceIndex] & ~m_bitboards[color];
 
@@ -276,7 +278,7 @@ namespace TungstenChess
     return legalMovesBitboard;
   }
 
-  Bitboard Board::getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, PieceColor color)
+  Bitboard Board::getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, PieceColor color) const
   {
     Bitboard attackingPiecesBitboard = 0;
 
@@ -414,7 +416,7 @@ namespace TungstenChess
     return legalMoves;
   }
 
-  bool Board::isAttacked(int square, PieceColor color)
+  bool Board::isAttacked(int square, PieceColor color) const
   {
     PieceColor opposingColor = color ^ COLOR;
 
@@ -454,7 +456,7 @@ namespace TungstenChess
     return isInCheck(color) ? LOSE : STALEMATE;
   }
 
-  Move Board::generateMoveFromUCI(std::string uci)
+  Move Board::generateMoveFromUCI(std::string uci) const
   {
     int from = (uci[0] - 'a') + (8 - uci[1] + '0') * 8;
     int to = (uci[2] - 'a') + (8 - uci[3] + '0') * 8;

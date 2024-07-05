@@ -22,27 +22,22 @@ namespace TungstenChess
   {
   private:
     std::array<Piece, 64> m_board;
+    std::array<Bitboard, ALL_PIECES + 1> m_bitboards;
+    std::array<int, PIECE_NUMBER> m_kingIndices; // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
 
     PieceColor m_sideToMove;
 
-    int m_castlingRights;
-    int m_enPassantFile = NO_EP;
-
-    int m_hasCastled;
-
-    int m_halfmoveClock;
-
-    std::array<Bitboard, ALL_PIECES + 1> m_bitboards;
+    uint m_castlingRights;
+    uint m_enPassantFile = NO_EP;
+    uint m_hasCastled;
+    uint m_halfmoveClock;
 
     ZobristKey m_zobristKey;
 
-    std::vector<MoveInt> m_moveHistory;
+    std::vector<ZobristKey> m_positionHistory;
 
     const bool m_isDefaultStartPosition; // Whether the board is in the default starting position (used for determining whether opening book can be used)
-
-    std::array<int, PIECE_NUMBER> m_kingIndices; // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
-
-    std::vector<ZobristKey> m_positionHistory;
+    std::vector<MoveInt> m_moveHistory;
 
   public:
     Board(std::string fen = START_FEN) : m_isDefaultStartPosition(fen == START_FEN)
@@ -55,17 +50,17 @@ namespace TungstenChess
     }
 
     // Accessor methods
-    Piece operator[](int index) { return m_board[index]; }
-    PieceColor sideToMove() { return m_sideToMove; }
-    int castlingRights() { return m_castlingRights; }
-    int enPassantFile() { return m_enPassantFile; }
-    int hasCastled() { return m_hasCastled; }
-    int halfmoveClock() { return m_halfmoveClock; }
-    Bitboard bitboard(Piece piece) { return m_bitboards[piece]; }
-    ZobristKey zobristKey() { return m_zobristKey; }
-    std::vector<MoveInt> moveHistory() { return m_moveHistory; }
-    bool isDefaultStartPosition() { return m_isDefaultStartPosition; }
-    int kingIndex(Piece piece) { return m_kingIndices[piece]; }
+    Piece operator[](int index) const { return m_board[index]; }
+    PieceColor sideToMove() const { return m_sideToMove; }
+    int castlingRights() const { return m_castlingRights; }
+    int enPassantFile() const { return m_enPassantFile; }
+    int hasCastled() const { return m_hasCastled; }
+    int halfmoveClock() const { return m_halfmoveClock; }
+    Bitboard bitboard(Piece piece) const { return m_bitboards[piece]; }
+    ZobristKey zobristKey() const { return m_zobristKey; }
+    const std::vector<MoveInt> &moveHistory() const { return m_moveHistory; }
+    bool isDefaultStartPosition() const { return m_isDefaultStartPosition; }
+    int kingIndex(Piece piece) const { return m_kingIndices[piece]; }
 
     /**
      * @brief Resets the board to the provided fen
@@ -77,7 +72,7 @@ namespace TungstenChess
      * @brief Checks if a color is in check in the current position
      * @param color The color to check
      */
-    bool isInCheck(PieceColor color)
+    bool isInCheck(PieceColor color) const
     {
       return isAttacked(m_kingIndices[color | KING], color ^ COLOR);
     }
@@ -114,7 +109,7 @@ namespace TungstenChess
      * @brief Generates a move from a UCI string
      * @param uci The UCI string
      */
-    Move generateMoveFromUCI(std::string uci);
+    Move generateMoveFromUCI(std::string uci) const;
 
     /**
      * @brief Generates a PGN string from a move
@@ -140,7 +135,7 @@ namespace TungstenChess
      * @brief Counts the number of times a position has been repeated
      * @param key The Zobrist key of the position to check
      */
-    int countRepetitions(ZobristKey key)
+    int countRepetitions(ZobristKey key) const
     {
       int count = 0;
 
@@ -156,7 +151,7 @@ namespace TungstenChess
      * @brief Calculates the Zobrist key for the current position. Should only be called once at board initialization
      *        After, the key is updated incrementally with updatePiece, updateCastlingRights, etc
      */
-    void calculateInitialZobristKey();
+    ZobristKey calculateInitialZobristKey() const;
 
     /**
      * @brief Updates bitboards for a single changing piece
@@ -376,7 +371,7 @@ namespace TungstenChess
      * @param pieceIndex The index of the piece
      * @param includeCastling Whether to include castling moves (should be false when checking for attacks on the king)
      */
-    Bitboard getPseudoLegalPieceMoves(int pieceIndex, PieceColor color, bool includeCastling = true)
+    Bitboard getPseudoLegalPieceMoves(int pieceIndex, PieceColor color, bool includeCastling = true) const
     {
       return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling);
     }
@@ -394,16 +389,16 @@ namespace TungstenChess
      * @param targetPiece The piece on the target square
      * @param color The color of the pieces moving
      */
-    Bitboard getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, PieceColor color);
+    Bitboard getAttackingPiecesBitboard(int targetSquare, Piece targetPiece, PieceColor color) const;
 
-    Bitboard getPawnMoves(int pieceIndex, PieceColor color, bool _ = false);
-    Bitboard getKnightMoves(int pieceIndex, PieceColor color, bool _ = false);
-    Bitboard getBishopMoves(int pieceIndex, PieceColor color, bool _ = false);
-    Bitboard getRookMoves(int pieceIndex, PieceColor color, bool _ = false);
-    Bitboard getQueenMoves(int pieceIndex, PieceColor color, bool _ = false);
-    Bitboard getKingMoves(int pieceIndex, PieceColor color, bool includeCastling = true);
+    Bitboard getPawnMoves(int pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getKnightMoves(int pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getBishopMoves(int pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getRookMoves(int pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getQueenMoves(int pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getKingMoves(int pieceIndex, PieceColor color, bool includeCastling = true) const;
 
-    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, PieceColor, bool) = {
+    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(int, PieceColor, bool) const = {
         nullptr,
         &TungstenChess::Board::getPawnMoves,
         &TungstenChess::Board::getKnightMoves,
@@ -417,6 +412,6 @@ namespace TungstenChess
      * @param square The square to check
      * @param color The color to check
      */
-    bool isAttacked(int square, PieceColor color);
+    bool isAttacked(int square, PieceColor color) const;
   };
 }

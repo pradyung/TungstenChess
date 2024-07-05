@@ -15,10 +15,10 @@ namespace TungstenChess
 {
   struct BotSettings
   {
-    int maxSearchTime = 500; // In milliseconds, not a hard limit
-    int minSearchDepth = 3;  // for iterative deepening
-    int maxSearchDepth = 5;  // for fixed depth search
-    int quiesceDepth = 10;
+    int maxSearchTime = 500;     // In milliseconds, not a hard limit
+    int minSearchDepth = 3;      // for iterative deepening
+    int maxSearchDepth = 5;      // for fixed depth search
+    int quiesceDepth = -1;       // for quiescence search, set to -1 to search indefinitely (recommended)
     bool useOpeningBook = false; // only used if board starting position is default
     bool logSearchInfo = true;
     bool logPGNMoves = true;      // as opposed to UCI moves
@@ -139,17 +139,17 @@ namespace TungstenChess
     /**
      * @brief Gets the material evaluation of the current position, independent of the side to move (positive for white favor, negative for black favor)
      */
-    int getMaterialEvaluation();
+    int getMaterialEvaluation() const;
 
     /**
      * @brief Gets the positional evaluation of the current position, independent of the side to move (positive for white favor, negative for black favor)
      */
-    int getPositionalEvaluation();
+    int getPositionalEvaluation() const;
 
     /**
      * @brief Gets the evaluation bonus for the current position, independent of the side to move (positive for white favor, negative for black favor)
      */
-    int getEvaluationBonus();
+    int getEvaluationBonus() const;
 
     /**
      * @brief Negamax search with alpha-beta pruning and quiescence search

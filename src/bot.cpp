@@ -68,7 +68,7 @@ namespace TungstenChess
     return board.sideToMove() == WHITE ? staticEvaluation : -staticEvaluation;
   }
 
-  int Bot::getMaterialEvaluation()
+  int Bot::getMaterialEvaluation() const
   {
     int materialEvaluation = 0;
 
@@ -87,7 +87,7 @@ namespace TungstenChess
     return materialEvaluation;
   }
 
-  int Bot::getPositionalEvaluation()
+  int Bot::getPositionalEvaluation() const
   {
     int positionalEvaluation = 0;
 
@@ -146,7 +146,7 @@ namespace TungstenChess
     return positionalEvaluation;
   }
 
-  int Bot::getEvaluationBonus()
+  int Bot::getEvaluationBonus() const
   {
     int evaluationBonus = 0;
 
