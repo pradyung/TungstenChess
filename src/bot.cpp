@@ -240,53 +240,44 @@ namespace TungstenChess
     return evaluationBonus;
   }
 
-  Move Bot::generateOneDeepMove()
+  int Bot::negamax(int depth, int alpha, int beta, bool quiesce)
   {
-    std::vector<Move> legalMoves = board.getLegalMoves(board.sideToMove());
+    int standPat;
 
-    int legalMovesCount = legalMoves.size();
-
-    int bestMoveIndex = 0;
-    int bestMoveEvaluation = POSITIVE_INFINITY;
-
-    for (int i = 0; i < legalMovesCount; i++)
+    if (quiesce)
     {
-      board.makeMove(legalMoves[i]);
+      standPat = getStaticEvaluation();
 
-      int evaluation = getStaticEvaluation();
+      if (depth == 0)
+        return standPat;
 
-      board.unmakeMove(legalMoves[i]);
+      if (standPat > alpha)
+        alpha = standPat;
 
-      if (evaluation < bestMoveEvaluation)
-      {
-        bestMoveEvaluation = evaluation;
-        bestMoveIndex = i;
-      }
+      if (alpha >= beta)
+        return beta;
     }
-
-    return legalMoves[bestMoveIndex];
-  }
-
-  int Bot::negamax(int depth, int alpha, int beta)
-  {
-    if (depth == 0)
-      return quiesce(botSettings.quiesceDepth, alpha, beta);
+    else
+    {
+      if (depth == 0)
+        return negamax(botSettings.quiesceDepth, alpha, beta, true);
+    }
 
     if (board.countRepetitions(board.zobristKey()) >= 3 || board.halfmoveClock() >= 100)
       return -STALEMATE_PENALTY;
 
-    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove());
+    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove(), quiesce);
 
     int legalMovesCount = legalMoves.size();
 
     if (legalMovesCount == 0)
-      return board.isInCheck(board.sideToMove()) ? NEGATIVE_INFINITY : -STALEMATE_PENALTY;
+      return quiesce ? standPat : (board.isInCheck(board.sideToMove()) ? NEGATIVE_INFINITY : -STALEMATE_PENALTY);
 
-    for (int i = 0; i < legalMovesCount; i++)
+    for (Move &move : legalMoves)
     {
-      board.makeMove(legalMoves[i]);
-      int evaluation = -negamax(depth - 1, -beta, -alpha);
-      board.unmakeMove(legalMoves[i]);
+      board.makeMove(move);
+      int evaluation = -negamax(depth - 1, -beta, -alpha, quiesce);
+      board.unmakeMove(move);
 
       if (evaluation > alpha)
       {
@@ -300,77 +291,31 @@ namespace TungstenChess
     return alpha;
   }
 
-  int Bot::quiesce(int depth, int alpha, int beta)
-  {
-    int standPat = getStaticEvaluation();
-
-    if (depth == 0)
-      return standPat;
-
-    if (standPat > alpha)
-      alpha = standPat;
-
-    if (alpha >= beta)
-      return beta;
-
-    if (board.countRepetitions(board.zobristKey()) >= 3 || board.halfmoveClock() >= 100)
-      return -STALEMATE_PENALTY;
-
-    std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove(), true);
-
-    int legalMovesCount = legalMoves.size();
-
-    if (legalMovesCount == 0)
-      return standPat;
-
-    for (int i = 0; i < legalMovesCount; i++)
-    {
-      board.makeMove(legalMoves[i]);
-      int evaluation = -quiesce(depth - 1, -beta, -alpha);
-      board.unmakeMove(legalMoves[i]);
-
-      if (evaluation > alpha)
-      {
-        alpha = evaluation;
-
-        if (alpha >= beta)
-          return beta;
-      }
-    }
-
-    return alpha;
-  }
-
-  Move Bot::generateBestMove(int depth, int alpha, int beta)
+  Move Bot::generateBestMove(int depth)
   {
     depthSearched = depth;
 
-    if (depth == 0)
-      return generateOneDeepMove();
-
     std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove());
 
     int legalMovesCount = legalMoves.size();
 
-    int bestMoveIndex = 0;
+    Move &bestMove = legalMoves[0];
+    int alpha = NEGATIVE_INFINITY;
 
-    for (int i = 0; i < legalMovesCount; i++)
+    for (Move &move : legalMoves)
     {
-      board.makeMove(legalMoves[i]);
-      int evaluation = -negamax(depth - 1, -beta, -alpha);
-      board.unmakeMove(legalMoves[i]);
+      board.makeMove(move);
+      int evaluation = -negamax(depth - 1, NEGATIVE_INFINITY, -alpha, false);
+      board.unmakeMove(move);
 
       if (evaluation > alpha)
       {
         alpha = evaluation;
-        bestMoveIndex = i;
-
-        if (alpha >= beta)
-          break;
+        bestMove = move;
       }
     }
 
-    return legalMoves[bestMoveIndex];
+    return bestMove;
   }
 
   Move Bot::iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start)

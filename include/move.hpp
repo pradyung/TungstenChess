@@ -9,18 +9,17 @@ namespace TungstenChess
 {
   struct Move
   {
-    uint from;
-    uint to;
+    uint8_t from;
+    uint8_t to;
     Piece piece;
     Piece capturedPiece;
     PieceType promotionPieceType;
 
-    uint castlingRights;
-    uint enPassantFile;
+    uint8_t castlingRights_enPassantFile; // 0xF0: castling rights, 0x0F: en passant file, grouped together to save space and fit Move object into 8 bytes
 
-    uint halfmoveClock;
+    uint8_t halfmoveClock;
 
-    uint flags;
+    uint8_t flags;
 
     Move() = default;
 
@@ -34,7 +33,7 @@ namespace TungstenChess
      * @param promotionPieceType The piece that the moving piece is being promoted to, if any (only piece type)
      */
     Move(int from, int to, Piece piece, Piece capturedPiece, int castlingRights, int enPassantFile, int halfmoveClock, PieceType promotionPieceType = EMPTY)
-        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights(castlingRights), enPassantFile(enPassantFile), halfmoveClock(halfmoveClock), promotionPieceType(promotionPieceType), flags(NORMAL)
+        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights_enPassantFile((castlingRights << 4) | enPassantFile), halfmoveClock(halfmoveClock), promotionPieceType(promotionPieceType), flags(NORMAL)
     {
       PieceType pieceType = piece & TYPE;
 
@@ -77,7 +76,7 @@ namespace TungstenChess
      * @param move The move to copy
      * @param promotionPieceType The new promotion piece type
      */
-    Move(const Move &move, PieceType promotionPieceType) : from(move.from), to(move.to), piece(move.piece), capturedPiece(move.capturedPiece), castlingRights(move.castlingRights), enPassantFile(move.enPassantFile), halfmoveClock(move.halfmoveClock), promotionPieceType(promotionPieceType), flags(move.flags) {}
+    Move(const Move &move, PieceType promotionPieceType) : from(move.from), to(move.to), piece(move.piece), capturedPiece(move.capturedPiece), castlingRights_enPassantFile(move.castlingRights_enPassantFile), halfmoveClock(move.halfmoveClock), promotionPieceType(promotionPieceType), flags(move.flags) {}
 
     /**
      * Returns an integer representation of the move

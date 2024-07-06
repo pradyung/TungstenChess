@@ -111,17 +111,12 @@ namespace TungstenChess
     Move generateMoveFromInt(MoveInt moveInt);
 
     /**
-     * @brief Generates a move using a depth of 1 (not used unless the bot is set to depth 1)
-     */
-    Move generateOneDeepMove();
-
-    /**
      * @brief Generates the best move for the bot
      * @param depth The depth to search to
      * @param alpha The alpha value for alpha-beta pruning (should not be set outside of recursive calls)
      * @param beta The beta value for alpha-beta pruning (should not be set outside of recursive calls)
      */
-    Move generateBestMove(int depth, int alpha = NEGATIVE_INFINITY, int beta = POSITIVE_INFINITY);
+    Move generateBestMove(int depth);
 
     /**
      * @brief Uses iterative deepening to find the best move in a constant amount of time
@@ -156,16 +151,9 @@ namespace TungstenChess
      * @param depth The depth to search to
      * @param alpha The alpha value for alpha-beta pruning
      * @param beta The beta value for alpha-beta pruning
+     * @param quiesce Whether the search is in quiescence mode (captures only)
      */
-    int negamax(int depth, int alpha, int beta);
-
-    /**
-     * @brief Quiescence search
-     * @param depth The depth to search to
-     * @param alpha The alpha value for alpha-beta pruning
-     * @param beta The beta value for alpha-beta pruning
-     */
-    int quiesce(int depth, int alpha, int beta);
+    int negamax(int depth, int alpha = NEGATIVE_INFINITY, int beta = POSITIVE_INFINITY, bool quiesce = false);
 
     /**
      * @brief Heuristic evaluation of a move, used for move ordering to improve alpha-beta pruning

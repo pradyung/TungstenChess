@@ -111,7 +111,7 @@ namespace TungstenChess
 
     m_moveHistory.push_back(move.toInt());
 
-    auto [from, to, piece, capturedPiece, promotionPieceType, castlingRights, enPassantFile, halfmoveClock, flags] = move;
+    auto [from, to, piece, capturedPiece, promotionPieceType, castlingRights_enPassantFile, halfmoveClock, flags] = move;
 
     PieceType pieceType = piece & TYPE;
     PieceColor pieceColor = piece & COLOR;
@@ -167,8 +167,8 @@ namespace TungstenChess
         unmovePiece(move.to - 2, move.to + 1);
     }
 
-    updateEnPassantFile(move.enPassantFile);
-    updateCastlingRights(move.castlingRights);
+    updateEnPassantFile(move.castlingRights_enPassantFile & 0x0F);
+    updateCastlingRights((move.castlingRights_enPassantFile & 0xF0) >> 4);
 
     if (move.flags & EP_CAPTURE)
       updatePiece((move.piece & WHITE) ? move.to + 8 : move.to - 8, move.piece ^ COLOR);
