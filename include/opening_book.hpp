@@ -10,7 +10,7 @@ namespace TungstenChess
   class OpeningBook
   {
   public:
-    bool inOpeningBook = true;
+    OpeningBook(bool inOpeningBook) : inOpeningBook(inOpeningBook) {}
 
     /**
      * @brief Loads the opening book from a file
@@ -35,13 +35,17 @@ namespace TungstenChess
     /**
      * @brief Updates move history to synchronize with given vector
      * @param moves The moves to update the history with
+     * @return Whether the moves were added successfully - if false, the moves are not in the opening book
      */
-    void updateMoveHistory(const std::vector<MoveInt> &newMoves)
+    bool updateMoveHistory(const std::vector<MoveInt> &newMoves)
     {
+      if (!inOpeningBook)
+        return false;
+
       for (size_t i = moves.size(); i < newMoves.size() && inOpeningBook; i++)
-      {
         inOpeningBook = addMove(newMoves[i]);
-      }
+
+      return inOpeningBook;
     }
 
     /**
@@ -76,6 +80,8 @@ namespace TungstenChess
 
   private:
     std::vector<uint> openingBook;
+
+    bool inOpeningBook = true;
 
     std::vector<MoveInt> moves;
 

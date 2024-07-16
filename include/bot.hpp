@@ -15,11 +15,11 @@ namespace TungstenChess
 {
   struct BotSettings
   {
-    int maxSearchTime = 500;     // In milliseconds, not a hard limit
-    int minSearchDepth = 3;      // for iterative deepening
-    int maxSearchDepth = 5;      // for fixed depth search
-    int quiesceDepth = -1;       // for quiescence search, set to -1 to search indefinitely (recommended)
-    bool useOpeningBook = false; // only used if board starting position is default
+    int maxSearchTime = 500;    // In milliseconds, not a hard limit
+    int minSearchDepth = 3;     // for iterative deepening
+    int maxSearchDepth = 5;     // for fixed depth search
+    int quiesceDepth = -1;      // for quiescence search, set to -1 to search indefinitely (recommended)
+    bool useOpeningBook = true; // only used if board starting position is default
     bool logSearchInfo = true;
     bool logPGNMoves = true;      // as opposed to UCI moves
     bool fixedDepthSearch = true; // as opposed to iterative deepening
@@ -44,10 +44,7 @@ namespace TungstenChess
   class Bot
   {
   public:
-    Bot(Board &board, const BotSettings &settings) : board(board), botSettings(settings)
-    {
-      openingBook.inOpeningBook = board.isDefaultStartPosition();
-    }
+    Bot(Board &board, const BotSettings &settings) : board(board), botSettings(settings), openingBook(board.isDefaultStartPosition()) {}
 
     Bot(Board &board) : Bot(board, BotSettings()) {}
 

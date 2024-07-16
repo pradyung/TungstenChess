@@ -15,10 +15,8 @@ namespace TungstenChess
 
   Move Bot::generateBotMove()
   {
-    if (openingBook.inOpeningBook && botSettings.useOpeningBook)
+    if (botSettings.useOpeningBook && openingBook.updateMoveHistory(board.moveHistory()))
     {
-      openingBook.updateMoveHistory(board.moveHistory());
-
       MoveInt moveInt = openingBook.getNextMove();
 
       if (moveInt != NULL_MOVE)
@@ -30,8 +28,6 @@ namespace TungstenChess
 
         return bestMove;
       }
-
-      openingBook.inOpeningBook = false;
     }
 
     positionsEvaluated = 0;
