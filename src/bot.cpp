@@ -30,7 +30,7 @@ namespace TungstenChess
       }
     }
 
-    positionsEvaluated = 0;
+    previousSearchInfo.positionsEvaluated = 0;
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -38,16 +38,16 @@ namespace TungstenChess
 
     if (botSettings.logSearchInfo)
       std::cout << "Move: " << (botSettings.logPGNMoves ? board.getMovePGN(bestMove) : bestMove.getUCI()) << ", "
-                << "Depth: " << depthSearched << ", "
+                << "Depth: " << previousSearchInfo.depthSearched << ", "
                 << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms, "
-                << "Positions evaluated: " << positionsEvaluated << std::endl;
+                << "Positions evaluated: " << previousSearchInfo.positionsEvaluated << std::endl;
 
     return bestMove;
   }
 
   int Bot::getStaticEvaluation()
   {
-    positionsEvaluated++;
+    previousSearchInfo.positionsEvaluated++;
 
     int gameStatus = board.getGameStatus(board.sideToMove());
 
@@ -289,7 +289,7 @@ namespace TungstenChess
 
   Move Bot::generateBestMove(int depth)
   {
-    depthSearched = depth;
+    previousSearchInfo.depthSearched = depth;
 
     std::vector<Move> legalMoves = getSortedLegalMoves(board.sideToMove());
 

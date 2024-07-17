@@ -43,6 +43,7 @@ namespace TungstenChess
             precomputedPieceCombinationKeys[i | (j << 6) | (k << 11)] = pieceKeys[i][j] ^ pieceKeys[i][k];
     }
 
+  private:
     /**
      * @brief Get the combined Zobrist key for two pieces on the same square (used for updating the hash for a single square)
      * @param square The square to get the key for
@@ -60,5 +61,7 @@ namespace TungstenChess
     static inline ZobristKey sideKey = 0;
 
     static inline std::array<ZobristKey, 64 * 32 * 32> precomputedPieceCombinationKeys = {};
+
+    friend class Board;
   };
 }

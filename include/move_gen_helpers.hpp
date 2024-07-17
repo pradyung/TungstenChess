@@ -9,15 +9,6 @@ namespace TungstenChess
   class MovesLookup
   {
   public:
-    static inline std::array<Bitboard, 64> KNIGHT_MOVES = {};
-    static inline std::array<Bitboard, 64> KING_MOVES = {};
-    static inline std::array<Bitboard, 64> BISHOP_MASKS = {};
-    static inline std::array<Bitboard, 64> ROOK_MASKS = {};
-
-    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_CAPTURE_MOVES = {};
-    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_SINGLE_MOVES = {};
-    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_DOUBLE_MOVES = {};
-
     /**
      * @brief Initializes the move lookup tables
      */
@@ -37,6 +28,18 @@ namespace TungstenChess
     }
 
   private:
+    static inline std::array<Bitboard, 64> KNIGHT_MOVES = {};
+    static inline std::array<Bitboard, 64> KING_MOVES = {};
+    static inline std::array<Bitboard, 64> BISHOP_MASKS = {};
+    static inline std::array<Bitboard, 64> ROOK_MASKS = {};
+
+    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_CAPTURE_MOVES = {};
+    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_SINGLE_MOVES = {};
+    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_DOUBLE_MOVES = {};
+
+    friend class Board;
+    friend class MagicMoveGen;
+
     /**
      * @brief Initializes the knight move lookup table
      */

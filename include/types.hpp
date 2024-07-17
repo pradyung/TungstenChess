@@ -19,7 +19,7 @@ namespace TungstenChess
   typedef uint64_t Magic;
   typedef uint8_t Shift;
 
-  enum CastlingRights
+  enum CastlingRights : uint8_t
   {
     WHITE_KINGSIDE = 1,
     WHITE_QUEENSIDE = 2,
@@ -32,14 +32,14 @@ namespace TungstenChess
     BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
   };
 
-  enum GameStatus
+  enum GameStatus : uint8_t
   {
     NO_MATE = 0,
     STALEMATE = 1,
     LOSE = 2,
   };
 
-  enum MoveFlags
+  enum MoveFlags : uint8_t
   {
     NORMAL = 0,
     CAPTURE = 1,
@@ -51,7 +51,7 @@ namespace TungstenChess
     CASTLE = KSIDE_CASTLE | QSIDE_CASTLE
   };
 
-  enum FenParts
+  enum FenParts : uint8_t
   {
     FEN_BOARD = 0,
     FEN_SIDE_TO_MOVE = 1,
@@ -61,13 +61,13 @@ namespace TungstenChess
     FEN_FULLMOVE_NUMBER = 5
   };
 
-  enum PieceMasks
+  enum PieceMasks : Piece
   {
     TYPE = 7,
     COLOR = 24
   };
 
-  enum PieceTypes
+  enum PieceTypes : PieceType
   {
     EMPTY = 0,
     PAWN = 1,
@@ -79,14 +79,14 @@ namespace TungstenChess
     PIECE_TYPE_NUMBER = 7
   };
 
-  enum PieceColors
+  enum PieceColors : PieceColor
   {
     WHITE = 8,
     BLACK = 16,
     BOTH = WHITE | BLACK
   };
 
-  enum Pieces
+  enum Pieces : Piece
   {
     WHITE_PAWN = WHITE | PAWN,
     WHITE_KNIGHT = WHITE | KNIGHT,
@@ -106,12 +106,12 @@ namespace TungstenChess
     ALL_PIECES = 24
   };
 
-  const int validPieces[13] = {
+  const Piece validPieces[13] = {
       EMPTY,
       WHITE_PAWN, WHITE_KNIGHT, WHITE_BISHOP, WHITE_ROOK, WHITE_QUEEN, WHITE_KING,
       BLACK_PAWN, BLACK_KNIGHT, BLACK_BISHOP, BLACK_ROOK, BLACK_QUEEN, BLACK_KING};
 
-  enum Squares
+  enum Squares : uint8_t
   {
     A8 = 0,
     B8 = 1,

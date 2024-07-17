@@ -4,9 +4,8 @@
 
 namespace TungstenChess
 {
-  class Bitboards
+  namespace Bitboards
   {
-  public:
     static void addBit(Bitboard &bitboard, int index) { bitboard |= (1ULL << index); }
     static void removeBit(Bitboard &bitboard, int index) { bitboard &= ~(1ULL << index); }
     static bool isEmpty(Bitboard bitboard) { return bitboard == 0; }

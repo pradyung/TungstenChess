@@ -13,49 +13,54 @@
 
 namespace TungstenChess
 {
-  struct BotSettings
-  {
-    int maxSearchTime = 500;    // In milliseconds, not a hard limit
-    int minSearchDepth = 3;     // for iterative deepening
-    int maxSearchDepth = 5;     // for fixed depth search
-    int quiesceDepth = -1;      // for quiescence search, set to -1 to search indefinitely (recommended)
-    bool useOpeningBook = true; // only used if board starting position is default
-    bool logSearchInfo = true;
-    bool logPGNMoves = true;      // as opposed to UCI moves
-    bool fixedDepthSearch = true; // as opposed to iterative deepening
-  };
-
-  enum EvaluationBonus
-  {
-    BISHOP_PAIR_BONUS = 100,
-    CASTLED_KING_BONUS = 25,
-    CAN_CASTLE_BONUS = 25,
-    ROOK_ON_OPEN_FILE_BONUS = 50,
-    ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
-    KNIGHT_OUTPOST_BONUS = 50,
-    PASSED_PAWN_BONUS = 50,
-    DOUBLED_PAWN_PENALTY = 50,
-    ISOLATED_PAWN_PENALTY = 25,
-    BACKWARDS_PAWN_PENALTY = 50,
-    KING_SAFETY_PAWN_SHIELD_BONUS = 50,
-    STALEMATE_PENALTY = 150,
-  };
-
   class Bot
   {
   private:
     Board &board;
     OpeningBook openingBook;
 
+    enum EvaluationConstants : int
+    {
+      BISHOP_PAIR_BONUS = 100,
+      CASTLED_KING_BONUS = 25,
+      CAN_CASTLE_BONUS = 25,
+      ROOK_ON_OPEN_FILE_BONUS = 50,
+      ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
+      KNIGHT_OUTPOST_BONUS = 50,
+      PASSED_PAWN_BONUS = 50,
+      DOUBLED_PAWN_PENALTY = 50,
+      ISOLATED_PAWN_PENALTY = 25,
+      BACKWARDS_PAWN_PENALTY = 50,
+      KING_SAFETY_PAWN_SHIELD_BONUS = 50,
+      STALEMATE_PENALTY = 150,
+    };
+
+    struct BotSettings
+    {
+      int maxSearchTime = 500;    // In milliseconds, not a hard limit
+      int minSearchDepth = 3;     // for iterative deepening
+      int maxSearchDepth = 5;     // for fixed depth search
+      int quiesceDepth = -1;      // for quiescence search, set to -1 to search indefinitely (recommended)
+      bool useOpeningBook = true; // only used if board starting position is default
+      bool logSearchInfo = true;
+      bool logPGNMoves = true;      // as opposed to UCI moves
+      bool fixedDepthSearch = true; // as opposed to iterative deepening
+    };
+
     const BotSettings botSettings;
+
+    struct SearchInfo
+    {
+      int positionsEvaluated;
+      int depthSearched;
+    };
+
+    SearchInfo previousSearchInfo = {0, 0};
 
   public:
     Bot(Board &board, const BotSettings &settings) : board(board), botSettings(settings), openingBook(board.isDefaultStartPosition()) {}
 
     Bot(Board &board) : Bot(board, BotSettings()) {}
-
-    int positionsEvaluated;
-    int depthSearched;
 
     /**
      * @brief Loads the opening book from a file
