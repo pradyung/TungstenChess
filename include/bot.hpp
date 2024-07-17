@@ -43,6 +43,12 @@ namespace TungstenChess
 
   class Bot
   {
+  private:
+    Board &board;
+    OpeningBook openingBook;
+
+    const BotSettings botSettings;
+
   public:
     Bot(Board &board, const BotSettings &settings) : board(board), botSettings(settings), openingBook(board.isDefaultStartPosition()) {}
 
@@ -67,11 +73,6 @@ namespace TungstenChess
     Move generateBotMove();
 
   private:
-    Board &board;
-    OpeningBook openingBook;
-
-    const BotSettings botSettings;
-
     /**
      * @brief Gets the legal moves for a color, sorted by heuristic evaluation
      * @param color The color to get the moves for

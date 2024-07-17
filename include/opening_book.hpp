@@ -9,6 +9,13 @@ namespace TungstenChess
 {
   class OpeningBook
   {
+  private:
+    std::vector<uint> openingBook;
+    std::vector<MoveInt> moves;
+
+    bool inOpeningBook = true;
+    int lastMoveIndex = -1;
+
   public:
     OpeningBook(bool inOpeningBook) : inOpeningBook(inOpeningBook) {}
 
@@ -79,14 +86,6 @@ namespace TungstenChess
     MoveInt getNextMove() const { return getWeightedRandomMove(); }
 
   private:
-    std::vector<uint> openingBook;
-
-    bool inOpeningBook = true;
-
-    std::vector<MoveInt> moves;
-
-    int lastMoveIndex = -1;
-
     /**
      * @brief Gets the next possible "children" moves from the opening book
      */

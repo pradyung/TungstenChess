@@ -57,13 +57,7 @@ namespace TungstenChess
      */
     ResourceManager()
     {
-      CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
-      char path[PATH_MAX];
-      if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
-        resourcePath = "";
-      else
-        resourcePath = std::string(path) + "/";
-      CFRelease(resourcesURL);
+      std::string resourcePath = getResourcePath();
 
       openingBookPath = resourcePath + "opening_book";
       openingBookSize = std::ifstream(openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(uint);
@@ -90,23 +84,24 @@ namespace TungstenChess
       icon.loadFromFile(resourcePath + "high_res_wn.png");
     }
 
-    std::string resourcePath;
+    static std::string getResourcePath()
+    {
+      std::string resourcePath;
+
+      CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
+      char path[PATH_MAX];
+      if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+        resourcePath = "";
+      else
+        resourcePath = std::string(path) + "/";
+      CFRelease(resourcesURL);
+
+      return resourcePath;
+    }
   };
 
   class GUIHandler
   {
-  public:
-    /**
-     * @brief Construct a new GUIHandler object
-     * @param window The window to render to
-     */
-    GUIHandler(RenderWindow &window);
-
-    /**
-     * @brief Runs the main loop of the GUI, including rendering, input handling, and move making
-     */
-    void runMainLoop();
-
   private:
     ResourceManager &resourceManager = ResourceManager::getInstance();
 
@@ -150,6 +145,19 @@ namespace TungstenChess
 
     std::thread thinkingThread;
 
+  public:
+    /**
+     * @brief Construct a new GUIHandler object
+     * @param window The window to render to
+     */
+    GUIHandler(RenderWindow &window);
+
+    /**
+     * @brief Runs the main loop of the GUI, including rendering, input handling, and move making
+     */
+    void runMainLoop();
+
+  private:
     void loadSquareTextures();
 
     void loadBoardSquares();
