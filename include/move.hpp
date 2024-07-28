@@ -38,38 +38,22 @@ namespace TungstenChess
       PieceType pieceType = piece & TYPE;
 
       if (pieceType == KING && from - to == -2)
-      {
-        this->flags |= KSIDE_CASTLE;
-        return;
-      }
+        flags |= KSIDE_CASTLE;
 
       if (pieceType == KING && from - to == 2)
-      {
-        this->flags |= QSIDE_CASTLE;
-        return;
-      }
+        flags |= QSIDE_CASTLE;
 
       if (pieceType == PAWN && (from - to == 16 || from - to == -16))
-      {
-        this->flags |= PAWN_DOUBLE;
-        return;
-      }
+        flags |= PAWN_DOUBLE;
 
       if (pieceType == PAWN && capturedPiece == EMPTY && (to - from) % 8)
-      {
-        this->flags |= EP_CAPTURE;
-        return;
-      }
+        flags |= EP_CAPTURE;
 
       if (capturedPiece != EMPTY)
-      {
-        this->flags |= CAPTURE;
-      }
+        flags |= CAPTURE;
 
       if (pieceType == PAWN && (to <= 7 || to >= 56))
-      {
-        this->flags |= PROMOTION;
-      }
+        flags |= PROMOTION;
     }
 
     /**

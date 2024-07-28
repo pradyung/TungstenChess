@@ -56,7 +56,7 @@ namespace TungstenChess
     int enPassantFile() const { return m_enPassantFile; }
     int hasCastled() const { return m_hasCastled; }
     int halfmoveClock() const { return m_halfmoveClock; }
-    Bitboard bitboard(Piece piece) const { return m_bitboards[piece]; }
+    const Bitboard &bitboard(Piece piece) const { return m_bitboards[piece]; }
     ZobristKey zobristKey() const { return m_zobristKey; }
     const std::vector<MoveInt> &moveHistory() const { return m_moveHistory; }
     bool isDefaultStartPosition() const { return m_isDefaultStartPosition; }

@@ -4,6 +4,12 @@
 
 #define NULL_MOVE 0
 
+#define DEBUG_MODE false
+
+#define DEF_USE_OPENING_BOOK !DEBUG_MODE
+#define DEF_THREADING !DEBUG_MODE
+#define DEF_PLAYER_COLOR DEBUG_MODE ? EMPTY : WHITE
+
 namespace TungstenChess
 {
   typedef uint8_t Piece;

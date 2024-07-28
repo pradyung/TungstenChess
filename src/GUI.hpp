@@ -18,8 +18,8 @@ using namespace sf;
 
 namespace TungstenChess
 {
-  const int PLAYER_COLOR = WHITE;
-  const bool THREADING = true;
+  const int PLAYER_COLOR = DEF_PLAYER_COLOR;
+  const bool THREADING = DEF_THREADING;
 
   enum Highlights
   {
