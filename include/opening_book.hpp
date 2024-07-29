@@ -10,14 +10,14 @@ namespace TungstenChess
   class OpeningBook
   {
   private:
-    std::vector<uint> openingBook;
-    std::vector<MoveInt> moves;
+    std::vector<uint> m_openingBook;
+    std::vector<MoveInt> m_moves;
 
-    bool inOpeningBook = true;
-    int lastMoveIndex = -1;
+    bool m_inOpeningBook = true;
+    int m_lastMoveIndex = -1;
 
   public:
-    OpeningBook(bool inOpeningBook) : inOpeningBook(inOpeningBook) {}
+    OpeningBook(bool m_inOpeningBook) : m_inOpeningBook(m_inOpeningBook) {}
 
     /**
      * @brief Loads the opening book from a file
@@ -28,12 +28,12 @@ namespace TungstenChess
     {
       std::ifstream file(path);
 
-      openingBook.resize(openingBookSize);
+      m_openingBook.resize(openingBookSize);
 
       // read the file 4 bytes at a time into the book array
       for (size_t i = 0; i < openingBookSize; i++)
       {
-        file.read((char *)&openingBook[i], sizeof(uint));
+        file.read((char *)&m_openingBook[i], sizeof(uint));
       }
 
       file.close();
@@ -46,13 +46,13 @@ namespace TungstenChess
      */
     bool updateMoveHistory(const std::vector<MoveInt> &newMoves)
     {
-      if (!inOpeningBook)
+      if (!m_inOpeningBook)
         return false;
 
-      for (size_t i = moves.size(); i < newMoves.size() && inOpeningBook; i++)
-        inOpeningBook = addMove(newMoves[i]);
+      for (size_t i = m_moves.size(); i < newMoves.size() && m_inOpeningBook; i++)
+        m_inOpeningBook = addMove(newMoves[i]);
 
-      return inOpeningBook;
+      return m_inOpeningBook;
     }
 
     /**
@@ -62,20 +62,20 @@ namespace TungstenChess
      */
     bool addMove(MoveInt move)
     {
-      for (int i = lastMoveIndex + 1;; i++)
+      for (int i = m_lastMoveIndex + 1;; i++)
       {
-        if (openingBook[i] >> 25 == moves.size() - 1)
+        if (m_openingBook[i] >> 25 == m_moves.size() - 1)
         {
           return false;
         }
-        if ((openingBook[i] & 0xFFF) == move && openingBook[i] >> 25 == moves.size())
+        if ((m_openingBook[i] & 0xFFF) == move && m_openingBook[i] >> 25 == m_moves.size())
         {
-          lastMoveIndex = i;
+          m_lastMoveIndex = i;
           break;
         }
       }
 
-      moves.push_back(move);
+      m_moves.push_back(move);
 
       return true;
     }
@@ -93,11 +93,11 @@ namespace TungstenChess
     {
       std::vector<MoveInt> childrenMoves;
 
-      for (size_t i = lastMoveIndex + 1; i < openingBook.size(); i++)
+      for (size_t i = m_lastMoveIndex + 1; i < m_openingBook.size(); i++)
       {
-        if (openingBook[i] >> 25 == moves.size())
-          childrenMoves.push_back(openingBook[i] & 0xFFF);
-        else if (openingBook[i] >> 25 == moves.size() - 1)
+        if (m_openingBook[i] >> 25 == m_moves.size())
+          childrenMoves.push_back(m_openingBook[i] & 0xFFF);
+        else if (m_openingBook[i] >> 25 == m_moves.size() - 1)
           break;
       }
 
@@ -118,7 +118,7 @@ namespace TungstenChess
 
       for (size_t i = 0; i < childrenMoves.size(); i++)
       {
-        totalWeight += openingBook[lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
+        totalWeight += m_openingBook[m_lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
       }
 
       int randomWeight = rand() % totalWeight;
@@ -127,7 +127,7 @@ namespace TungstenChess
 
       for (size_t i = 0; i < childrenMoves.size(); i++)
       {
-        currentWeight += openingBook[lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
+        currentWeight += m_openingBook[m_lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
 
         if (currentWeight > randomWeight)
         {

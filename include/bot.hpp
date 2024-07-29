@@ -16,8 +16,8 @@ namespace TungstenChess
   class Bot
   {
   private:
-    Board &board;
-    OpeningBook openingBook;
+    Board &m_board;
+    OpeningBook m_openingBook;
 
     enum EvaluationConstants : int
     {
@@ -47,7 +47,7 @@ namespace TungstenChess
       bool fixedDepthSearch = true; // as opposed to iterative deepening
     };
 
-    const BotSettings botSettings;
+    const BotSettings m_botSettings;
 
     struct SearchInfo
     {
@@ -55,10 +55,10 @@ namespace TungstenChess
       int depthSearched;
     };
 
-    SearchInfo previousSearchInfo = {0, 0};
+    SearchInfo m_previousSearchInfo = {0, 0};
 
   public:
-    Bot(Board &board, const BotSettings &settings) : board(board), botSettings(settings), openingBook(board.isDefaultStartPosition()) {}
+    Bot(Board &board, const BotSettings &settings) : m_board(board), m_botSettings(settings), m_openingBook(board.isDefaultStartPosition()) {}
 
     Bot(Board &board) : Bot(board, BotSettings()) {}
 
@@ -69,7 +69,7 @@ namespace TungstenChess
      */
     void loadOpeningBook(const std::string path, uint openingBookSize)
     {
-      openingBook.loadOpeningBook(path, openingBookSize);
+      m_openingBook.loadOpeningBook(path, openingBookSize);
     }
 
     /**
@@ -85,7 +85,7 @@ namespace TungstenChess
      */
     std::vector<Move> getSortedLegalMoves(PieceColor color, bool onlyCaptures = false)
     {
-      std::vector<Move> moves = board.getLegalMoves(color, onlyCaptures);
+      std::vector<Move> moves = m_board.getLegalMoves(color, onlyCaptures);
       heuristicSortMoves(moves);
       return moves;
     }
@@ -99,9 +99,9 @@ namespace TungstenChess
     {
       int positionalEvaluation = 0;
 
-      positionalEvaluation = PIECE_EVAL_TABLES[board[pieceIndex]][pieceIndex];
+      positionalEvaluation = PIECE_EVAL_TABLES[m_board[pieceIndex]][pieceIndex];
 
-      if (!absolute && (board[pieceIndex] & BLACK))
+      if (!absolute && (m_board[pieceIndex] & BLACK))
         positionalEvaluation = -positionalEvaluation;
 
       return positionalEvaluation;

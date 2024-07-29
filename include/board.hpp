@@ -23,7 +23,7 @@ namespace TungstenChess
   private:
     std::array<Piece, 64> m_board;
     std::array<Bitboard, ALL_PIECES + 1> m_bitboards;
-    std::array<int, PIECE_NUMBER> m_kingIndices; // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
+    std::array<Piece, PIECE_NUMBER> m_kingIndices; // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
 
     PieceColor m_sideToMove;
 

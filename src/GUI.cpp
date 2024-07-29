@@ -19,7 +19,7 @@ namespace TungstenChess
   {
     this->window = &window;
 
-    bot.loadOpeningBook(resourceManager.openingBookPath, resourceManager.openingBookSize);
+    bot.loadOpeningBook(resourceManager.m_openingBookPath, resourceManager.m_openingBookSize);
 
     loadSquareTextures();
     loadBoardSquares();
@@ -27,7 +27,7 @@ namespace TungstenChess
     loadPieces();
     loadPromotionPieces();
 
-    window.setIcon(resourceManager.icon.getSize().x, resourceManager.icon.getSize().y, resourceManager.icon.getPixelsPtr());
+    window.setIcon(resourceManager.m_icon.getSize().x, resourceManager.m_icon.getSize().y, resourceManager.m_icon.getPixelsPtr());
   }
 
   void GUIHandler::runMainLoop()
@@ -174,7 +174,7 @@ namespace TungstenChess
         redHighlightsSprites[squareIndex].setTexture(squareTextures[RED_HIGHLIGHT]);
         yellowHighlightsSprites[squareIndex].setTexture(squareTextures[YELLOW_HIGHLIGHT]);
         grayHighlightsSprites[squareIndex].setTexture(squareTextures[GRAY_HIGHLIGHT]);
-        yellowOutlineSprites[squareIndex].setTexture(resourceManager.yellowOutlineTexture);
+        yellowOutlineSprites[squareIndex].setTexture(resourceManager.m_yellowOutlineTexture);
 
         boardSquares[squareIndex].setPosition(getSquareCoordinates(j, i));
         redHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
@@ -193,7 +193,7 @@ namespace TungstenChess
     {
       for (int j = 0; j < PIECE_NUMBER; j++)
       {
-        pieceSprites[j][i].setTexture(resourceManager.pieceTextures[j]);
+        pieceSprites[j][i].setTexture(resourceManager.m_pieceTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
         pieceSprites[j][i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
       }
@@ -206,8 +206,8 @@ namespace TungstenChess
   {
     for (int i = 0; i < 4; i++)
     {
-      whitePromotionPieces[i].setTexture(resourceManager.pieceTextures[WHITE_QUEEN - i]);
-      blackPromotionPieces[i].setTexture(resourceManager.pieceTextures[BLACK_QUEEN - i]);
+      whitePromotionPieces[i].setTexture(resourceManager.m_pieceTextures[WHITE_QUEEN - i]);
+      blackPromotionPieces[i].setTexture(resourceManager.m_pieceTextures[BLACK_QUEEN - i]);
 
       whitePromotionPieces[i].setPosition(getSquareCoordinates(10 + i));
       blackPromotionPieces[i].setPosition(getSquareCoordinates(50 + i));
@@ -243,7 +243,7 @@ namespace TungstenChess
 
     if (draggingPieceIndex != NO_SQUARE)
     {
-      draggingPieceSprite.setTexture(resourceManager.pieceTextures[board[draggingPieceIndex]]);
+      draggingPieceSprite.setTexture(resourceManager.m_pieceTextures[board[draggingPieceIndex]]);
       draggingPieceSprite.setPosition(Mouse::getPosition(*window).x - SQUARE_SIZE / 2, Mouse::getPosition(*window).y - SQUARE_SIZE / 2);
       window->draw(draggingPieceSprite);
     }
