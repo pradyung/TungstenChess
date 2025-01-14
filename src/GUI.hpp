@@ -120,9 +120,9 @@ namespace TungstenChess
 
     std::array<Sprite, 64> pieceSprites[PIECE_NUMBER];
 
-    Bitboard redHighlightsBitboard;
-    Bitboard yellowHighlightsBitboard;
-    Bitboard grayHighlightsBitboard;
+    Bitboard redHighlightsBitboard = 0;
+    Bitboard yellowHighlightsBitboard = 0;
+    Bitboard grayHighlightsBitboard = 0;
 
     int yellowOutlineIndex = NO_SQUARE;
 
