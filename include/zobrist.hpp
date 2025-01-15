@@ -15,11 +15,9 @@ namespace TungstenChess
      */
     static void init()
     {
-      static bool initialized = false;
-
+      static once<false> initialized;
       if (initialized)
         return;
-      initialized = true;
 
       std::random_device rd;
       std::mt19937_64 gen(rd());

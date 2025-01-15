@@ -69,7 +69,9 @@ namespace TungstenChess
      */
     void loadOpeningBook(const std::string path, uint openingBookSize)
     {
-      m_openingBook.loadOpeningBook(path, openingBookSize);
+      static once<false> openingBookLoaded;
+      if (!openingBookLoaded)
+        m_openingBook.loadOpeningBook(path, openingBookSize);
     }
 
     /**

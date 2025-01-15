@@ -14,11 +14,9 @@ namespace TungstenChess
      */
     static void init()
     {
-      static bool initialized = false;
-
+      static once<false> initialized;
       if (initialized)
         return;
-      initialized = true;
 
       initKnightMoves();
       initKingMoves();

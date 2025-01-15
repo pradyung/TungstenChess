@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <mutex>
 
 #define NULL_MOVE 0
 
@@ -24,6 +25,25 @@ namespace TungstenChess
 
   typedef uint64_t Magic;
   typedef uint8_t Shift;
+
+  template <bool B>
+  struct once
+  {
+    operator bool()
+    {
+      std::lock_guard<std::mutex> lock(mtx);
+      if (value == B)
+      {
+        value = !B;
+        return B;
+      }
+      return !B;
+    }
+
+  private:
+    bool value = B;
+    std::mutex mtx;
+  };
 
   enum CastlingRights : uint8_t
   {
