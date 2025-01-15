@@ -7,72 +7,19 @@
 
 namespace TungstenChess
 {
-  struct Move
+  class Moves
   {
-    uint8_t from;
-    uint8_t to;
-    Piece piece;
-    Piece capturedPiece;
-    PieceType promotionPieceType;
-
-    uint8_t castlingRights_enPassantFile; // 0xF0: castling rights, 0x0F: en passant file, grouped together to save space and fit Move object into 8 bytes
-
-    uint8_t halfmoveClock;
-
-    uint8_t flags;
-
-    Move() = default;
-
-    /**
-     * @param from The square the piece is moving from
-     * @param to The square the piece is moving to
-     * @param piece The piece that is moving
-     * @param capturedPiece The piece that is being captured, if any
-     * @param enPassantFile The current state of the en passant file, used to restore it when the move is unmade
-     * @param castlingRights The current state of the castling rights, used to restore them when the move is unmade
-     * @param promotionPieceType The piece that the moving piece is being promoted to, if any (only piece type)
-     */
-    Move(int from, int to, Piece piece, Piece capturedPiece, int castlingRights, int enPassantFile, int halfmoveClock, PieceType promotionPieceType = EMPTY)
-        : from(from), to(to), piece(piece), capturedPiece(capturedPiece), castlingRights_enPassantFile((castlingRights << 4) | enPassantFile), halfmoveClock(halfmoveClock), promotionPieceType(promotionPieceType), flags(NORMAL)
-    {
-      PieceType pieceType = piece & TYPE;
-
-      if (pieceType == KING && from - to == -2)
-        flags |= KSIDE_CASTLE;
-
-      if (pieceType == KING && from - to == 2)
-        flags |= QSIDE_CASTLE;
-
-      if (pieceType == PAWN && (from - to == 16 || from - to == -16))
-        flags |= PAWN_DOUBLE;
-
-      if (pieceType == PAWN && capturedPiece == EMPTY && (to - from) % 8)
-        flags |= EP_CAPTURE;
-
-      if (capturedPiece != EMPTY)
-        flags |= CAPTURE;
-
-      if (pieceType == PAWN && (to <= 7 || to >= 56))
-        flags |= PROMOTION;
-    }
-
-    /**
-     * @param move The move to copy
-     * @param promotionPieceType The new promotion piece type
-     */
-    Move(const Move &move, PieceType promotionPieceType) : from(move.from), to(move.to), piece(move.piece), capturedPiece(move.capturedPiece), castlingRights_enPassantFile(move.castlingRights_enPassantFile), halfmoveClock(move.halfmoveClock), promotionPieceType(promotionPieceType), flags(move.flags) {}
-
-    /**
-     * Returns an integer representation of the move
-     */
-    MoveInt toInt() const { return from | (to << 6); }
-
+  public:
     /**
      * Returns a UCI string representation of the move
      */
-    std::string getUCI() const
+    static std::string getUCI(Move move)
     {
       std::string uci = "";
+
+      uint8_t from = move & FROM;
+      uint8_t to = (move & TO) >> 6;
+      uint8_t promotionPieceType = (move & PROMOTION) >> 12;
 
       uci += 'a' + (from % 8);
       uci += '8' - (from / 8);
@@ -83,6 +30,56 @@ namespace TungstenChess
         uci += ".pnbrqk"[promotionPieceType];
 
       return uci;
+    }
+
+    /**
+     * Creates a move
+     * @param from The square the piece is moving from
+     * @param to The square the piece is moving to
+     * @param promotionPieceType The piece type to promote to (if any)
+     */
+    static Move createMove(Square from, Square to, PieceType promotionPieceType = EMPTY)
+    {
+      return from | (to << 6) | (promotionPieceType << 12);
+    }
+
+    /**
+     * Returns the move flags for a move
+     * @param from The square the piece is moving from
+     * @param to The square the piece is moving to
+     * @param pieceType The type of the piece moving
+     * @param capturedPiece The piece being captured (if any)
+     */
+    static uint8_t getMoveFlags(Square from, Square to, PieceType pieceType, Piece capturedPiece)
+    {
+      if (pieceType == KING)
+      {
+        if (from - to == -2)
+          return KSIDE_CASTLE;
+        if (from - to == 2)
+          return QSIDE_CASTLE;
+      }
+      else if (pieceType == PAWN)
+      {
+        if (from - to == 16 || from - to == -16)
+          return PAWN_DOUBLE;
+        else if (capturedPiece == EMPTY && (to - from) % 8)
+          return EP_CAPTURE;
+        else if (to <= 7 || to >= 56)
+          return PROMOTION | bool(capturedPiece);
+      }
+
+      return bool(capturedPiece);
+    }
+
+    /**
+     * Checks if a move is a promotion
+     * @param to The square the piece is moving to
+     * @param pieceType The type of the piece moving (only matters if it's a pawn)
+     */
+    static bool isPromotion(Square to, PieceType pieceType)
+    {
+      return (pieceType == PAWN && (to <= 7 || to >= 56));
     }
   };
 }

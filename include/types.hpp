@@ -17,7 +17,9 @@ namespace TungstenChess
   typedef uint8_t PieceColor;
   typedef uint8_t PieceType;
 
-  typedef uint16_t MoveInt;
+  typedef uint16_t Move;
+
+  typedef uint8_t Square;
 
   typedef uint64_t Bitboard;
 
@@ -77,6 +79,14 @@ namespace TungstenChess
     CASTLE = KSIDE_CASTLE | QSIDE_CASTLE
   };
 
+  enum MoveMasks : uint16_t
+  {
+    FROM = 0x3F,
+    TO = 0xFC0,
+    BASE = FROM | TO,
+    PROMOTION_PIECE = 0x7000
+  };
+
   enum FenParts : uint8_t
   {
     FEN_BOARD = 0,
@@ -103,6 +113,14 @@ namespace TungstenChess
     QUEEN = 5,
     KING = 6,
     PIECE_TYPE_NUMBER = 7
+  };
+
+  enum MovePromotions : uint16_t
+  {
+    KNIGHT_PROMOTION = KNIGHT << 12,
+    BISHOP_PROMOTION = BISHOP << 12,
+    ROOK_PROMOTION = ROOK << 12,
+    QUEEN_PROMOTION = QUEEN << 12
   };
 
   enum PieceColors : PieceColor

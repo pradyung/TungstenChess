@@ -2,29 +2,18 @@
 
 namespace TungstenChess
 {
-  Move Bot::generateMoveFromInt(MoveInt moveInt)
-  {
-    int from = moveInt & 0x3f;
-    int to = (moveInt >> 6) & 0x3f;
-
-    Piece piece = m_board[from];
-    int capturedPiece = m_board[to];
-
-    return Move(from, to, piece, capturedPiece, m_board.castlingRights(), m_board.enPassantFile(), m_board.halfmoveClock());
-  }
-
   Move Bot::generateBotMove()
   {
     if (m_botSettings.useOpeningBook && m_openingBook.updateMoveHistory(m_board.moveHistory()))
     {
-      MoveInt moveInt = m_openingBook.getNextMove();
+      Move moveInt = m_openingBook.getNextMove();
 
       if (moveInt != NULL_MOVE)
       {
-        Move bestMove = generateMoveFromInt(moveInt);
+        Move bestMove = moveInt & BASE;
 
         if (m_botSettings.logSearchInfo)
-          std::cout << "Book move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : bestMove.getUCI()) << std::endl;
+          std::cout << "Book move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << std::endl;
 
         return bestMove;
       }
@@ -34,13 +23,15 @@ namespace TungstenChess
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    Move bestMove = m_botSettings.fixedDepthSearch ? generateBestMove(m_botSettings.maxSearchDepth) : iterativeDeepening(m_botSettings.maxSearchTime, start);
+    int evaluation = 0;
+    Move bestMove = m_botSettings.fixedDepthSearch ? generateBestMove(m_botSettings.maxSearchDepth, &evaluation) : iterativeDeepening(m_botSettings.maxSearchTime, start, &evaluation);
 
     if (m_botSettings.logSearchInfo)
-      std::cout << "Move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : bestMove.getUCI()) << ", "
+      std::cout << "Move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << ", "
                 << "Depth: " << m_previousSearchInfo.depthSearched << ", "
                 << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms, "
-                << "Positions evaluated: " << m_previousSearchInfo.positionsEvaluated << std::endl;
+                << "Positions evaluated: " << m_previousSearchInfo.positionsEvaluated << ", "
+                << "Evaluation: " << (evaluation * (m_board.sideToMove() == WHITE ? 1 : -1)) << std::endl;
 
     return bestMove;
   }
@@ -49,7 +40,7 @@ namespace TungstenChess
   {
     m_previousSearchInfo.positionsEvaluated++;
 
-    int gameStatus = m_board.getGameStatus(m_board.sideToMove());
+    GameStatus gameStatus = m_board.getGameStatus(m_board.sideToMove());
 
     if (gameStatus != NO_MATE)
     {
@@ -94,13 +85,13 @@ namespace TungstenChess
 
     while (allPieces)
     {
-      int pieceIndex = Bitboards::popBit(allPieces);
+      Square pieceIndex = Bitboards::popBit(allPieces);
 
       positionalEvaluation += getPiecePositionalEvaluation(pieceIndex);
     }
 
     {
-      int whiteKingIndex = m_board.kingIndex(WHITE_KING);
+      Square whiteKingIndex = m_board.kingIndex(WHITE_KING);
 
       Bitboard enemyPieces = blackPieces | m_board.bitboard(BLACK_PAWN);
       Bitboard friendlyPieces = whitePieces;
@@ -120,7 +111,7 @@ namespace TungstenChess
     }
 
     {
-      int blackKingIndex = m_board.kingIndex(BLACK_KING);
+      Square blackKingIndex = m_board.kingIndex(BLACK_KING);
 
       Bitboard enemyPieces = whitePieces | m_board.bitboard(WHITE_PAWN);
       Bitboard friendlyPieces = blackPieces;
@@ -165,10 +156,10 @@ namespace TungstenChess
     if (m_board.hasCastled() & BLACK)
       evaluationBonus -= CASTLED_KING_BONUS;
 
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
-      int file = i % 8;
-      int rank = i / 8;
+      Square file = i % 8;
+      Square rank = i / 8;
 
       if (rank == 0)
       {
@@ -264,16 +255,14 @@ namespace TungstenChess
 
     std::vector<Move> legalMoves = getSortedLegalMoves(m_board.sideToMove(), quiesce);
 
-    int legalMovesCount = legalMoves.size();
-
-    if (legalMovesCount == 0)
+    if (legalMoves.empty())
       return quiesce ? standPat : (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY : -STALEMATE_PENALTY);
 
     for (Move &move : legalMoves)
     {
-      m_board.makeMove(move);
+      Board::UnmoveData unmoveData = m_board.makeMove(move);
       int evaluation = -negamax(depth - 1, -beta, -alpha, quiesce);
-      m_board.unmakeMove(move);
+      m_board.unmakeMove(move, unmoveData);
 
       if (evaluation > alpha)
       {
@@ -281,52 +270,55 @@ namespace TungstenChess
 
         if (alpha >= beta)
           return beta;
+
+        if (!quiesce && alpha >= POSITIVE_INFINITY)
+          break;
       }
     }
 
     return alpha;
   }
 
-  Move Bot::generateBestMove(int depth)
+  Move Bot::generateBestMove(int depth, int *evaluation)
   {
     m_previousSearchInfo.depthSearched = depth;
 
     std::vector<Move> legalMoves = getSortedLegalMoves(m_board.sideToMove());
-
-    int legalMovesCount = legalMoves.size();
 
     Move &bestMove = legalMoves[0];
     int alpha = NEGATIVE_INFINITY;
 
     for (Move &move : legalMoves)
     {
-      m_board.makeMove(move);
+      Board::UnmoveData unmoveData = m_board.makeMove(move);
       int evaluation = -negamax(depth - 1, NEGATIVE_INFINITY, -alpha, false);
-      m_board.unmakeMove(move);
+      m_board.unmakeMove(move, unmoveData);
 
       if (evaluation > alpha)
       {
         alpha = evaluation;
         bestMove = move;
+
+        if (alpha >= POSITIVE_INFINITY)
+          break;
       }
     }
+
+    *evaluation = alpha;
 
     return bestMove;
   }
 
-  Move Bot::iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start)
+  Move Bot::iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start, int *evaluation)
   {
     int depth = m_botSettings.minSearchDepth;
 
-    Move bestMove = generateBestMove(depth);
+    Move bestMove = generateBestMove(depth, evaluation);
 
     while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() < time)
     {
       depth++;
-
-      Move newBestMove = generateBestMove(depth);
-
-      bestMove = newBestMove;
+      bestMove = generateBestMove(depth, evaluation);
     }
 
     return bestMove;
@@ -342,10 +334,14 @@ namespace TungstenChess
   {
     int evaluation = 0;
 
-    evaluation += PIECE_VALUES[move.capturedPiece & TYPE] * (move.flags & CAPTURE);
-    evaluation += PIECE_VALUES[move.promotionPieceType] * (move.flags & PROMOTION);
+    uint8_t from = move & FROM;
+    uint8_t to = (move & TO) >> 6;
+    PieceType promotionPieceType = (move & PROMOTION_PIECE) >> 12;
 
-    evaluation += getPiecePositionalEvaluation(move.to, true) - getPiecePositionalEvaluation(move.from, true);
+    evaluation += PIECE_VALUES[m_board[to] & TYPE];
+    evaluation += PIECE_VALUES[promotionPieceType];
+
+    evaluation += getPiecePositionalEvaluation(to, true) - getPiecePositionalEvaluation(from, true);
 
     return evaluation;
   }

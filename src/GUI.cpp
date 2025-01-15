@@ -57,19 +57,19 @@ namespace TungstenChess
         {
           if (event.mouseButton.button == Mouse::Left && !gameOver)
           {
-            int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
+            Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
             if (!(board.sideToMove() & board[index]) && !awaitingPromotion)
               continue;
 
             if (awaitingPromotion)
             {
-              int promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
+              Piece promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
               if (promotionPiece == EMPTY || !(promotionPiece & board.sideToMove()))
                 continue;
 
-              promotionMove.promotionPieceType = promotionPiece & TYPE;
+              promotionMove |= (promotionPiece & TYPE) << 12;
 
               draggingPieceIndex = NO_SQUARE;
 
@@ -103,11 +103,11 @@ namespace TungstenChess
               continue;
             }
 
-            int index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
+            Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-            Move move(draggingPieceIndex, index, board[draggingPieceIndex], board[index], board.castlingRights(), board.enPassantFile(), board.halfmoveClock());
+            Move move = Moves::createMove(draggingPieceIndex, index);
 
-            if (!(move.flags & PROMOTION))
+            if (!Moves::isPromotion(index, board[draggingPieceIndex] & TYPE))
             {
               makeMove(move);
             }
@@ -165,7 +165,7 @@ namespace TungstenChess
 
   void GUIHandler::loadBoardSquares()
   {
-    int squareIndex = 0;
+    Square squareIndex = 0;
     for (int i = 0; i < 8; i++)
     {
       for (int j = 0; j < 8; j++)
@@ -189,9 +189,9 @@ namespace TungstenChess
 
   void GUIHandler::loadPieces()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
-      for (int j = 0; j < PIECE_NUMBER; j++)
+      for (Piece j = 0; j < PIECE_NUMBER; j++)
       {
         pieceSprites[j][i].setTexture(resourceManager.m_pieceTextures[j]);
         pieceSprites[j][i].setPosition(getSquareCoordinates(i));
@@ -219,7 +219,7 @@ namespace TungstenChess
 
   void GUIHandler::drawBoardSquares()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
       window->draw(boardSquares[i]);
     }
@@ -227,9 +227,9 @@ namespace TungstenChess
 
   void GUIHandler::drawPieces()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
-      if (draggingPieceIndex == i || (awaitingPromotion && promotionMove.from == i))
+      if (draggingPieceIndex == i || (awaitingPromotion && (promotionMove & FROM) == i))
         continue;
 
       if (!isThinking)
@@ -251,7 +251,7 @@ namespace TungstenChess
 
   void GUIHandler::drawHighlights()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
       if (Bitboards::hasBit(redHighlightsBitboard, i))
         window->draw(redHighlightsSprites[i]);
@@ -287,7 +287,7 @@ namespace TungstenChess
     grayHighlightsBitboard = 0;
   }
 
-  void GUIHandler::clearHighlights(int highlight)
+  void GUIHandler::clearHighlights(Highlight highlight)
   {
     if (highlight == RED_HIGHLIGHT)
       redHighlightsBitboard = 0;
@@ -299,7 +299,10 @@ namespace TungstenChess
 
   void GUIHandler::makeMove(Move move)
   {
-    if (move.from == move.to)
+    uint8_t from = move & FROM;
+    uint8_t to = (move & TO) >> 6;
+
+    if (from == to)
       return;
 
     board.makeMove(move);
@@ -309,7 +312,7 @@ namespace TungstenChess
     if (board.isInCheck(board.sideToMove()))
       Bitboards::addBit(redHighlightsBitboard, board.kingIndex(board.sideToMove() | KING));
 
-    int gameStatus = board.getGameStatus(board.sideToMove());
+    GameStatus gameStatus = board.getGameStatus(board.sideToMove());
 
     if (gameStatus)
     {
@@ -325,8 +328,8 @@ namespace TungstenChess
       }
     }
 
-    Bitboards::addBit(yellowHighlightsBitboard, move.from);
-    Bitboards::addBit(yellowHighlightsBitboard, move.to);
+    Bitboards::addBit(yellowHighlightsBitboard, from);
+    Bitboards::addBit(yellowHighlightsBitboard, to);
   }
 
   void GUIHandler::makeBotMove()
@@ -340,7 +343,7 @@ namespace TungstenChess
 
   void GUIHandler::saveBufferBoard()
   {
-    for (int i = 0; i < 64; i++)
+    for (Square i = 0; i < 64; i++)
     {
       bufferBoard[i] = board[i];
     }

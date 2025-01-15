@@ -14,14 +14,14 @@ using namespace sf;
 #define SQUARE_SIZE 100
 #define SPRITE_SIZE 100.0f
 
-#define NO_SQUARE -1
+#define NO_SQUARE 64
 
 namespace TungstenChess
 {
-  const int PLAYER_COLOR = DEF_PLAYER_COLOR;
+  const PieceColor PLAYER_COLOR = DEF_PLAYER_COLOR;
   const bool THREADING = DEF_THREADING;
 
-  enum Highlights
+  enum Highlight
   {
     WHITE_SQUARE = 0,
     BLACK_SQUARE = 1,
@@ -124,14 +124,14 @@ namespace TungstenChess
     Bitboard yellowHighlightsBitboard = 0;
     Bitboard grayHighlightsBitboard = 0;
 
-    int yellowOutlineIndex = NO_SQUARE;
+    Square yellowOutlineIndex = NO_SQUARE;
 
     Sprite redHighlightsSprites[64];
     Sprite yellowHighlightsSprites[64];
     Sprite grayHighlightsSprites[64];
     Sprite yellowOutlineSprites[64];
 
-    int draggingPieceIndex = NO_SQUARE;
+    Square draggingPieceIndex = NO_SQUARE;
     Sprite draggingPieceSprite;
 
     Sprite whitePromotionPieces[4];
@@ -167,7 +167,7 @@ namespace TungstenChess
     void loadPromotionPieces();
 
     void clearHighlights();
-    void clearHighlights(int highlight);
+    void clearHighlights(Highlight highlight);
 
     void makeMove(Move move);
     void makeBotMove();
@@ -182,11 +182,11 @@ namespace TungstenChess
     void drawHighlights();
     void drawPromotionPieces();
 
-    static int getSquareIndex(int x, int y) { return (y / SQUARE_SIZE) * 8 + (x / SQUARE_SIZE); }
+    static Square getSquareIndex(int x, int y) { return (y / SQUARE_SIZE) * 8 + (x / SQUARE_SIZE); }
 
-    static int getPromotionPiece(int x, int y)
+    static Piece getPromotionPiece(int x, int y)
     {
-      int index = getSquareIndex(x, y);
+      Square index = getSquareIndex(x, y);
 
       switch (index)
       {
@@ -211,7 +211,7 @@ namespace TungstenChess
       }
     }
 
-    static Vector2f getSquareCoordinates(int index) { return getSquareCoordinates(index % 8, index / 8); }
-    static Vector2f getSquareCoordinates(int x, int y) { return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE); }
+    static Vector2f getSquareCoordinates(Square index) { return getSquareCoordinates(index % 8, index / 8); }
+    static Vector2f getSquareCoordinates(Square x, Square y) { return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE); }
   };
 }

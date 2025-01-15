@@ -97,7 +97,7 @@ namespace TungstenChess
      * @param pieceIndex The index of the piece
      * @param absolute Whether to return the value of the evaluation as if the piece was white (true for heuristic evaluation, false for static evaluation)
      */
-    int getPiecePositionalEvaluation(int pieceIndex, bool absolute = false) const
+    int getPiecePositionalEvaluation(Square pieceIndex, bool absolute = false) const
     {
       int positionalEvaluation = 0;
 
@@ -110,18 +110,12 @@ namespace TungstenChess
     }
 
     /**
-     * @brief Generates a move from the integer representation, used for opening book parsing (see Move::toInt())
-     * @param moveInt The integer representation of the move
-     */
-    Move generateMoveFromInt(MoveInt moveInt);
-
-    /**
      * @brief Generates the best move for the bot
      * @param depth The depth to search to
      * @param alpha The alpha value for alpha-beta pruning (should not be set outside of recursive calls)
      * @param beta The beta value for alpha-beta pruning (should not be set outside of recursive calls)
      */
-    Move generateBestMove(int depth);
+    Move generateBestMove(int depth, int *evaluation = nullptr);
 
     /**
      * @brief Uses iterative deepening to find the best move in a constant amount of time
@@ -129,7 +123,7 @@ namespace TungstenChess
      *             It will not stop in the middle of a search, so the actual time spent may be significantly longer than the time parameter)
      * @param start The time the search started, used to check if the time has run out
      */
-    Move iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start);
+    Move iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start, int *evaluation = nullptr);
 
     /**
      * @brief Gets the static evaluation of the current position, from the perspective of the side to move

@@ -43,7 +43,7 @@ namespace TungstenChess
      */
     static void initKnightMoves()
     {
-      for (int square = 0; square < 64; square++)
+      for (Square square = 0; square < 64; square++)
       {
         Bitboard position = 1ULL << square;
 
@@ -73,22 +73,20 @@ namespace TungstenChess
      */
     static void initKingMoves()
     {
-      for (int square = 0; square < 64; square++)
+      for (Square square = 0; square < 64; square++)
       {
-        Bitboard position = 1ULL << square;
-
         KING_MOVES[square] = 0ULL;
 
         int offsets[8] = {-1, 0, 1};
-        int rank = square / 8;
-        int file = square % 8;
+        Square rank = square / 8;
+        Square file = square % 8;
 
         for (int dr = 0; dr < 3; dr++)
         {
           for (int df = 0; df < 3; df++)
           {
-            int toRank = rank + offsets[dr];
-            int toFile = file + offsets[df];
+            Square toRank = rank + offsets[dr];
+            Square toFile = file + offsets[df];
 
             if (toRank < 0 || toRank > 7 || toFile < 0 || toFile > 7 || (dr == 1 && df == 1))
               continue;
@@ -104,7 +102,7 @@ namespace TungstenChess
      */
     static void initPawnMoves()
     {
-      for (int square = 0; square < 64; square++)
+      for (Square square = 0; square < 64; square++)
       {
         Bitboard position = 1ULL << square;
 
@@ -147,7 +145,7 @@ namespace TungstenChess
      */
     static void initBishopMasks()
     {
-      for (int square = 0; square < 64; square++)
+      for (Square square = 0; square < 64; square++)
       {
         BISHOP_MASKS[square] = 0;
 
@@ -157,7 +155,7 @@ namespace TungstenChess
 
         for (int i = 0; i < 4; i++)
         {
-          int to = square;
+          Square to = square;
 
           while (true)
           {
@@ -179,13 +177,13 @@ namespace TungstenChess
      */
     static void initRookMasks()
     {
-      for (int square = 0; square < 64; square++)
+      for (Square square = 0; square < 64; square++)
       {
         ROOK_MASKS[square] = 0;
 
         for (int i = 0; i < 4; i++)
         {
-          int to = square;
+          Square to = square;
 
           int directions[4] = {-8, -1, 1, 8};
           int rankEdges[4] = {0, -1, -1, 7};

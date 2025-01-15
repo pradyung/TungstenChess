@@ -23,8 +23,8 @@ namespace TungstenChess
       std::mt19937_64 gen(rd());
       std::uniform_int_distribution<ZobristKey> dis(0, 0xFFFFFFFFFFFFFFFF);
 
-      for (int i = 0; i < 64; i++)
-        for (int j : validPieces)
+      for (Square i = 0; i < 64; i++)
+        for (Piece j : validPieces)
           pieceKeys[i][j] = dis(gen);
 
       for (int i = 0; i < 16; i++)
@@ -35,9 +35,9 @@ namespace TungstenChess
 
       sideKey = dis(gen);
 
-      for (int i = 0; i < 64; i++)
-        for (int j : validPieces)
-          for (int k : validPieces)
+      for (Square i = 0; i < 64; i++)
+        for (Piece j : validPieces)
+          for (Piece k : validPieces)
             precomputedPieceCombinationKeys[i | (j << 6) | (k << 11)] = pieceKeys[i][j] ^ pieceKeys[i][k];
     }
 
@@ -48,7 +48,7 @@ namespace TungstenChess
      * @param before The piece that was on the square before
      * @param after The piece that is on the square now
      */
-    static ZobristKey getPieceCombinationKey(int square, int before, int after)
+    static ZobristKey getPieceCombinationKey(Square square, Square before, Square after)
     {
       return precomputedPieceCombinationKeys[square | (before << 6) | (after << 11)];
     }

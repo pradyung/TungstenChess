@@ -11,7 +11,7 @@ namespace TungstenChess
   {
   private:
     std::vector<uint> m_openingBook;
-    std::vector<MoveInt> m_moves;
+    std::vector<Move> m_moves;
 
     bool m_inOpeningBook = true;
     int m_lastMoveIndex = -1;
@@ -44,7 +44,7 @@ namespace TungstenChess
      * @param moves The moves to update the history with
      * @return Whether the moves were added successfully - if false, the moves are not in the opening book
      */
-    bool updateMoveHistory(const std::vector<MoveInt> &newMoves)
+    bool updateMoveHistory(const std::vector<Move> &newMoves)
     {
       if (!m_inOpeningBook)
         return false;
@@ -60,7 +60,7 @@ namespace TungstenChess
      * @param move The move to add
      * @return Whether the move was added successfully - if false, the move is not in the opening book
      */
-    bool addMove(MoveInt move)
+    bool addMove(Move move)
     {
       for (int i = m_lastMoveIndex + 1;; i++)
       {
@@ -83,15 +83,15 @@ namespace TungstenChess
     /**
      * @brief Gets the next move from the opening book, randomly selected weighted by the frequency of the moves
      */
-    MoveInt getNextMove() const { return getWeightedRandomMove(); }
+    Move getNextMove() const { return getWeightedRandomMove(); }
 
   private:
     /**
      * @brief Gets the next possible "children" moves from the opening book
      */
-    std::vector<MoveInt> getChildrenMoves() const
+    std::vector<Move> getChildrenMoves() const
     {
-      std::vector<MoveInt> childrenMoves;
+      std::vector<Move> childrenMoves;
 
       for (size_t i = m_lastMoveIndex + 1; i < m_openingBook.size(); i++)
       {
@@ -107,9 +107,9 @@ namespace TungstenChess
     /**
      * @brief Gets a random next move, weighted by the frequency of the children moves
      */
-    MoveInt getWeightedRandomMove() const
+    Move getWeightedRandomMove() const
     {
-      std::vector<MoveInt> childrenMoves = getChildrenMoves();
+      std::vector<Move> childrenMoves = getChildrenMoves();
 
       if (childrenMoves.size() == 0)
         return NULL_MOVE;
