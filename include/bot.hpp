@@ -53,6 +53,7 @@ namespace TungstenChess
     {
       int positionsEvaluated;
       int depthSearched;
+      int evaluation;
     };
 
     SearchInfo m_previousSearchInfo = {0, 0};
@@ -115,7 +116,7 @@ namespace TungstenChess
      * @param alpha The alpha value for alpha-beta pruning (should not be set outside of recursive calls)
      * @param beta The beta value for alpha-beta pruning (should not be set outside of recursive calls)
      */
-    Move generateBestMove(int depth, int *evaluation = nullptr);
+    Move generateBestMove(int depth);
 
     /**
      * @brief Uses iterative deepening to find the best move in a constant amount of time
@@ -123,7 +124,7 @@ namespace TungstenChess
      *             It will not stop in the middle of a search, so the actual time spent may be significantly longer than the time parameter)
      * @param start The time the search started, used to check if the time has run out
      */
-    Move iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start, int *evaluation = nullptr);
+    Move iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start);
 
     /**
      * @brief Gets the static evaluation of the current position, from the perspective of the side to move

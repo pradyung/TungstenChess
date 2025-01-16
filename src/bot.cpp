@@ -23,15 +23,14 @@ namespace TungstenChess
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    int evaluation = 0;
-    Move bestMove = m_botSettings.fixedDepthSearch ? generateBestMove(m_botSettings.maxSearchDepth, &evaluation) : iterativeDeepening(m_botSettings.maxSearchTime, start, &evaluation);
+    Move bestMove = m_botSettings.fixedDepthSearch ? generateBestMove(m_botSettings.maxSearchDepth) : iterativeDeepening(m_botSettings.maxSearchTime, start);
 
     if (m_botSettings.logSearchInfo)
       std::cout << "Move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << "\t"
                 << "Depth: " << m_previousSearchInfo.depthSearched << "\t"
                 << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms\t"
                 << "Positions evaluated: " << m_previousSearchInfo.positionsEvaluated << "\t"
-                << "Evaluation: " << (evaluation * (m_board.sideToMove() == WHITE ? 1 : -1)) << std::endl;
+                << "Evaluation: " << (m_previousSearchInfo.evaluation * (m_board.sideToMove() == WHITE ? 1 : -1)) << std::endl;
 
     return bestMove;
   }
@@ -282,7 +281,7 @@ namespace TungstenChess
     return alpha;
   }
 
-  Move Bot::generateBestMove(int depth, int *evaluation)
+  Move Bot::generateBestMove(int depth)
   {
     m_previousSearchInfo.depthSearched = depth;
 
@@ -307,21 +306,21 @@ namespace TungstenChess
       }
     }
 
-    *evaluation = alpha;
+    m_previousSearchInfo.evaluation = alpha;
 
     return bestMove;
   }
 
-  Move Bot::iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start, int *evaluation)
+  Move Bot::iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start)
   {
     int depth = m_botSettings.minSearchDepth;
 
-    Move bestMove = generateBestMove(depth, evaluation);
+    Move bestMove = generateBestMove(depth);
 
     while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() < time)
     {
       depth++;
-      bestMove = generateBestMove(depth, evaluation);
+      bestMove = generateBestMove(depth);
     }
 
     return bestMove;
