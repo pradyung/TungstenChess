@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <algorithm>
+#include <thread>
 
 #include "board.hpp"
 #include "opening_book.hpp"
@@ -37,14 +38,14 @@ namespace TungstenChess
 
     struct BotSettings
     {
-      int maxSearchTime = 500;                    // In milliseconds, not a hard limit
+      int maxSearchTime = 1000;                   // In milliseconds
       int minSearchDepth = 3;                     // for iterative deepening
       int maxSearchDepth = 5;                     // for fixed depth search
       int quiesceDepth = -1;                      // for quiescence search, set to -1 to search indefinitely (recommended)
       bool useOpeningBook = DEF_USE_OPENING_BOOK; // only used if board starting position is default
       bool logSearchInfo = true;
-      bool logPGNMoves = true;      // as opposed to UCI moves
-      bool fixedDepthSearch = true; // as opposed to iterative deepening
+      bool logPGNMoves = true;
+      bool fixedDepthSearch = false; // as opposed to iterative deepening
     };
 
     const BotSettings m_botSettings;
@@ -58,10 +59,40 @@ namespace TungstenChess
 
     SearchInfo m_previousSearchInfo = {0, 0};
 
+    std::atomic<bool> m_searchCancelled = false;
+    std::thread m_searchTimerThread;
+    std::condition_variable m_searchTimerEvent;
+    std::mutex m_searchTimerMutex;
+
   public:
-    Bot(Board &board, const BotSettings &settings) : m_board(board), m_botSettings(settings), m_openingBook(board.isDefaultStartPosition()) {}
+    Bot(Board &board, const BotSettings &settings) : m_board(board), m_botSettings(settings), m_openingBook(board.isDefaultStartPosition())
+    {
+      if (m_botSettings.maxSearchTime > 0)
+      {
+        m_searchTimerThread = std::thread(
+            [this]()
+            {
+              while (true)
+              {
+                std::unique_lock<std::mutex> lock(m_searchTimerMutex);
+                m_searchTimerEvent.wait(lock);
+                std::this_thread::sleep_for(std::chrono::milliseconds(m_botSettings.maxSearchTime));
+                m_searchCancelled = true;
+              }
+            });
+
+        m_searchTimerThread.detach();
+      }
+    }
 
     Bot(Board &board) : Bot(board, BotSettings()) {}
+
+    ~Bot()
+    {
+      m_searchCancelled = true;
+      if (m_searchTimerThread.joinable())
+        m_searchTimerThread.join();
+    }
 
     /**
      * @brief Loads the opening book from a file

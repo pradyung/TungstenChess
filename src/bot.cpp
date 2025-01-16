@@ -228,6 +228,9 @@ namespace TungstenChess
 
   int Bot::negamax(int depth, int alpha, int beta, bool quiesce)
   {
+    if (m_searchCancelled)
+      return 0;
+
     int standPat;
 
     if (quiesce)
@@ -266,6 +269,9 @@ namespace TungstenChess
       int evaluation = -negamax(depth - 1, -beta, -alpha, quiesce);
       m_board.unmakeMove(move, unmoveData);
 
+      if (m_searchCancelled)
+        return 0;
+
       if (evaluation > alpha)
       {
         alpha = evaluation;
@@ -283,7 +289,8 @@ namespace TungstenChess
 
   Move Bot::generateBestMove(int depth)
   {
-    m_previousSearchInfo.depthSearched = depth;
+    if (m_searchCancelled)
+      return NULL_MOVE;
 
     std::vector<Move> legalMoves = getSortedLegalMoves(m_board.sideToMove());
 
@@ -296,6 +303,9 @@ namespace TungstenChess
       int evaluation = -negamax(depth - 1, NEGATIVE_INFINITY, -alpha, false);
       m_board.unmakeMove(move, unmoveData);
 
+      if (m_searchCancelled)
+        return NULL_MOVE;
+
       if (evaluation > alpha)
       {
         alpha = evaluation;
@@ -307,20 +317,30 @@ namespace TungstenChess
     }
 
     m_previousSearchInfo.evaluation = alpha;
+    m_previousSearchInfo.depthSearched = depth;
 
     return bestMove;
   }
 
   Move Bot::iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start)
   {
+    m_searchCancelled = false;
+
     int depth = m_botSettings.minSearchDepth;
+
+    m_searchTimerEvent.notify_one();
 
     Move bestMove = generateBestMove(depth);
 
-    while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() < time)
+    while (true)
     {
       depth++;
-      bestMove = generateBestMove(depth);
+      Move newMove = generateBestMove(depth);
+
+      if (!m_searchCancelled)
+        bestMove = newMove;
+      else
+        break;
     }
 
     return bestMove;
