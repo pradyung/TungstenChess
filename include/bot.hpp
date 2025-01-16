@@ -70,13 +70,13 @@ namespace TungstenChess
       if (m_botSettings.maxSearchTime > 0)
       {
         m_searchTimerThread = std::thread(
-            [this]()
+            [&m_searchCancelled, &m_searchTimerEvent, &m_searchTimerMutex, maxSearchTime = m_botSettings.maxSearchTime]()
             {
               while (true)
               {
                 std::unique_lock<std::mutex> lock(m_searchTimerMutex);
                 m_searchTimerEvent.wait(lock);
-                std::this_thread::sleep_for(std::chrono::milliseconds(m_botSettings.maxSearchTime));
+                std::this_thread::sleep_for(std::chrono::milliseconds(maxSearchTime));
                 m_searchCancelled = true;
               }
             });

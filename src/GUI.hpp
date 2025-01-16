@@ -19,7 +19,7 @@ using namespace sf;
 namespace TungstenChess
 {
   const PieceColor PLAYER_COLOR = DEF_PLAYER_COLOR;
-  const bool THREADING = DEF_THREADING;
+  const bool THREADING = DEF_GUI_THREADING;
 
   enum Highlight
   {
