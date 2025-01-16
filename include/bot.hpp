@@ -4,6 +4,8 @@
 #include <chrono>
 #include <algorithm>
 #include <thread>
+#include <atomic>
+#include <condition_variable>
 
 #include "board.hpp"
 #include "opening_book.hpp"
@@ -60,9 +62,12 @@ namespace TungstenChess
     SearchInfo m_previousSearchInfo = {0, 0};
 
     std::atomic<bool> m_searchCancelled = false;
+    std::atomic<int> m_maxSearchTime = 0;
     std::thread m_searchTimerThread;
     std::condition_variable m_searchTimerEvent;
     std::mutex m_searchTimerMutex;
+
+    once<false> m_openingBookLoaded;
 
   public:
     Bot(Board &board, const BotSettings &settings) : m_board(board), m_botSettings(settings), m_openingBook(board.isDefaultStartPosition())
@@ -70,13 +75,13 @@ namespace TungstenChess
       if (m_botSettings.maxSearchTime > 0)
       {
         m_searchTimerThread = std::thread(
-            [&m_searchCancelled, &m_searchTimerEvent, &m_searchTimerMutex, maxSearchTime = m_botSettings.maxSearchTime]()
+            [this]()
             {
               while (true)
               {
                 std::unique_lock<std::mutex> lock(m_searchTimerMutex);
                 m_searchTimerEvent.wait(lock);
-                std::this_thread::sleep_for(std::chrono::milliseconds(maxSearchTime));
+                std::this_thread::sleep_for(std::chrono::milliseconds(m_maxSearchTime));
                 m_searchCancelled = true;
               }
             });
@@ -90,6 +95,7 @@ namespace TungstenChess
     ~Bot()
     {
       m_searchCancelled = true;
+      m_searchTimerEvent.notify_one();
       if (m_searchTimerThread.joinable())
         m_searchTimerThread.join();
     }
@@ -101,8 +107,7 @@ namespace TungstenChess
      */
     void loadOpeningBook(const std::string path, uint openingBookSize)
     {
-      static once<false> openingBookLoaded;
-      if (!openingBookLoaded)
+      if (!m_openingBookLoaded)
         m_openingBook.loadOpeningBook(path, openingBookSize);
     }
 
@@ -151,11 +156,9 @@ namespace TungstenChess
 
     /**
      * @brief Uses iterative deepening to find the best move in a constant amount of time
-     * @param time The time in milliseconds to search for (this time is not exact, but the bot will stop after a search is complete AND the time has run out.
-     *             It will not stop in the middle of a search, so the actual time spent may be significantly longer than the time parameter)
-     * @param start The time the search started, used to check if the time has run out
+     * @param time The time in milliseconds to search for
      */
-    Move iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start);
+    Move iterativeDeepening(int time);
 
     /**
      * @brief Gets the static evaluation of the current position, from the perspective of the side to move

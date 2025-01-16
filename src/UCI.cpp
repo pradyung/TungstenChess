@@ -29,6 +29,7 @@ int main()
   Board board(START_FEN);
 
   Bot bot(board);
+  bot.loadOpeningBook("../resources/opening_book", std::ifstream("../resources/opening_book", std::ios::binary | std::ios::ate).tellg() / sizeof(uint));
 
   std::cout << "TungstenChess v1.0\n";
 
@@ -93,7 +94,13 @@ int main()
     if (splitInput[0] == "go")
     {
       Move bestMove = bot.generateBotMove();
-      std::cout << "bestmove " << bestMove.getUCI() << "\n";
+      std::cout << "bestmove " << Moves::getUCI(bestMove) << "\n";
+
+      if (splitInput[1] == "move")
+      {
+        board.makeMove(bestMove);
+      }
+
       continue;
     }
 

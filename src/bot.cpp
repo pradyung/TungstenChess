@@ -4,7 +4,7 @@ namespace TungstenChess
 {
   Move Bot::generateBotMove()
   {
-    if (m_botSettings.useOpeningBook && m_openingBook.updateMoveHistory(m_board.moveHistory()))
+    if (m_botSettings.useOpeningBook && m_openingBookLoaded && m_openingBook.updateMoveHistory(m_board.moveHistory()))
     {
       Move moveInt = m_openingBook.getNextMove();
 
@@ -23,7 +23,7 @@ namespace TungstenChess
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    Move bestMove = m_botSettings.fixedDepthSearch ? generateBestMove(m_botSettings.maxSearchDepth) : iterativeDeepening(m_botSettings.maxSearchTime, start);
+    Move bestMove = m_botSettings.fixedDepthSearch ? generateBestMove(m_botSettings.maxSearchDepth) : iterativeDeepening(m_botSettings.maxSearchTime);
 
     if (m_botSettings.logSearchInfo)
       std::cout << "Move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << "\t"
@@ -322,12 +322,13 @@ namespace TungstenChess
     return bestMove;
   }
 
-  Move Bot::iterativeDeepening(int time, std::chrono::time_point<std::chrono::high_resolution_clock> start)
+  Move Bot::iterativeDeepening(int time)
   {
     m_searchCancelled = false;
 
     int depth = m_botSettings.minSearchDepth;
 
+    m_maxSearchTime = time;
     m_searchTimerEvent.notify_one();
 
     Move bestMove = generateBestMove(depth);
