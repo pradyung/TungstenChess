@@ -106,7 +106,7 @@ namespace TungstenChess
 
     uint8_t from = move & FROM;
     uint8_t to = (move & TO) >> 6;
-    PieceType promotionPieceType = (move & PROMOTION_PIECE) >> 12;
+    PieceType promotionPieceType = move >> 12;
 
     Piece piece = m_board[from];
     PieceType pieceType = piece & TYPE;
@@ -506,7 +506,7 @@ namespace TungstenChess
 
     uint8_t from = move & FROM;
     uint8_t to = (move & TO) >> 6;
-    PieceType promotionPieceType = (move & PROMOTION_PIECE) >> 12;
+    PieceType promotionPieceType = move >> 12;
 
     Piece piece = m_board[from];
 

@@ -17,7 +17,7 @@ namespace TungstenChess
     int m_lastMoveIndex = -1;
 
   public:
-    OpeningBook(bool m_inOpeningBook) : m_inOpeningBook(m_inOpeningBook) {}
+    OpeningBook(bool inOpeningBook) : m_inOpeningBook(inOpeningBook) {}
 
     /**
      * @brief Loads the opening book from a file

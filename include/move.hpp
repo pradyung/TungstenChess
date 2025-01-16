@@ -19,7 +19,7 @@ namespace TungstenChess
 
       uint8_t from = move & FROM;
       uint8_t to = (move & TO) >> 6;
-      uint8_t promotionPieceType = (move & PROMOTION) >> 12;
+      uint8_t promotionPieceType = move >> 12;
 
       uci += 'a' + (from % 8);
       uci += '8' - (from / 8);

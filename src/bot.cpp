@@ -13,7 +13,7 @@ namespace TungstenChess
         Move bestMove = moveInt & BASE;
 
         if (m_botSettings.logSearchInfo)
-          std::cout << "Book move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << std::endl;
+          std::cout << "Book: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << std::endl;
 
         return bestMove;
       }
@@ -27,10 +27,10 @@ namespace TungstenChess
     Move bestMove = m_botSettings.fixedDepthSearch ? generateBestMove(m_botSettings.maxSearchDepth, &evaluation) : iterativeDeepening(m_botSettings.maxSearchTime, start, &evaluation);
 
     if (m_botSettings.logSearchInfo)
-      std::cout << "Move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << ", "
-                << "Depth: " << m_previousSearchInfo.depthSearched << ", "
-                << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms, "
-                << "Positions evaluated: " << m_previousSearchInfo.positionsEvaluated << ", "
+      std::cout << "Move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << "\t"
+                << "Depth: " << m_previousSearchInfo.depthSearched << "\t"
+                << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms\t"
+                << "Positions evaluated: " << m_previousSearchInfo.positionsEvaluated << "\t"
                 << "Evaluation: " << (evaluation * (m_board.sideToMove() == WHITE ? 1 : -1)) << std::endl;
 
     return bestMove;
@@ -258,6 +258,9 @@ namespace TungstenChess
     if (legalMoves.empty())
       return quiesce ? standPat : (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY : -STALEMATE_PENALTY);
 
+    if (legalMoves.size() == 1)
+      depth++;
+
     for (Move &move : legalMoves)
     {
       Board::UnmoveData unmoveData = m_board.makeMove(move);
@@ -336,7 +339,7 @@ namespace TungstenChess
 
     uint8_t from = move & FROM;
     uint8_t to = (move & TO) >> 6;
-    PieceType promotionPieceType = (move & PROMOTION_PIECE) >> 12;
+    PieceType promotionPieceType = move >> 12;
 
     evaluation += PIECE_VALUES[m_board[to] & TYPE];
     evaluation += PIECE_VALUES[promotionPieceType];
