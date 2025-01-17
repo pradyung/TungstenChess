@@ -9,7 +9,7 @@
 
 #define DEF_USE_OPENING_BOOK !DEBUG_MODE
 #define DEF_GUI_THREADING !DEBUG_MODE
-#define DEF_USE_ITERATIVE_DEEPENING !DEBUG_MODE
+#define DEF_USE_ITERATIVE_DEEPENING true
 #define DEF_PLAYER_COLOR DEBUG_MODE ? EMPTY : WHITE
 
 namespace TungstenChess
@@ -41,6 +41,12 @@ namespace TungstenChess
         return B;
       }
       return !B;
+    }
+
+    void trigger()
+    {
+      std::lock_guard<std::mutex> lock(mtx);
+      value = !B;
     }
 
   private:

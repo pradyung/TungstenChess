@@ -41,7 +41,6 @@ namespace TungstenChess
     struct BotSettings
     {
       int maxSearchTime = 1000;                   // In milliseconds
-      int minSearchDepth = 3;                     // for iterative deepening
       int maxSearchDepth = 5;                     // for fixed depth search
       int quiesceDepth = -1;                      // for quiescence search, set to -1 to search indefinitely (recommended)
       bool useOpeningBook = DEF_USE_OPENING_BOOK; // only used if board starting position is default
@@ -57,6 +56,16 @@ namespace TungstenChess
       int positionsEvaluated;
       int depthSearched;
       int evaluation;
+      bool mateFound;
+      int mateIn;
+
+      std::string evalString(PieceColor sideToMove) const
+      {
+        if (mateFound)
+          return "Mate" + (mateIn > 0 ? " in " + std::to_string(mateIn) : "");
+        else
+          return std::to_string(evaluation * (sideToMove == WHITE ? 1 : -1));
+      }
     };
 
     SearchInfo m_previousSearchInfo = {0, 0};
@@ -149,8 +158,6 @@ namespace TungstenChess
     /**
      * @brief Generates the best move for the bot
      * @param depth The depth to search to
-     * @param alpha The alpha value for alpha-beta pruning (should not be set outside of recursive calls)
-     * @param beta The beta value for alpha-beta pruning (should not be set outside of recursive calls)
      */
     Move generateBestMove(int depth);
 

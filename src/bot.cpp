@@ -30,7 +30,8 @@ namespace TungstenChess
                 << "Depth: " << m_previousSearchInfo.depthSearched << "\t"
                 << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms\t"
                 << "Positions evaluated: " << m_previousSearchInfo.positionsEvaluated << "\t"
-                << "Evaluation: " << (m_previousSearchInfo.evaluation * (m_board.sideToMove() == WHITE ? 1 : -1)) << std::endl;
+                << "Evaluation: " << m_previousSearchInfo.evalString(m_board.sideToMove())
+                << std::endl;
 
     return bestMove;
   }
@@ -258,7 +259,7 @@ namespace TungstenChess
     std::vector<Move> legalMoves = getSortedLegalMoves(m_board.sideToMove(), quiesce);
 
     if (legalMoves.empty())
-      return quiesce ? standPat : (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY : -STALEMATE_PENALTY);
+      return (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY + (quiesce ? 1 : 0) : -STALEMATE_PENALTY);
 
     if (legalMoves.size() == 1)
       depth++;
@@ -312,7 +313,10 @@ namespace TungstenChess
         bestMove = move;
 
         if (alpha >= POSITIVE_INFINITY)
+        {
+          m_previousSearchInfo.mateFound = true;
           break;
+        }
       }
     }
 
@@ -325,8 +329,9 @@ namespace TungstenChess
   Move Bot::iterativeDeepening(int time)
   {
     m_searchCancelled = false;
+    m_previousSearchInfo.mateFound = false;
 
-    int depth = m_botSettings.minSearchDepth;
+    int depth = 1;
 
     m_maxSearchTime = time;
     m_searchTimerEvent.notify_one();
@@ -342,6 +347,12 @@ namespace TungstenChess
         bestMove = newMove;
       else
         break;
+
+      if (m_previousSearchInfo.mateFound)
+      {
+        m_previousSearchInfo.mateIn = (depth - 1) / 2;
+        break;
+      }
     }
 
     return bestMove;
