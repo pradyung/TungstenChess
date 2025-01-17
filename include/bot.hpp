@@ -47,7 +47,7 @@ namespace TungstenChess
       bool useOpeningBook = DEF_USE_OPENING_BOOK; // only used if board starting position is default
       bool logSearchInfo = true;
       bool logPGNMoves = true;
-      bool fixedDepthSearch = false; // as opposed to iterative deepening
+      bool fixedDepthSearch = !DEF_USE_ITERATIVE_DEEPENING;
     };
 
     const BotSettings m_botSettings;
