@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <mutex>
+#include <string>
 
 #define NULL_MOVE 0
 
@@ -59,6 +60,13 @@ namespace TungstenChess
     bool value = B;
     std::mutex mtx;
   };
+
+  static inline std::string padString(std::string str, size_t length)
+  {
+    if (str.length() < length)
+      str += std::string(length - str.length(), ' ');
+    return str;
+  }
 
   enum CastlingRights : uint8_t
   {

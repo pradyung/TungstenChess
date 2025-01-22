@@ -40,13 +40,11 @@ namespace TungstenChess
 
     struct BotSettings
     {
-      int maxSearchTime = 1000;                   // In milliseconds
-      int maxSearchDepth = 5;                     // for fixed depth search
-      int quiesceDepth = -1;                      // for quiescence search, set to -1 to search indefinitely (recommended)
-      bool useOpeningBook = DEF_USE_OPENING_BOOK; // only used if board starting position is default
+      int maxSearchTime = 1000; // In milliseconds
+      int quiesceDepth = -1;    // for quiescence search, set to -1 to search indefinitely (recommended)
+      bool useOpeningBook = false;
       bool logSearchInfo = true;
       bool logPGNMoves = true;
-      bool fixedDepthSearch = !DEF_USE_ITERATIVE_DEEPENING;
     };
 
     const BotSettings m_botSettings;
@@ -55,6 +53,10 @@ namespace TungstenChess
     {
       int positionsEvaluated;
       int depthSearched;
+
+      int nextDepthNumMovesSearched;
+      int nextDepthTotalMoves;
+
       int evaluation;
       bool mateFound;
       int mateIn;
@@ -69,6 +71,19 @@ namespace TungstenChess
           return "Mate" + (mateIn > 0 ? " in " + std::to_string(mateIn) : "");
 
         return std::to_string(evaluation * (sideToMove == WHITE ? 1 : -1));
+      }
+
+      std::string to_string(std::string move, std::chrono::milliseconds time, PieceColor sideToMove) const
+      {
+        std::string str = "";
+
+        str += "Move: " + padString(move, 10);
+        str += "Depth: " + std::to_string(depthSearched) + " + " + padString(std::to_string(nextDepthNumMovesSearched) + "/" + std::to_string(nextDepthTotalMoves), 11);
+        str += "Time: " + padString(std::to_string(time.count()) + " ms", 12);
+        str += "Positions evaluated: " + padString(std::to_string(positionsEvaluated), 12);
+        str += "Evaluation: " + evalString(sideToMove);
+
+        return str;
       }
     };
 
@@ -134,19 +149,21 @@ namespace TungstenChess
 
     /**
      * @brief Generates the best move for the bot
+     * @param maxSearchTime The maximum time to search for in milliseconds
      */
-    Move generateBotMove();
+    Move generateBotMove(int maxSearchTime = -1);
 
   private:
     /**
      * @brief Gets the legal moves for a color, sorted by heuristic evaluation
      * @param color The color to get the moves for
      * @param onlyCaptures Whether to only get captures
+     * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      */
-    std::vector<Move> getSortedLegalMoves(PieceColor color, bool onlyCaptures = false)
+    std::vector<Move> getSortedLegalMoves(PieceColor color, bool onlyCaptures = false, Move bestMove = NULL_MOVE)
     {
       std::vector<Move> moves = m_board.getLegalMoves(color, onlyCaptures);
-      heuristicSortMoves(moves);
+      heuristicSortMoves(moves, bestMove);
       return moves;
     }
 
@@ -170,8 +187,9 @@ namespace TungstenChess
     /**
      * @brief Generates the best move for the bot
      * @param depth The depth to search to
+     * @param bestMoveSoFar The best move found so far, used when iterative deepening has already found a good move
      */
-    Move generateBestMove(int depth);
+    Move generateBestMove(int depth, Move bestMoveSoFar = NULL_MOVE);
 
     /**
      * @brief Uses iterative deepening to find the best move in a constant amount of time
@@ -211,13 +229,15 @@ namespace TungstenChess
     /**
      * @brief Heuristic evaluation of a move, used for move ordering to improve alpha-beta pruning
      * @param move The move to evaluate
+     * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      */
-    int heuristicEvaluation(Move move);
+    int heuristicEvaluation(Move move, Move bestMove = NULL_MOVE);
 
     /**
      * @brief Sorts moves by heuristic evaluation (in place) to improve alpha-beta pruning
      * @param moves The moves to sort
+     * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      */
-    void heuristicSortMoves(std::vector<Move> &moves);
+    void heuristicSortMoves(std::vector<Move> &moves, Move bestMove = NULL_MOVE);
   };
 }

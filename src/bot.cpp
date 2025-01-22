@@ -2,7 +2,7 @@
 
 namespace TungstenChess
 {
-  Move Bot::generateBotMove()
+  Move Bot::generateBotMove(int maxSearchTime)
   {
     if (m_botSettings.useOpeningBook && m_openingBookLoaded.peek() && m_openingBook.updateMoveHistory(m_board.moveHistory()))
     {
@@ -23,14 +23,12 @@ namespace TungstenChess
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    Move bestMove = m_botSettings.fixedDepthSearch ? generateBestMove(m_botSettings.maxSearchDepth) : iterativeDeepening(m_botSettings.maxSearchTime);
+    Move bestMove = iterativeDeepening(maxSearchTime == -1 ? m_botSettings.maxSearchTime : maxSearchTime);
 
     if (m_botSettings.logSearchInfo)
-      std::cout << "Move: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << "\t"
-                << "Depth: " << m_previousSearchInfo.depthSearched << "\t"
-                << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms\t"
-                << "Positions evaluated: " << m_previousSearchInfo.positionsEvaluated << "\t"
-                << "Evaluation: " << m_previousSearchInfo.evalString(m_board.sideToMove())
+      std::cout << m_previousSearchInfo.to_string(m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove),
+                                                  std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start),
+                                                  m_board.sideToMove())
                 << std::endl;
 
     return bestMove;
@@ -288,12 +286,9 @@ namespace TungstenChess
     return alpha;
   }
 
-  Move Bot::generateBestMove(int depth)
+  Move Bot::generateBestMove(int depth, Move bestMoveSoFar)
   {
-    if (m_searchCancelled)
-      return NULL_MOVE;
-
-    std::vector<Move> legalMoves = getSortedLegalMoves(m_board.sideToMove());
+    std::vector<Move> legalMoves = getSortedLegalMoves(m_board.sideToMove(), false, bestMoveSoFar);
 
     Move bestMove = legalMoves[0];
 
@@ -301,6 +296,10 @@ namespace TungstenChess
       return NULL_MOVE;
 
     int alpha = NEGATIVE_INFINITY;
+    int numMovesSearched = 0;
+
+    m_previousSearchInfo.nextDepthNumMovesSearched = 0;
+    m_previousSearchInfo.nextDepthTotalMoves = legalMoves.size();
 
     for (Move &move : legalMoves)
     {
@@ -309,7 +308,12 @@ namespace TungstenChess
       m_board.unmakeMove(move, unmoveData);
 
       if (m_searchCancelled)
-        return NULL_MOVE;
+      {
+        if (numMovesSearched > 0)
+          break;
+        else
+          return NULL_MOVE;
+      }
 
       if (evaluation > alpha)
       {
@@ -322,10 +326,17 @@ namespace TungstenChess
           break;
         }
       }
+
+      numMovesSearched++;
     }
 
-    m_previousSearchInfo.evaluation = alpha;
-    m_previousSearchInfo.depthSearched = depth;
+    if (!m_searchCancelled)
+    {
+      m_previousSearchInfo.evaluation = alpha;
+      m_previousSearchInfo.depthSearched = depth;
+    }
+
+    m_previousSearchInfo.nextDepthNumMovesSearched = numMovesSearched;
 
     return bestMove;
   }
@@ -347,9 +358,10 @@ namespace TungstenChess
     while (!m_searchCancelled)
     {
       depth++;
-      Move newMove = generateBestMove(depth);
 
-      if (m_searchCancelled)
+      Move newMove = generateBestMove(depth, bestMove);
+
+      if (newMove == NULL_MOVE)
         break;
 
       bestMove = newMove;
@@ -371,14 +383,17 @@ namespace TungstenChess
     return bestMove;
   }
 
-  void Bot::heuristicSortMoves(std::vector<Move> &moves)
+  void Bot::heuristicSortMoves(std::vector<Move> &moves, Move bestMove)
   {
-    std::sort(moves.begin(), moves.end(), [this](Move a, Move b)
-              { return heuristicEvaluation(a) > heuristicEvaluation(b); });
+    std::sort(moves.begin(), moves.end(), [this, bestMove](Move a, Move b)
+              { return heuristicEvaluation(a, bestMove) > heuristicEvaluation(b, bestMove); });
   }
 
-  int Bot::heuristicEvaluation(Move move)
+  int Bot::heuristicEvaluation(Move move, Move bestMove)
   {
+    if (move == bestMove)
+      return POSITIVE_INFINITY;
+
     int evaluation = 0;
 
     uint8_t from = move & FROM;
