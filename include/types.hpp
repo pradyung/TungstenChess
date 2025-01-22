@@ -49,6 +49,12 @@ namespace TungstenChess
       value = !B;
     }
 
+    bool peek()
+    {
+      std::lock_guard<std::mutex> lock(mtx);
+      return value;
+    }
+
   private:
     bool value = B;
     std::mutex mtx;

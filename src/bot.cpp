@@ -4,7 +4,7 @@ namespace TungstenChess
 {
   Move Bot::generateBotMove()
   {
-    if (m_botSettings.useOpeningBook && m_openingBookLoaded && m_openingBook.updateMoveHistory(m_board.moveHistory()))
+    if (m_botSettings.useOpeningBook && m_openingBookLoaded.peek() && m_openingBook.updateMoveHistory(m_board.moveHistory()))
     {
       Move moveInt = m_openingBook.getNextMove();
 
@@ -295,7 +295,11 @@ namespace TungstenChess
 
     std::vector<Move> legalMoves = getSortedLegalMoves(m_board.sideToMove());
 
-    Move &bestMove = legalMoves[0];
+    Move bestMove = legalMoves[0];
+
+    if (legalMoves.empty())
+      return NULL_MOVE;
+
     int alpha = NEGATIVE_INFINITY;
 
     for (Move &move : legalMoves)
@@ -330,26 +334,35 @@ namespace TungstenChess
   {
     m_searchCancelled = false;
     m_previousSearchInfo.mateFound = false;
+    m_previousSearchInfo.lossFound = false;
 
     int depth = 1;
 
     m_maxSearchTime = time;
+    m_searchTimerReset = true;
     m_searchTimerEvent.notify_one();
 
     Move bestMove = generateBestMove(depth);
 
-    while (true)
+    while (!m_searchCancelled)
     {
       depth++;
       Move newMove = generateBestMove(depth);
 
-      if (!m_searchCancelled)
-        bestMove = newMove;
-      else
+      if (m_searchCancelled)
         break;
+
+      bestMove = newMove;
 
       if (m_previousSearchInfo.mateFound)
       {
+        m_previousSearchInfo.mateIn = (depth - 1) / 2;
+        break;
+      }
+
+      if (m_previousSearchInfo.evaluation <= NEGATIVE_INFINITY)
+      {
+        m_previousSearchInfo.lossFound = true;
         m_previousSearchInfo.mateIn = (depth - 1) / 2;
         break;
       }

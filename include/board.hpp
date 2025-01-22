@@ -15,7 +15,10 @@
 #define NO_EP 8
 
 #define DEFAULT_START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+#ifndef START_FEN
 #define START_FEN DEFAULT_START_FEN
+#endif
 
 namespace TungstenChess
 {

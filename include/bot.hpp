@@ -58,13 +58,17 @@ namespace TungstenChess
       int evaluation;
       bool mateFound;
       int mateIn;
+      bool lossFound;
 
       std::string evalString(PieceColor sideToMove) const
       {
+        if (lossFound)
+          return "Loss in " + std::to_string(mateIn);
+
         if (mateFound)
           return "Mate" + (mateIn > 0 ? " in " + std::to_string(mateIn) : "");
-        else
-          return std::to_string(evaluation * (sideToMove == WHITE ? 1 : -1));
+
+        return std::to_string(evaluation * (sideToMove == WHITE ? 1 : -1));
       }
     };
 
@@ -74,7 +78,9 @@ namespace TungstenChess
     std::atomic<int> m_maxSearchTime = 0;
     std::thread m_searchTimerThread;
     std::condition_variable m_searchTimerEvent;
+    std::atomic<bool> m_searchTimerReset = false;
     std::mutex m_searchTimerMutex;
+    std::atomic<bool> m_searchTimerTerminated = false;
 
     once<false> m_openingBookLoaded;
 
@@ -86,11 +92,16 @@ namespace TungstenChess
         m_searchTimerThread = std::thread(
             [this]()
             {
-              while (true)
+              std::unique_lock<std::mutex> lock(m_searchTimerMutex);
+              m_searchTimerEvent.wait(lock);
+              while (!m_searchTimerTerminated)
               {
-                std::unique_lock<std::mutex> lock(m_searchTimerMutex);
-                m_searchTimerEvent.wait(lock);
-                std::this_thread::sleep_for(std::chrono::milliseconds(m_maxSearchTime));
+                m_searchTimerReset = false;
+
+                if (m_searchTimerEvent.wait_for(lock, std::chrono::milliseconds(m_maxSearchTime), [this]
+                                                { return m_searchTimerReset.load(); }))
+                  continue;
+
                 m_searchCancelled = true;
               }
             });
@@ -104,7 +115,8 @@ namespace TungstenChess
     ~Bot()
     {
       m_searchCancelled = true;
-      m_searchTimerEvent.notify_one();
+      m_searchTimerTerminated = true;
+      m_searchTimerReset = true;
       if (m_searchTimerThread.joinable())
         m_searchTimerThread.join();
     }
