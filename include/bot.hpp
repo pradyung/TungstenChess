@@ -42,7 +42,7 @@ namespace TungstenChess
     {
       int maxSearchTime = 1000; // In milliseconds
       int quiesceDepth = -1;    // for quiescence search, set to -1 to search indefinitely (recommended)
-      bool useOpeningBook = false;
+      bool useOpeningBook = DEF_USE_OPENING_BOOK;
       bool logSearchInfo = true;
       bool logPGNMoves = true;
     };
