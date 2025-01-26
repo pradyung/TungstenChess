@@ -78,15 +78,15 @@ namespace TungstenChess
         KING_MOVES[square] = 0ULL;
 
         int offsets[8] = {-1, 0, 1};
-        Square rank = square / 8;
-        Square file = square % 8;
+        Rank rank = square / 8;
+        File file = square % 8;
 
         for (int dr = 0; dr < 3; dr++)
         {
           for (int df = 0; df < 3; df++)
           {
-            Square toRank = rank + offsets[dr];
-            Square toFile = file + offsets[df];
+            Rank toRank = rank + offsets[dr];
+            File toFile = file + offsets[df];
 
             if (toRank < 0 || toRank > 7 || toFile < 0 || toFile > 7 || (dr == 1 && df == 1))
               continue;

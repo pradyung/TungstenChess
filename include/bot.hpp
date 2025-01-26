@@ -127,6 +127,8 @@ namespace TungstenChess
 
     Bot(Board &board) : Bot(board, BotSettings()) {}
 
+    Bot(Board &board, int maxSearchTime) : Bot(board, BotSettings{maxSearchTime}) {}
+
     ~Bot()
     {
       m_searchCancelled = true;

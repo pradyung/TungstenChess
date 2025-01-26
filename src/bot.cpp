@@ -156,8 +156,8 @@ namespace TungstenChess
 
     for (Square i = 0; i < 64; i++)
     {
-      Square file = i % 8;
-      Square rank = i / 8;
+      File file = i % 8;
+      Rank rank = i / 8;
 
       if (rank == 0)
       {
@@ -330,7 +330,7 @@ namespace TungstenChess
       numMovesSearched++;
     }
 
-    if (!m_searchCancelled)
+    if (!m_searchCancelled && !m_previousSearchInfo.mateFound)
     {
       m_previousSearchInfo.evaluation = alpha;
       m_previousSearchInfo.depthSearched = depth;

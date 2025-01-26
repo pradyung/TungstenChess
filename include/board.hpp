@@ -354,7 +354,7 @@ namespace TungstenChess
      * @brief Updates the en passant file and handles Zobrist key updates
      * @param file The new en passant file (0-7), or NO_EP (8) if there is no en passant
      */
-    void updateEnPassantFile(Square file)
+    void updateEnPassantFile(File file)
     {
       m_zobristKey ^= Zobrist::enPassantKeys[m_enPassantFile];
       m_enPassantFile = file;
