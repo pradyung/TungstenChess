@@ -10,7 +10,7 @@ namespace TungstenChess
 
       if (moveInt != NULL_MOVE)
       {
-        Move bestMove = moveInt & BASE;
+        Move bestMove = moveInt & FROM_TO;
 
         if (m_botSettings.logSearchInfo)
           std::cout << "Book: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << std::endl;

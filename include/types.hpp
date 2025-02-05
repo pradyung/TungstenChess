@@ -105,7 +105,7 @@ namespace TungstenChess
   {
     FROM = 0x3F,
     TO = 0xFC0,
-    BASE = FROM | TO,
+    FROM_TO = FROM | TO,
     PROMOTION_PIECE = 0x7000
   };
 

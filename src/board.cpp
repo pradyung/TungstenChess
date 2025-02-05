@@ -124,7 +124,7 @@ namespace TungstenChess
     if (m_board[to] || pieceType == PAWN)
       m_halfmoveClock = 0;
 
-    m_moveHistory.push_back(move & BASE);
+    m_moveHistory.push_back(move & FROM_TO);
 
     movePiece(from, to, promotionPieceType | pieceColor);
 
