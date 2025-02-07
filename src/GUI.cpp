@@ -32,9 +32,17 @@ namespace TungstenChess
 
   void GUIHandler::runMainLoop()
   {
+    Event event;
+
+    bool needsRefresh = true;
+
     while (window->isOpen())
     {
-      Event event;
+      if (needsRefresh || boardUpdated.pop() || draggingPieceReleased.pop())
+      {
+        render();
+        needsRefresh = false;
+      }
 
       if (!(board.sideToMove() & PLAYER_COLOR) && !gameOver)
       {
@@ -42,109 +50,130 @@ namespace TungstenChess
           startThinking();
       }
 
-      while (window->pollEvent(event))
-      {
-        if (event.type == Event::Closed)
-        {
-          window->close();
-          return;
-        }
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-        if (isThinking)
-          continue;
-
-        if (event.type == Event::MouseButtonPressed)
-        {
-          if (event.mouseButton.button == Mouse::Left && !gameOver)
-          {
-            Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
-
-            if (!(board.sideToMove() & board[index]) && !awaitingPromotion)
-              continue;
-
-            if (awaitingPromotion)
-            {
-              Piece promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
-
-              if (promotionPiece == EMPTY || !(promotionPiece & board.sideToMove()))
-                continue;
-
-              promotionMove |= (promotionPiece & TYPE) << 12;
-
-              draggingPieceIndex = NO_SQUARE;
-
-              awaitingPromotion = false;
-
-              makeMove(promotionMove);
-            }
-            else
-            {
-              if (!(board.sideToMove() & board[index]))
-                continue;
-
-              grayHighlightsBitboard = board.getLegalPieceMovesBitboard(index);
-
-              draggingPieceIndex = index;
-            }
-          }
-        }
-
-        if (event.type == Event::MouseButtonReleased)
-        {
-          if (event.mouseButton.button == Mouse::Left)
-          {
-            if (draggingPieceIndex == NO_SQUARE)
-              continue;
-
-            if (!Bitboards::hasBit(grayHighlightsBitboard, GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y)))
-            {
-              draggingPieceIndex = NO_SQUARE;
-              clearHighlights(GRAY_HIGHLIGHT);
-              continue;
-            }
-
-            Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
-
-            Move move = Moves::createMove(draggingPieceIndex, index);
-
-            if (!Moves::isPromotion(index, board[draggingPieceIndex] & TYPE))
-            {
-              makeMove(move);
-            }
-            else
-            {
-              awaitingPromotion = true;
-              promotionMove = move;
-            }
-
-            draggingPieceIndex = NO_SQUARE;
-          }
-        }
-      }
-
-      int x = Mouse::getPosition(*window).x;
-      int y = Mouse::getPosition(*window).y;
-      if (x >= 0 && x <= 8 * SQUARE_SIZE && y >= 0 && y <= 8 * SQUARE_SIZE)
-        yellowOutlineIndex = getSquareIndex(x, y);
+      if (isThinking || boardUpdated)
+        window->pollEvent(event);
       else
-        yellowOutlineIndex = NO_SQUARE;
+        window->waitEvent(event);
 
-      window->clear();
-
-      drawBoardSquares();
-
-      if (awaitingPromotion)
+      if (event.type == Event::Closed)
       {
-        drawPromotionPieces();
-      }
-      else
-      {
-        drawHighlights();
-        drawPieces();
+        window->close();
+        return;
       }
 
-      window->display();
+      if (!isThinking && event.mouseButton.button == Mouse::Left)
+      {
+        if (event.type == Event::MouseButtonPressed && !gameOver)
+          needsRefresh = handleLeftClick(event);
+
+        else if (event.type == Event::MouseButtonReleased)
+          needsRefresh = handleLeftRelease(event);
+      }
+
+      if (event.type == Event::MouseMoved)
+        needsRefresh = (draggingPieceIndex != NO_SQUARE) || (getMouseSquareIndex() != yellowOutlineIndex);
     }
+  }
+
+  bool GUIHandler::handleLeftClick(Event &event)
+  {
+    Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
+
+    if (!(board.sideToMove() & board[index]) && !awaitingPromotion)
+      return false;
+
+    if (awaitingPromotion)
+    {
+      Piece promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
+
+      if (promotionPiece == EMPTY || !(promotionPiece & board.sideToMove()))
+        return false;
+
+      promotionMove |= (promotionPiece & TYPE) << 12;
+
+      draggingPieceIndex = NO_SQUARE;
+
+      awaitingPromotion = false;
+
+      makeMove(promotionMove);
+    }
+    else
+    {
+      if (!(board.sideToMove() & board[index]))
+        return false;
+
+      grayHighlightsBitboard = board.getLegalPieceMovesBitboard(index);
+
+      draggingPieceIndex = index;
+    }
+
+    return true;
+  }
+
+  bool GUIHandler::handleLeftRelease(Event &event)
+  {
+    if (draggingPieceIndex == NO_SQUARE)
+      return false;
+
+    if (!Bitboards::hasBit(grayHighlightsBitboard, GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y)))
+    {
+      draggingPieceIndex = NO_SQUARE;
+      draggingPieceReleased.set();
+      clearHighlights(GRAY_HIGHLIGHT);
+      return false;
+    }
+
+    Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
+
+    Move move = Moves::createMove(draggingPieceIndex, index);
+
+    if (!Moves::isPromotion(index, board[draggingPieceIndex] & TYPE))
+    {
+      makeMove(move);
+    }
+    else
+    {
+      awaitingPromotion = true;
+      promotionMove = move;
+    }
+
+    draggingPieceIndex = NO_SQUARE;
+
+    return true;
+  }
+
+  Square GUIHandler::getMouseSquareIndex()
+  {
+    int x = Mouse::getPosition(*window).x;
+    int y = Mouse::getPosition(*window).y;
+
+    if (x >= 0 && x <= 8 * SQUARE_SIZE && y >= 0 && y <= 8 * SQUARE_SIZE)
+      return getSquareIndex(x, y);
+    else
+      return NO_SQUARE;
+  }
+
+  void GUIHandler::render()
+  {
+    yellowOutlineIndex = getMouseSquareIndex();
+
+    window->clear();
+
+    drawBoardSquares();
+
+    if (awaitingPromotion)
+    {
+      drawPromotionPieces();
+    }
+    else
+    {
+      drawHighlights();
+      drawPieces();
+    }
+
+    window->display();
   }
 
   void GUIHandler::loadSquareTextures()
@@ -330,6 +359,8 @@ namespace TungstenChess
 
     Bitboards::addBit(yellowHighlightsBitboard, from);
     Bitboards::addBit(yellowHighlightsBitboard, to);
+
+    boardUpdated.set();
   }
 
   void GUIHandler::makeBotMove()

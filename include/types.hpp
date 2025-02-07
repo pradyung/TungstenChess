@@ -62,6 +62,21 @@ namespace TungstenChess
     std::mutex mtx;
   };
 
+  struct flag
+  {
+    operator bool() const { return value; }
+    void set() { value = true; }
+    bool pop()
+    {
+      bool temp = value;
+      value = false;
+      return temp;
+    }
+
+  private:
+    bool value;
+  };
+
   static inline std::string padString(std::string str, size_t length)
   {
     if (str.length() < length)

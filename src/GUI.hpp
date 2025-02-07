@@ -133,12 +133,15 @@ namespace TungstenChess
 
     Square draggingPieceIndex = NO_SQUARE;
     Sprite draggingPieceSprite;
+    flag draggingPieceReleased;
 
     Sprite whitePromotionPieces[4];
     Sprite blackPromotionPieces[4];
 
     bool awaitingPromotion = false;
     Move promotionMove;
+
+    flag boardUpdated;
 
     bool gameOver = false;
 
@@ -168,6 +171,13 @@ namespace TungstenChess
 
     void clearHighlights();
     void clearHighlights(Highlight highlight);
+
+    Square getMouseSquareIndex();
+
+    bool handleLeftClick(Event &event);   // Returns true if screen needs to be redrawn
+    bool handleLeftRelease(Event &event); // Returns true if screen needs to be redrawn
+
+    void render();
 
     void makeMove(Move move);
     void makeBotMove();
