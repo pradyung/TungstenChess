@@ -6,6 +6,7 @@
 #include <thread>
 #include <atomic>
 #include <condition_variable>
+#include <unordered_map>
 
 #include "board.hpp"
 #include "opening_book.hpp"
@@ -21,6 +22,16 @@ namespace TungstenChess
   private:
     Board &m_board;
     OpeningBook m_openingBook;
+
+    struct TranspositionTableEntry
+    {
+      int evaluation;
+      int depth;
+      bool quiesce;
+    };
+
+    std::unordered_map<ZobristKey, TranspositionTableEntry> m_transpositionTable;
+    uint64_t m_transpositionTablePieceKey = 0;
 
     enum EvaluationConstants : int
     {
@@ -52,6 +63,7 @@ namespace TungstenChess
     struct SearchInfo
     {
       int positionsEvaluated;
+      int transpositionsUsed;
       int depthSearched;
 
       int nextDepthNumMovesSearched;
@@ -78,9 +90,10 @@ namespace TungstenChess
         std::string str = "";
 
         str += "Move: " + padString(move, 10);
-        str += "Depth: " + std::to_string(depthSearched) + " + " + padString(std::to_string(nextDepthNumMovesSearched) + "/" + std::to_string(nextDepthTotalMoves), 11);
+        str += "Depth: " + padString(std::to_string(depthSearched) + " + " + std::to_string(nextDepthNumMovesSearched) + "/" + std::to_string(nextDepthTotalMoves), 11);
         str += "Time: " + padString(std::to_string(time.count()) + " ms", 12);
         str += "Positions evaluated: " + padString(std::to_string(positionsEvaluated), 12);
+        str += "Transpositions used: " + padString(std::to_string(transpositionsUsed), 10);
         str += "Evaluation: " + evalString(sideToMove);
 
         return str;

@@ -230,6 +230,17 @@ namespace TungstenChess
     if (m_searchCancelled)
       return 0;
 
+    if (m_transpositionTable.count(m_board.zobristKey()))
+    {
+      TranspositionTableEntry &entry = m_transpositionTable[m_board.zobristKey()];
+
+      if (entry.quiesce == quiesce && entry.depth >= depth)
+      {
+        m_previousSearchInfo.transpositionsUsed++;
+        return entry.evaluation;
+      }
+    }
+
     int standPat;
 
     if (quiesce)
@@ -281,6 +292,11 @@ namespace TungstenChess
         if (!quiesce && alpha >= POSITIVE_INFINITY)
           break;
       }
+    }
+
+    if (!m_searchCancelled)
+    {
+      m_transpositionTable[m_board.zobristKey()] = {alpha, depth, quiesce};
     }
 
     return alpha;
@@ -346,6 +362,14 @@ namespace TungstenChess
     m_searchCancelled = false;
     m_previousSearchInfo.mateFound = false;
     m_previousSearchInfo.lossFound = false;
+    m_previousSearchInfo.transpositionsUsed = 0;
+
+    uint64_t pieceKey = m_board.getPieceKey();
+    if (pieceKey != m_transpositionTablePieceKey)
+    {
+      m_transpositionTable.clear();
+      m_transpositionTablePieceKey = pieceKey;
+    }
 
     int depth = 1;
 

@@ -68,6 +68,30 @@ namespace TungstenChess
     Square kingIndex(Piece piece) const { return m_kingIndices[piece]; }
 
     /**
+     * @brief Gets a key representing the pieces still on the board
+     */
+    uint64_t getPieceKey() const
+    {
+      uint64_t key = 0;
+
+      std::array<uint8_t, PIECE_NUMBER> pieceCounts = {0};
+
+      for (Square i = 0; i < 64; i++)
+        if (m_board[i])
+          pieceCounts[m_board[i]]++;
+
+      for (Piece piece : validPieces)
+      {
+        if (piece == EMPTY)
+          continue;
+
+        key = key * 10 + pieceCounts[piece];
+      }
+
+      return key;
+    }
+
+    /**
      * @brief Resets the board to the provided fen
      * @param fen The fen to reset the board to
      */
