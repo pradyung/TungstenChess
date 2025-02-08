@@ -17,10 +17,10 @@ namespace TungstenChess
 {
   GUIHandler::GUIHandler(RenderWindow &window)
   {
-    this->window = &window;
+    this->m_window = &window;
 
-    whiteBot.loadOpeningBook(resourceManager.m_openingBookPath, resourceManager.m_openingBookSize);
-    blackBot.loadOpeningBook(resourceManager.m_openingBookPath, resourceManager.m_openingBookSize);
+    m_whiteBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
+    m_blackBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
 
     loadSquareTextures();
     loadBoardSquares();
@@ -28,7 +28,7 @@ namespace TungstenChess
     loadPieces();
     loadPromotionPieces();
 
-    window.setIcon(resourceManager.m_icon.getSize().x, resourceManager.m_icon.getSize().y, resourceManager.m_icon.getPixelsPtr());
+    window.setIcon(m_resourceManager.m_icon.getSize().x, m_resourceManager.m_icon.getSize().y, m_resourceManager.m_icon.getPixelsPtr());
   }
 
   void GUIHandler::runMainLoop()
@@ -37,36 +37,36 @@ namespace TungstenChess
 
     bool needsRefresh = true;
 
-    while (window->isOpen())
+    while (m_window->isOpen())
     {
-      if (needsRefresh || boardUpdated.pop() || draggingPieceReleased.pop())
+      if (needsRefresh || m_boardUpdated.pop() || m_draggingPieceReleased.pop())
       {
         render();
         needsRefresh = false;
       }
 
-      if (!(board.sideToMove() & PLAYER_COLOR) && !gameOver)
+      if (!(m_board.sideToMove() & PLAYER_COLOR) && !m_gameOver)
       {
-        if (!isThinking)
+        if (!m_isThinking)
           startThinking();
       }
 
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-      if (isThinking || boardUpdated)
-        window->pollEvent(event);
+      if (m_isThinking || m_boardUpdated)
+        m_window->pollEvent(event);
       else
-        window->waitEvent(event);
+        m_window->waitEvent(event);
 
       if (event.type == Event::Closed)
       {
-        window->close();
+        m_window->close();
         return;
       }
 
-      if (!isThinking && event.mouseButton.button == Mouse::Left)
+      if (!m_isThinking && event.mouseButton.button == Mouse::Left)
       {
-        if (event.type == Event::MouseButtonPressed && !gameOver)
+        if (event.type == Event::MouseButtonPressed && !m_gameOver)
           needsRefresh = handleLeftClick(event);
 
         else if (event.type == Event::MouseButtonReleased)
@@ -74,7 +74,7 @@ namespace TungstenChess
       }
 
       if (event.type == Event::MouseMoved)
-        needsRefresh = (draggingPieceIndex != NO_SQUARE) || (getMouseSquareIndex() != yellowOutlineIndex);
+        needsRefresh = (m_draggingPieceIndex != NO_SQUARE) || (getMouseSquareIndex() != m_yellowOutlineIndex);
     }
   }
 
@@ -82,32 +82,32 @@ namespace TungstenChess
   {
     Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-    if (!(board.sideToMove() & board[index]) && !awaitingPromotion)
+    if (!(m_board.sideToMove() & m_board[index]) && !m_awaitingPromotion)
       return false;
 
-    if (awaitingPromotion)
+    if (m_awaitingPromotion)
     {
       Piece promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
-      if (promotionPiece == EMPTY || !(promotionPiece & board.sideToMove()))
+      if (promotionPiece == EMPTY || !(promotionPiece & m_board.sideToMove()))
         return false;
 
-      promotionMove |= (promotionPiece & TYPE) << 12;
+      m_promotionMove |= (promotionPiece & TYPE) << 12;
 
-      draggingPieceIndex = NO_SQUARE;
+      m_draggingPieceIndex = NO_SQUARE;
 
-      awaitingPromotion = false;
+      m_awaitingPromotion = false;
 
-      makeMove(promotionMove);
+      makeMove(m_promotionMove);
     }
     else
     {
-      if (!(board.sideToMove() & board[index]))
+      if (!(m_board.sideToMove() & m_board[index]))
         return false;
 
-      grayHighlightsBitboard = board.getLegalPieceMovesBitboard(index);
+      m_grayHighlightsBitboard = m_board.getLegalPieceMovesBitboard(index);
 
-      draggingPieceIndex = index;
+      m_draggingPieceIndex = index;
     }
 
     return true;
@@ -115,40 +115,40 @@ namespace TungstenChess
 
   bool GUIHandler::handleLeftRelease(Event &event)
   {
-    if (draggingPieceIndex == NO_SQUARE)
+    if (m_draggingPieceIndex == NO_SQUARE)
       return false;
 
-    if (!Bitboards::hasBit(grayHighlightsBitboard, GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y)))
+    if (!Bitboards::hasBit(m_grayHighlightsBitboard, GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y)))
     {
-      draggingPieceIndex = NO_SQUARE;
-      draggingPieceReleased.set();
+      m_draggingPieceIndex = NO_SQUARE;
+      m_draggingPieceReleased.set();
       clearHighlights(GRAY_HIGHLIGHT);
       return false;
     }
 
     Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-    Move move = Moves::createMove(draggingPieceIndex, index);
+    Move move = Moves::createMove(m_draggingPieceIndex, index);
 
-    if (!Moves::isPromotion(index, board[draggingPieceIndex] & TYPE))
+    if (!Moves::isPromotion(index, m_board[m_draggingPieceIndex] & TYPE))
     {
       makeMove(move);
     }
     else
     {
-      awaitingPromotion = true;
-      promotionMove = move;
+      m_awaitingPromotion = true;
+      m_promotionMove = move;
     }
 
-    draggingPieceIndex = NO_SQUARE;
+    m_draggingPieceIndex = NO_SQUARE;
 
     return true;
   }
 
   Square GUIHandler::getMouseSquareIndex()
   {
-    int x = Mouse::getPosition(*window).x;
-    int y = Mouse::getPosition(*window).y;
+    int x = Mouse::getPosition(*m_window).x;
+    int y = Mouse::getPosition(*m_window).y;
 
     if (x >= 0 && x <= 8 * SQUARE_SIZE && y >= 0 && y <= 8 * SQUARE_SIZE)
       return getSquareIndex(x, y);
@@ -158,13 +158,13 @@ namespace TungstenChess
 
   void GUIHandler::render()
   {
-    yellowOutlineIndex = getMouseSquareIndex();
+    m_yellowOutlineIndex = getMouseSquareIndex();
 
-    window->clear();
+    m_window->clear();
 
     drawBoardSquares();
 
-    if (awaitingPromotion)
+    if (m_awaitingPromotion)
     {
       drawPromotionPieces();
     }
@@ -174,7 +174,7 @@ namespace TungstenChess
       drawPieces();
     }
 
-    window->display();
+    m_window->display();
   }
 
   void GUIHandler::loadSquareTextures()
@@ -182,15 +182,15 @@ namespace TungstenChess
     sf::Image square;
 
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 255, 255));
-    squareTextures[WHITE_SQUARE].loadFromImage(square);
+    m_squareTextures[WHITE_SQUARE].loadFromImage(square);
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(216, 181, 149));
-    squareTextures[BLACK_SQUARE].loadFromImage(square);
+    m_squareTextures[BLACK_SQUARE].loadFromImage(square);
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 255, 0, 127));
-    squareTextures[YELLOW_HIGHLIGHT].loadFromImage(square);
+    m_squareTextures[YELLOW_HIGHLIGHT].loadFromImage(square);
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 0, 0, 200));
-    squareTextures[RED_HIGHLIGHT].loadFromImage(square);
+    m_squareTextures[RED_HIGHLIGHT].loadFromImage(square);
     square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(127, 127, 127, 200));
-    squareTextures[GRAY_HIGHLIGHT].loadFromImage(square);
+    m_squareTextures[GRAY_HIGHLIGHT].loadFromImage(square);
   }
 
   void GUIHandler::loadBoardSquares()
@@ -200,17 +200,17 @@ namespace TungstenChess
     {
       for (int j = 0; j < 8; j++)
       {
-        boardSquares[squareIndex].setTexture(squareTextures[(i + j) % 2]);
-        redHighlightsSprites[squareIndex].setTexture(squareTextures[RED_HIGHLIGHT]);
-        yellowHighlightsSprites[squareIndex].setTexture(squareTextures[YELLOW_HIGHLIGHT]);
-        grayHighlightsSprites[squareIndex].setTexture(squareTextures[GRAY_HIGHLIGHT]);
-        yellowOutlineSprites[squareIndex].setTexture(resourceManager.m_yellowOutlineTexture);
+        m_boardSquares[squareIndex].setTexture(m_squareTextures[(i + j) % 2]);
+        m_redHighlightsSprites[squareIndex].setTexture(m_squareTextures[RED_HIGHLIGHT]);
+        m_yellowHighlightsSprites[squareIndex].setTexture(m_squareTextures[YELLOW_HIGHLIGHT]);
+        m_grayHighlightsSprites[squareIndex].setTexture(m_squareTextures[GRAY_HIGHLIGHT]);
+        m_yellowOutlineSprites[squareIndex].setTexture(m_resourceManager.m_yellowOutlineTexture);
 
-        boardSquares[squareIndex].setPosition(getSquareCoordinates(j, i));
-        redHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
-        yellowHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
-        grayHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
-        yellowOutlineSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
+        m_boardSquares[squareIndex].setPosition(getSquareCoordinates(j, i));
+        m_redHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
+        m_yellowHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
+        m_grayHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
+        m_yellowOutlineSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
 
         squareIndex++;
       }
@@ -223,12 +223,12 @@ namespace TungstenChess
     {
       for (Piece j = 0; j < PIECE_NUMBER; j++)
       {
-        pieceSprites[j][i].setTexture(resourceManager.m_pieceTextures[j]);
-        pieceSprites[j][i].setPosition(getSquareCoordinates(i));
-        pieceSprites[j][i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
+        m_pieceSprites[j][i].setTexture(m_resourceManager.m_pieceTextures[j]);
+        m_pieceSprites[j][i].setPosition(getSquareCoordinates(i));
+        m_pieceSprites[j][i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
       }
 
-      draggingPieceSprite.setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
+      m_draggingPieceSprite.setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
     }
   }
 
@@ -236,14 +236,14 @@ namespace TungstenChess
   {
     for (int i = 0; i < 4; i++)
     {
-      whitePromotionPieces[i].setTexture(resourceManager.m_pieceTextures[WHITE_QUEEN - i]);
-      blackPromotionPieces[i].setTexture(resourceManager.m_pieceTextures[BLACK_QUEEN - i]);
+      m_whitePromotionPieces[i].setTexture(m_resourceManager.m_pieceTextures[WHITE_QUEEN - i]);
+      m_blackPromotionPieces[i].setTexture(m_resourceManager.m_pieceTextures[BLACK_QUEEN - i]);
 
-      whitePromotionPieces[i].setPosition(getSquareCoordinates(10 + i));
-      blackPromotionPieces[i].setPosition(getSquareCoordinates(50 + i));
+      m_whitePromotionPieces[i].setPosition(getSquareCoordinates(10 + i));
+      m_blackPromotionPieces[i].setPosition(getSquareCoordinates(50 + i));
 
-      whitePromotionPieces[i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
-      blackPromotionPieces[i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
+      m_whitePromotionPieces[i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
+      m_blackPromotionPieces[i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
     }
   }
 
@@ -251,7 +251,7 @@ namespace TungstenChess
   {
     for (Square i = 0; i < 64; i++)
     {
-      window->draw(boardSquares[i]);
+      m_window->draw(m_boardSquares[i]);
     }
   }
 
@@ -259,23 +259,23 @@ namespace TungstenChess
   {
     for (Square i = 0; i < 64; i++)
     {
-      if (draggingPieceIndex == i || (awaitingPromotion && (promotionMove & FROM) == i))
+      if (m_draggingPieceIndex == i || (m_awaitingPromotion && (m_promotionMove & FROM) == i))
         continue;
 
-      if (!isThinking)
-        window->draw(pieceSprites[board[i]][i]);
+      if (!m_isThinking)
+        m_window->draw(m_pieceSprites[m_board[i]][i]);
       else
-        window->draw(pieceSprites[bufferBoard[i]][i]);
+        m_window->draw(m_pieceSprites[m_bufferBoard[i]][i]);
     }
 
-    if (isThinking)
+    if (m_isThinking)
       return;
 
-    if (draggingPieceIndex != NO_SQUARE)
+    if (m_draggingPieceIndex != NO_SQUARE)
     {
-      draggingPieceSprite.setTexture(resourceManager.m_pieceTextures[board[draggingPieceIndex]]);
-      draggingPieceSprite.setPosition(Mouse::getPosition(*window).x - SQUARE_SIZE / 2, Mouse::getPosition(*window).y - SQUARE_SIZE / 2);
-      window->draw(draggingPieceSprite);
+      m_draggingPieceSprite.setTexture(m_resourceManager.m_pieceTextures[m_board[m_draggingPieceIndex]]);
+      m_draggingPieceSprite.setPosition(Mouse::getPosition(*m_window).x - SQUARE_SIZE / 2, Mouse::getPosition(*m_window).y - SQUARE_SIZE / 2);
+      m_window->draw(m_draggingPieceSprite);
     }
   }
 
@@ -283,15 +283,15 @@ namespace TungstenChess
   {
     for (Square i = 0; i < 64; i++)
     {
-      if (Bitboards::hasBit(redHighlightsBitboard, i))
-        window->draw(redHighlightsSprites[i]);
-      else if (Bitboards::hasBit(grayHighlightsBitboard, i))
-        window->draw(grayHighlightsSprites[i]);
-      else if (Bitboards::hasBit(yellowHighlightsBitboard, i) || draggingPieceIndex == i)
-        window->draw(yellowHighlightsSprites[i]);
+      if (Bitboards::hasBit(m_redHighlightsBitboard, i))
+        m_window->draw(m_redHighlightsSprites[i]);
+      else if (Bitboards::hasBit(m_grayHighlightsBitboard, i))
+        m_window->draw(m_grayHighlightsSprites[i]);
+      else if (Bitboards::hasBit(m_yellowHighlightsBitboard, i) || m_draggingPieceIndex == i)
+        m_window->draw(m_yellowHighlightsSprites[i]);
 
-      if (yellowOutlineIndex == i)
-        window->draw(yellowOutlineSprites[i]);
+      if (m_yellowOutlineIndex == i)
+        m_window->draw(m_yellowOutlineSprites[i]);
     }
   }
 
@@ -299,32 +299,32 @@ namespace TungstenChess
   {
     for (int i = 0; i < 4; i++)
     {
-      if (board.sideToMove() == WHITE)
+      if (m_board.sideToMove() == WHITE)
       {
-        window->draw(whitePromotionPieces[i]);
+        m_window->draw(m_whitePromotionPieces[i]);
       }
       else
       {
-        window->draw(blackPromotionPieces[i]);
+        m_window->draw(m_blackPromotionPieces[i]);
       }
     }
   }
 
   void GUIHandler::clearHighlights()
   {
-    redHighlightsBitboard = 0;
-    yellowHighlightsBitboard = 0;
-    grayHighlightsBitboard = 0;
+    m_redHighlightsBitboard = 0;
+    m_yellowHighlightsBitboard = 0;
+    m_grayHighlightsBitboard = 0;
   }
 
   void GUIHandler::clearHighlights(Highlight highlight)
   {
     if (highlight == RED_HIGHLIGHT)
-      redHighlightsBitboard = 0;
+      m_redHighlightsBitboard = 0;
     else if (highlight == YELLOW_HIGHLIGHT)
-      yellowHighlightsBitboard = 0;
+      m_yellowHighlightsBitboard = 0;
     else if (highlight == GRAY_HIGHLIGHT)
-      grayHighlightsBitboard = 0;
+      m_grayHighlightsBitboard = 0;
   }
 
   void GUIHandler::makeMove(Move move)
@@ -335,18 +335,18 @@ namespace TungstenChess
     if (from == to)
       return;
 
-    board.makeMove(move);
+    m_board.makeMove(move);
 
     clearHighlights();
 
-    if (board.isInCheck(board.sideToMove()))
-      Bitboards::addBit(redHighlightsBitboard, board.kingIndex(board.sideToMove() | KING));
+    if (m_board.isInCheck(m_board.sideToMove()))
+      Bitboards::addBit(m_redHighlightsBitboard, m_board.kingIndex(m_board.sideToMove() | KING));
 
-    GameStatus gameStatus = board.getGameStatus(board.sideToMove());
+    GameStatus gameStatus = m_board.getGameStatus(m_board.sideToMove());
 
     if (gameStatus)
     {
-      gameOver = true;
+      m_gameOver = true;
 
       if (gameStatus == LOSE)
       {
@@ -358,15 +358,15 @@ namespace TungstenChess
       }
     }
 
-    Bitboards::addBit(yellowHighlightsBitboard, from);
-    Bitboards::addBit(yellowHighlightsBitboard, to);
+    Bitboards::addBit(m_yellowHighlightsBitboard, from);
+    Bitboards::addBit(m_yellowHighlightsBitboard, to);
 
-    boardUpdated.set();
+    m_boardUpdated.set();
   }
 
   void GUIHandler::makeBotMove()
   {
-    Move move = (board.sideToMove() == WHITE) ? whiteBot.generateBotMove() : blackBot.generateBotMove();
+    Move move = (m_board.sideToMove() == WHITE) ? m_whiteBot.generateBotMove() : m_blackBot.generateBotMove();
 
     makeMove(move);
 
@@ -377,21 +377,21 @@ namespace TungstenChess
   {
     for (Square i = 0; i < 64; i++)
     {
-      bufferBoard[i] = board[i];
+      m_bufferBoard[i] = m_board[i];
     }
   }
 
   void GUIHandler::startThinking()
   {
-    isThinking = true;
+    m_isThinking = true;
 
     if (THREADING)
     {
       saveBufferBoard();
 
-      thinkingThread = std::thread(&GUIHandler::makeBotMove, this);
+      m_thinkingThread = std::thread(&GUIHandler::makeBotMove, this);
 
-      thinkingThread.detach();
+      m_thinkingThread.detach();
     }
     else
     {
@@ -401,6 +401,6 @@ namespace TungstenChess
 
   void GUIHandler::stopThinking()
   {
-    isThinking = false;
+    m_isThinking = false;
   }
 }

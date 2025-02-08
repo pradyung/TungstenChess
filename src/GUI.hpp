@@ -104,51 +104,51 @@ namespace TungstenChess
   class GUIHandler
   {
   private:
-    ResourceManager &resourceManager = ResourceManager::getInstance();
+    ResourceManager &m_resourceManager = ResourceManager::getInstance();
 
-    Board board;
-    Bot whiteBot = Bot(board, 2000);
-    Bot blackBot = Bot(board, 2000);
+    Board m_board;
+    Bot m_whiteBot = Bot(m_board, 2000);
+    Bot m_blackBot = Bot(m_board, 2000);
 
-    Piece bufferBoard[64];
+    Piece m_bufferBoard[64];
 
-    RenderWindow *window;
+    RenderWindow *m_window;
 
-    Texture squareTextures[5];
+    Texture m_squareTextures[5];
 
-    Sprite boardSquares[64];
-    Sprite pieces[64];
+    Sprite m_boardSquares[64];
+    Sprite m_pieces[64];
 
-    std::array<Sprite, 64> pieceSprites[PIECE_NUMBER];
+    std::array<Sprite, 64> m_pieceSprites[PIECE_NUMBER];
 
-    Bitboard redHighlightsBitboard = 0;
-    Bitboard yellowHighlightsBitboard = 0;
-    Bitboard grayHighlightsBitboard = 0;
+    Bitboard m_redHighlightsBitboard = 0;
+    Bitboard m_yellowHighlightsBitboard = 0;
+    Bitboard m_grayHighlightsBitboard = 0;
 
-    Square yellowOutlineIndex = NO_SQUARE;
+    Square m_yellowOutlineIndex = NO_SQUARE;
 
-    Sprite redHighlightsSprites[64];
-    Sprite yellowHighlightsSprites[64];
-    Sprite grayHighlightsSprites[64];
-    Sprite yellowOutlineSprites[64];
+    Sprite m_redHighlightsSprites[64];
+    Sprite m_yellowHighlightsSprites[64];
+    Sprite m_grayHighlightsSprites[64];
+    Sprite m_yellowOutlineSprites[64];
 
-    Square draggingPieceIndex = NO_SQUARE;
-    Sprite draggingPieceSprite;
-    flag draggingPieceReleased;
+    Square m_draggingPieceIndex = NO_SQUARE;
+    Sprite m_draggingPieceSprite;
+    flag m_draggingPieceReleased;
 
-    Sprite whitePromotionPieces[4];
-    Sprite blackPromotionPieces[4];
+    Sprite m_whitePromotionPieces[4];
+    Sprite m_blackPromotionPieces[4];
 
-    bool awaitingPromotion = false;
-    Move promotionMove;
+    bool m_awaitingPromotion = false;
+    Move m_promotionMove;
 
-    flag boardUpdated;
+    flag m_boardUpdated;
 
-    bool gameOver = false;
+    bool m_gameOver = false;
 
-    bool isThinking = false;
+    bool m_isThinking = false;
 
-    std::thread thinkingThread;
+    std::thread m_thinkingThread;
 
   public:
     /**
