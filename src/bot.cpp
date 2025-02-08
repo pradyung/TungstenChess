@@ -364,18 +364,18 @@ namespace TungstenChess
     m_previousSearchInfo.lossFound = false;
     m_previousSearchInfo.transpositionsUsed = 0;
 
+    int depth = 1;
+
+    m_maxSearchTime = time;
+    m_searchTimerReset = true;
+    m_searchTimerEvent.notify_one();
+
     uint64_t pieceKey = m_board.getPieceKey();
     if (pieceKey != m_transpositionTablePieceKey)
     {
       m_transpositionTable.clear();
       m_transpositionTablePieceKey = pieceKey;
     }
-
-    int depth = 1;
-
-    m_maxSearchTime = time;
-    m_searchTimerReset = true;
-    m_searchTimerEvent.notify_one();
 
     Move bestMove = generateBestMove(depth);
 

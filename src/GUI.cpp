@@ -19,7 +19,8 @@ namespace TungstenChess
   {
     this->window = &window;
 
-    bot.loadOpeningBook(resourceManager.m_openingBookPath, resourceManager.m_openingBookSize);
+    whiteBot.loadOpeningBook(resourceManager.m_openingBookPath, resourceManager.m_openingBookSize);
+    blackBot.loadOpeningBook(resourceManager.m_openingBookPath, resourceManager.m_openingBookSize);
 
     loadSquareTextures();
     loadBoardSquares();
@@ -365,7 +366,7 @@ namespace TungstenChess
 
   void GUIHandler::makeBotMove()
   {
-    Move move = bot.generateBotMove();
+    Move move = (board.sideToMove() == WHITE) ? whiteBot.generateBotMove() : blackBot.generateBotMove();
 
     makeMove(move);
 
