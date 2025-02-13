@@ -192,7 +192,7 @@ namespace TungstenChess
       WHITE_PAWN, WHITE_KNIGHT, WHITE_BISHOP, WHITE_ROOK, WHITE_QUEEN, WHITE_KING,
       BLACK_PAWN, BLACK_KNIGHT, BLACK_BISHOP, BLACK_ROOK, BLACK_QUEEN, BLACK_KING};
 
-  enum Squares : uint8_t
+  enum Squares : Square
   {
     A8 = 0,
     B8 = 1,
@@ -260,7 +260,7 @@ namespace TungstenChess
     H1 = 63
   };
 
-  enum Files : uint8_t
+  enum Files : File
   {
     FILE_A = 0,
     FILE_B = 1,
@@ -272,7 +272,7 @@ namespace TungstenChess
     FILE_H = 7
   };
 
-  enum Ranks : uint8_t
+  enum Ranks : Rank
   {
     RANK_1 = 0,
     RANK_2 = 1,

@@ -584,7 +584,7 @@ namespace TungstenChess
     return pgn;
   }
 
-  uint Board::countGames(uint depth, bool verbose)
+  uint Board::countGames(uint8_t depth, bool verbose)
   {
     if (depth == 0)
       return 1;

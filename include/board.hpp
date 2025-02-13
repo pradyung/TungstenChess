@@ -159,7 +159,7 @@ namespace TungstenChess
      * @param depth The depth to search to
      * @param verbose Whether to print the number of games found after each 1-deep move
      */
-    uint countGames(uint depth, bool verbose = true);
+    uint countGames(uint8_t depth, bool verbose = true);
 
     /**
      * @brief Gets the legal moves for a color
@@ -172,9 +172,9 @@ namespace TungstenChess
      * @brief Counts the number of times a position has been repeated
      * @param key The Zobrist key of the position to check
      */
-    uint countRepetitions(ZobristKey key) const
+    uint8_t countRepetitions(ZobristKey key) const
     {
-      uint count = 0;
+      uint8_t count = 0;
 
       for (size_t i = 0; i < m_positionHistory.size(); i++)
         if (m_positionHistory[i] == key)
