@@ -11,7 +11,6 @@
 #include "types.hpp"
 #include "move.hpp"
 
-#define NUM_FEN_PARTS 6
 #define NO_EP 8
 
 #define DEFAULT_START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -46,7 +45,6 @@ namespace TungstenChess
   public:
     Board(std::string fen = START_FEN) : m_isDefaultStartPosition(fen == DEFAULT_START_FEN)
     {
-
       Zobrist::init();
       MovesLookup::init();
       MagicMoveGen::init();

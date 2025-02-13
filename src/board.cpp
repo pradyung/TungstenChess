@@ -25,7 +25,7 @@ namespace TungstenChess
 
   void Board::resetBoard(std::string fen)
   {
-    std::string fenParts[NUM_FEN_PARTS];
+    std::string fenParts[6];
 
     int fenPartIndex = 0;
 
@@ -564,7 +564,7 @@ namespace TungstenChess
       pgn += '8' - (to / 8);
 
       if (flags & EP_CAPTURE)
-        pgn += " e.p.";
+        pgn += " ep";
       else if (flags & PROMOTION)
       {
         pgn += "=";
