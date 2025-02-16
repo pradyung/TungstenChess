@@ -46,7 +46,7 @@ namespace TungstenChess
       ISOLATED_PAWN_PENALTY = 25,
       BACKWARDS_PAWN_PENALTY = 50,
       KING_SAFETY_PAWN_SHIELD_BONUS = 50,
-      STALEMATE_PENALTY = 150,
+      CONTEMPT = 100,
     };
 
     struct BotSettings

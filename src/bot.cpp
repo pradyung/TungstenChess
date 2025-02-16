@@ -45,7 +45,7 @@ namespace TungstenChess
       if (gameStatus == LOSE)
         return NEGATIVE_INFINITY;
       else
-        return -STALEMATE_PENALTY;
+        return -CONTEMPT;
     }
 
     int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
@@ -263,12 +263,12 @@ namespace TungstenChess
     }
 
     if (m_board.countRepetitions(m_board.zobristKey()) >= 3 || m_board.halfmoveClock() >= 100)
-      return -STALEMATE_PENALTY;
+      return -CONTEMPT;
 
     std::vector<Move> legalMoves = getSortedLegalMoves(m_board.sideToMove(), quiesce);
 
     if (legalMoves.empty())
-      return (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY + (quiesce ? 1 : 0) : -STALEMATE_PENALTY);
+      return (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY + (quiesce ? 1 : 0) : -CONTEMPT);
 
     if (legalMoves.size() == 1)
       depth++;
