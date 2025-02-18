@@ -204,14 +204,12 @@ namespace TungstenChess
       std::vector<Bitboard> shifts = getShiftedBlockers(magic, shift, square, blocks);
       std::vector<Bitboard> moves = getAllMovesBitboards(square, blocks, rook);
 
-      Bitboard maxShift = 0;
-      for (size_t i = 0; i < shifts.size(); i++)
-        maxShift = std::max(maxShift, shifts[i]);
-
-      std::vector<Bitboard> lookupTable = std::vector<Bitboard>(maxShift + 1, 0);
+      std::vector<Bitboard> lookupTable = std::vector<Bitboard>(1 << (64 - shift), 0);
 
       for (size_t i = 0; i < shifts.size(); i++)
         lookupTable[shifts[i]] = moves[i];
+
+      std::cout << lookupTable.size() << std::endl;
 
       return lookupTable;
     }
