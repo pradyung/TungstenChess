@@ -11,7 +11,8 @@ namespace TungstenChess
   {
   public:
     /**
-     * Returns a UCI string representation of the move
+     * @brief Returns a UCI string representation of the move
+     * @param move The move to convert
      */
     static std::string getUCI(Move move)
     {
@@ -33,10 +34,11 @@ namespace TungstenChess
     }
 
     /**
-     * Creates a move
+     * @brief Creates a move
      * @param from The square the piece is moving from
      * @param to The square the piece is moving to
      * @param promotionPieceType The piece type to promote to (if any)
+     * @return The created move
      */
     static Move createMove(Square from, Square to, PieceType promotionPieceType = EMPTY)
     {
@@ -73,7 +75,7 @@ namespace TungstenChess
     }
 
     /**
-     * Checks if a move is a promotion
+     * @brief Checks if a move is a promotion
      * @param to The square the piece is moving to
      * @param pieceType The type of the piece moving (only matters if it's a pawn)
      */
