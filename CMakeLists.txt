@@ -16,7 +16,7 @@ file(GLOB_RECURSE RESOURCES "resources/*")
 list(FILTER RESOURCES EXCLUDE REGEX ".*\\.DS_Store")
 set_source_files_properties(${RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-add_executable(TungstenChess MACOSX_BUNDLE src/GUI.cpp src/board.cpp src/bot.cpp ${RESOURCES})
+add_executable(TungstenChess MACOSX_BUNDLE src/main.cpp src/GUI.cpp src/board.cpp src/bot.cpp ${RESOURCES})
 set_target_properties(TungstenChess PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist)
 target_include_directories(TungstenChess PRIVATE include)
 target_link_libraries(TungstenChess PRIVATE sfml-graphics pthread "-framework CoreFoundation")
