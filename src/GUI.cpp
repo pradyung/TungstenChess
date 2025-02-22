@@ -2,22 +2,18 @@
 
 int main()
 {
-  using namespace TungstenChess;
-
   RenderWindow window(VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE * 8), "TungstenChess", sf::Style::Titlebar | sf::Style::Close);
 
-  GUIHandler gui(window);
+  TungstenChess::GUIHandler gui(window);
 
   gui.runMainLoop();
-
-  return 0;
 }
 
 namespace TungstenChess
 {
   GUIHandler::GUIHandler(RenderWindow &window)
   {
-    this->m_window = &window;
+    m_window = &window;
 
     m_whiteBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
     m_blackBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);

@@ -209,8 +209,6 @@ namespace TungstenChess
       for (size_t i = 0; i < shifts.size(); i++)
         lookupTable[shifts[i]] = moves[i];
 
-      std::cout << lookupTable.size() << std::endl;
-
       return lookupTable;
     }
 
