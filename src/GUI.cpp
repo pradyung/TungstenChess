@@ -76,7 +76,7 @@ namespace TungstenChess
     {
       Piece promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
-      if (promotionPiece == EMPTY || !(promotionPiece & m_board.sideToMove()))
+      if (promotionPiece == NO_PIECE || !(promotionPiece & m_board.sideToMove()))
         return false;
 
       m_promotionMove |= (promotionPiece & TYPE) << 12;

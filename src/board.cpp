@@ -10,7 +10,7 @@ namespace TungstenChess
     {
       if (m_board[i])
       {
-        zobristKey ^= Zobrist::pieceKeys[i][m_board[i]];
+        zobristKey ^= Zobrist::pieceKeys[m_board[i], i];
       }
     }
 
@@ -57,7 +57,7 @@ namespace TungstenChess
       {
         for (int j = 0; j < fen[i] - '0'; j++)
         {
-          m_board[pieceIndex] = EMPTY;
+          m_board[pieceIndex] = NO_PIECE;
           pieceIndex++;
         }
       }
@@ -139,7 +139,7 @@ namespace TungstenChess
       removeCastlingRights(capturedPieceColor, to % 8 == 0 ? QUEENSIDE : KINGSIDE);
 
     if (flags & EP_CAPTURE)
-      updatePiece(to + (piece & WHITE ? 8 : -8), EMPTY);
+      updatePiece(to + (piece & WHITE ? 8 : -8), NO_PIECE);
 
     if (flags & CASTLE)
     {
@@ -202,7 +202,7 @@ namespace TungstenChess
           Bitboards::addBit(movesBitboard, pieceIndex - 16);
       }
 
-      movesBitboard |= (MovesLookup::PAWN_CAPTURE_MOVES[WHITE_PAWN][pieceIndex] & (m_bitboards[BLACK] | (m_enPassantFile == NO_EP ? 0 : 1ULL << (m_enPassantFile + 16))));
+      movesBitboard |= (MovesLookup::PAWN_CAPTURE_MOVES[WHITE_PAWN, pieceIndex] & (m_bitboards[BLACK] | (m_enPassantFile == NO_EP ? 0 : 1ULL << (m_enPassantFile + 16))));
     }
     else if (color & BLACK)
     {
@@ -213,7 +213,7 @@ namespace TungstenChess
           Bitboards::addBit(movesBitboard, pieceIndex + 16);
       }
 
-      movesBitboard |= (MovesLookup::PAWN_CAPTURE_MOVES[BLACK_PAWN][pieceIndex] & (m_bitboards[WHITE] | (m_enPassantFile == NO_EP ? 0 : 1ULL << (m_enPassantFile + 40))));
+      movesBitboard |= (MovesLookup::PAWN_CAPTURE_MOVES[BLACK_PAWN, pieceIndex] & (m_bitboards[WHITE] | (m_enPassantFile == NO_EP ? 0 : 1ULL << (m_enPassantFile + 40))));
     }
 
     return movesBitboard;
@@ -299,12 +299,12 @@ namespace TungstenChess
 
     if (targetPiece)
     {
-      if (Bitboard attackingPawns = MovesLookup::PAWN_CAPTURE_MOVES[color ^ COLOR][targetSquare] & m_bitboards[color | PAWN])
+      if (Bitboard attackingPawns = MovesLookup::PAWN_CAPTURE_MOVES[color ^ COLOR, targetSquare] & m_bitboards[color | PAWN])
         attackingPiecesBitboard |= attackingPawns;
     }
     else
     {
-      Bitboard reverseSinglePawnMoveSquare = MovesLookup::PAWN_REVERSE_SINGLE_MOVES[color][targetSquare];
+      Bitboard reverseSinglePawnMoveSquare = MovesLookup::PAWN_REVERSE_SINGLE_MOVES[color, targetSquare];
 
       if (Bitboard attackingSingleMovePawns = reverseSinglePawnMoveSquare & m_bitboards[color | PAWN])
       {
@@ -312,7 +312,7 @@ namespace TungstenChess
       }
       else if (!(reverseSinglePawnMoveSquare & m_bitboards[ALL_PIECES]))
       {
-        Bitboard reverseDoublePawnMoveSquare = MovesLookup::PAWN_REVERSE_DOUBLE_MOVES[color][targetSquare];
+        Bitboard reverseDoublePawnMoveSquare = MovesLookup::PAWN_REVERSE_DOUBLE_MOVES[color, targetSquare];
 
         if (Bitboard attackingDoubleMovePawns = reverseDoublePawnMoveSquare & m_bitboards[color | PAWN])
           attackingPiecesBitboard |= attackingDoubleMovePawns;
@@ -411,7 +411,7 @@ namespace TungstenChess
 
         if (!isInCheck(color))
         {
-          legalMoves.push_back(Moves::createMove(attackerIndex, targetSquare, EMPTY));
+          legalMoves.push_back(Moves::createMove(attackerIndex, targetSquare, NO_TYPE));
 
           Move &move = legalMoves.back();
 
@@ -435,7 +435,7 @@ namespace TungstenChess
   {
     PieceColor opposingColor = color ^ COLOR;
 
-    if (MovesLookup::PAWN_CAPTURE_MOVES[opposingColor][square] & m_bitboards[color | PAWN])
+    if (MovesLookup::PAWN_CAPTURE_MOVES[opposingColor, square] & m_bitboards[color | PAWN])
       return true;
 
     else if (MovesLookup::KNIGHT_MOVES[square] & m_bitboards[color | KNIGHT])
@@ -476,7 +476,7 @@ namespace TungstenChess
     Square from = (uci[0] - 'a') + (8 - uci[1] + '0') * 8;
     Square to = (uci[2] - 'a') + (8 - uci[3] + '0') * 8;
 
-    PieceType promotionPieceType = EMPTY;
+    PieceType promotionPieceType = NO_TYPE;
 
     if (uci.length() == 5)
     {

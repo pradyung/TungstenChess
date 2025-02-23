@@ -11,6 +11,7 @@
 #include "board.hpp"
 #include "opening_book.hpp"
 #include "piece_eval_tables.hpp"
+#include "utils.hpp"
 
 #define POSITIVE_INFINITY 1000000
 #define NEGATIVE_INFINITY -1000000

@@ -20,6 +20,6 @@ add_executable(TungstenChess MACOSX_BUNDLE src/main.cpp src/GUI.cpp src/board.cp
 set_target_properties(TungstenChess PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist)
 target_include_directories(TungstenChess PRIVATE include)
 target_link_libraries(TungstenChess PRIVATE sfml-graphics pthread "-framework CoreFoundation")
-target_compile_features(TungstenChess PRIVATE cxx_std_17)
+target_compile_features(TungstenChess PRIVATE cxx_std_23)
 
 install(TARGETS TungstenChess BUNDLE DESTINATION .)

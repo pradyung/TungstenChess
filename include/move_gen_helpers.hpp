@@ -3,6 +3,7 @@
 #include <array>
 
 #include "bitboard.hpp"
+#include "utils.hpp"
 
 namespace TungstenChess
 {
@@ -31,9 +32,9 @@ namespace TungstenChess
     static inline std::array<Bitboard, 64> BISHOP_MASKS = {};
     static inline std::array<Bitboard, 64> ROOK_MASKS = {};
 
-    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_CAPTURE_MOVES = {};
-    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_SINGLE_MOVES = {};
-    static inline std::array<std::array<Bitboard, 64>, BLACK_PAWN + 1> PAWN_REVERSE_DOUBLE_MOVES = {};
+    static inline array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_CAPTURE_MOVES = {};
+    static inline array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_REVERSE_SINGLE_MOVES = {};
+    static inline array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_REVERSE_DOUBLE_MOVES = {};
 
     friend class Board;
     friend class MagicMoveGen;
@@ -106,38 +107,40 @@ namespace TungstenChess
       {
         Bitboard position = 1ULL << square;
 
-        PAWN_CAPTURE_MOVES[WHITE_PAWN][square] = 0ULL;
-        PAWN_CAPTURE_MOVES[BLACK_PAWN][square] = 0ULL;
+        PAWN_CAPTURE_MOVES[WHITE_PAWN, square] = 0ULL;
+        PAWN_CAPTURE_MOVES[BLACK_PAWN, square] = 0ULL;
 
         if (square > 7 && square % 8 > 0)
-          PAWN_CAPTURE_MOVES[WHITE_PAWN][square] |= position >> 9;
+          PAWN_CAPTURE_MOVES[WHITE_PAWN, square] |= position >> 9;
         if (square > 7 && square % 8 < 7)
-          PAWN_CAPTURE_MOVES[WHITE_PAWN][square] |= position >> 7;
+          PAWN_CAPTURE_MOVES[WHITE_PAWN, square] |= position >> 7;
         if (square < 56 && square % 8 > 0)
-          PAWN_CAPTURE_MOVES[BLACK_PAWN][square] |= position << 7;
+          PAWN_CAPTURE_MOVES[BLACK_PAWN, square] |= position << 7;
         if (square < 56 && square % 8 < 7)
-          PAWN_CAPTURE_MOVES[BLACK_PAWN][square] |= position << 9;
+          PAWN_CAPTURE_MOVES[BLACK_PAWN, square] |= position << 9;
 
-        PAWN_REVERSE_SINGLE_MOVES[WHITE_PAWN][square] = position << 8;
-        PAWN_REVERSE_SINGLE_MOVES[BLACK_PAWN][square] = position >> 8;
+        PAWN_REVERSE_SINGLE_MOVES[WHITE_PAWN, square] = position << 8;
+        PAWN_REVERSE_SINGLE_MOVES[BLACK_PAWN, square] = position >> 8;
 
-        PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN][square] = 0ULL;
-        PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN][square] = 0ULL;
+        PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN, square] = 0ULL;
+        PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN, square] = 0ULL;
 
         if (square / 8 == 4)
-          PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN][square] = position << 16;
+          PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN, square] = position << 16;
         else if (square / 8 == 3)
-          PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN][square] = position >> 16;
+          PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN, square] = position >> 16;
       }
 
-      PAWN_CAPTURE_MOVES[WHITE] = PAWN_CAPTURE_MOVES[WHITE_PAWN];
-      PAWN_CAPTURE_MOVES[BLACK] = PAWN_CAPTURE_MOVES[BLACK_PAWN];
+      std::cout << PAWN_CAPTURE_MOVES[WHITE_PAWN, 53] << std::endl;
 
-      PAWN_REVERSE_SINGLE_MOVES[WHITE] = PAWN_REVERSE_SINGLE_MOVES[WHITE_PAWN];
-      PAWN_REVERSE_SINGLE_MOVES[BLACK] = PAWN_REVERSE_SINGLE_MOVES[BLACK_PAWN];
+      PAWN_CAPTURE_MOVES.copyRow(WHITE_PAWN, WHITE);
+      PAWN_CAPTURE_MOVES.copyRow(BLACK_PAWN, BLACK);
 
-      PAWN_REVERSE_DOUBLE_MOVES[WHITE] = PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN];
-      PAWN_REVERSE_DOUBLE_MOVES[BLACK] = PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN];
+      PAWN_REVERSE_SINGLE_MOVES.copyRow(WHITE_PAWN, WHITE);
+      PAWN_REVERSE_SINGLE_MOVES.copyRow(BLACK_PAWN, BLACK);
+
+      PAWN_REVERSE_DOUBLE_MOVES.copyRow(WHITE_PAWN, WHITE);
+      PAWN_REVERSE_DOUBLE_MOVES.copyRow(BLACK_PAWN, BLACK);
     }
 
     /**

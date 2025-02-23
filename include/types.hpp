@@ -10,7 +10,7 @@
 
 #define DEF_USE_OPENING_BOOK !DEBUG_MODE
 #define DEF_GUI_THREADING !DEBUG_MODE
-#define DEF_PLAYER_COLOR DEBUG_MODE ? EMPTY : WHITE
+#define DEF_PLAYER_COLOR DEBUG_MODE ? NO_COLOR : WHITE
 
 namespace TungstenChess
 {
@@ -30,59 +30,6 @@ namespace TungstenChess
 
   typedef uint64_t Magic;
   typedef uint8_t Shift;
-
-  template <bool B>
-  struct once
-  {
-    operator bool()
-    {
-      std::lock_guard<std::mutex> lock(mtx);
-      if (value == B)
-      {
-        value = !B;
-        return B;
-      }
-      return !B;
-    }
-
-    void trigger()
-    {
-      std::lock_guard<std::mutex> lock(mtx);
-      value = !B;
-    }
-
-    bool peek()
-    {
-      std::lock_guard<std::mutex> lock(mtx);
-      return value;
-    }
-
-  private:
-    bool value = B;
-    std::mutex mtx;
-  };
-
-  struct bool_flag
-  {
-    operator bool() const { return value; }
-    void set() { value = true; }
-    bool pop()
-    {
-      bool temp = value;
-      value = false;
-      return temp;
-    }
-
-  private:
-    bool value;
-  };
-
-  static inline std::string padString(std::string str, size_t length)
-  {
-    if (str.length() < length)
-      str += std::string(length - str.length(), ' ');
-    return str;
-  }
 
   enum CastlingRights : uint8_t
   {
@@ -142,7 +89,7 @@ namespace TungstenChess
 
   enum PieceTypes : PieceType
   {
-    EMPTY = 0,
+    NO_TYPE = 0,
     PAWN = 1,
     KNIGHT = 2,
     BISHOP = 3,
@@ -162,6 +109,7 @@ namespace TungstenChess
 
   enum PieceColors : PieceColor
   {
+    NO_COLOR = 0,
     WHITE = 8,
     BLACK = 16,
     BOTH = WHITE | BLACK
@@ -169,6 +117,7 @@ namespace TungstenChess
 
   enum Pieces : Piece
   {
+    NO_PIECE = 0,
     WHITE_PAWN = WHITE | PAWN,
     WHITE_KNIGHT = WHITE | KNIGHT,
     WHITE_BISHOP = WHITE | BISHOP,
@@ -188,7 +137,7 @@ namespace TungstenChess
   };
 
   const Piece validPieces[13] = {
-      EMPTY,
+      NO_PIECE,
       WHITE_PAWN, WHITE_KNIGHT, WHITE_BISHOP, WHITE_ROOK, WHITE_QUEEN, WHITE_KING,
       BLACK_PAWN, BLACK_KNIGHT, BLACK_BISHOP, BLACK_ROOK, BLACK_QUEEN, BLACK_KING};
 

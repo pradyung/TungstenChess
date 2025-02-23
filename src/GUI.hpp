@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "bot.hpp"
+#include "utils.hpp"
 
 using namespace sf;
 
@@ -218,7 +219,7 @@ namespace TungstenChess
       case F2:
         return BLACK_KNIGHT;
       default:
-        return EMPTY;
+        return NO_PIECE;
       }
     }
 

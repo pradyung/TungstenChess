@@ -80,7 +80,7 @@ namespace TungstenChess
 
       for (Piece piece : validPieces)
       {
-        if (piece == EMPTY)
+        if (piece == NO_PIECE)
           continue;
 
         key = key * 10 + pieceCounts[piece];
@@ -226,7 +226,7 @@ namespace TungstenChess
       Piece fromPiece = m_board[from];
       Piece toPiece = m_board[to];
 
-      updateBitboards(from, fromPiece, EMPTY);
+      updateBitboards(from, fromPiece, NO_PIECE);
       updateBitboards(to, toPiece, fromPiece);
 
       if ((fromPiece & TYPE) == PAWN)
@@ -235,7 +235,7 @@ namespace TungstenChess
         {
           PieceColor color = fromPiece & COLOR;
           Square epSquare = to + (color & WHITE ? 8 : -8);
-          updateBitboards(epSquare, (color ^ COLOR) | PAWN, EMPTY);
+          updateBitboards(epSquare, (color ^ COLOR) | PAWN, NO_PIECE);
 
           return EP_CAPTURE;
         }
@@ -251,16 +251,16 @@ namespace TungstenChess
         if (to - from == 2)
         {
           Piece rook = (fromPiece & COLOR) | ROOK;
-          updateBitboards(from + 3, rook, EMPTY);
-          updateBitboards(from + 1, EMPTY, rook);
+          updateBitboards(from + 3, rook, NO_PIECE);
+          updateBitboards(from + 1, NO_PIECE, rook);
 
           return KSIDE_CASTLE;
         }
         else if (from - to == 2)
         {
           Piece rook = (fromPiece & COLOR) | ROOK;
-          updateBitboards(from - 4, rook, EMPTY);
-          updateBitboards(from - 1, EMPTY, rook);
+          updateBitboards(from - 4, rook, NO_PIECE);
+          updateBitboards(from - 1, NO_PIECE, rook);
 
           return QSIDE_CASTLE;
         }
@@ -281,7 +281,7 @@ namespace TungstenChess
       Piece toPiece = m_board[to];
 
       updateBitboards(to, fromPiece, toPiece);
-      updateBitboards(from, EMPTY, fromPiece);
+      updateBitboards(from, NO_PIECE, fromPiece);
 
       if ((fromPiece & TYPE) == KING)
         m_kingIndices[fromPiece] = from;
@@ -290,21 +290,21 @@ namespace TungstenChess
       {
         PieceColor color = fromPiece & COLOR;
         Square epSquare = to + (color & WHITE ? 8 : -8);
-        updateBitboards(epSquare, EMPTY, (color ^ COLOR) | PAWN);
+        updateBitboards(epSquare, NO_PIECE, (color ^ COLOR) | PAWN);
       }
 
       else if (flag & KSIDE_CASTLE)
       {
         Piece rook = (fromPiece & COLOR) | ROOK;
-        updateBitboards(from + 3, EMPTY, rook);
-        updateBitboards(from + 1, rook, EMPTY);
+        updateBitboards(from + 3, NO_PIECE, rook);
+        updateBitboards(from + 1, rook, NO_PIECE);
       }
 
       else if (flag & QSIDE_CASTLE)
       {
         Piece rook = (fromPiece & COLOR) | ROOK;
-        updateBitboards(from - 4, EMPTY, rook);
-        updateBitboards(from - 1, rook, EMPTY);
+        updateBitboards(from - 4, NO_PIECE, rook);
+        updateBitboards(from - 1, rook, NO_PIECE);
       }
     }
 
@@ -331,10 +331,10 @@ namespace TungstenChess
      * @param to The index to move the piece to
      * @param promotionPiece The piece to promote to (if any)
      */
-    void movePiece(Square from, Square to, Piece promotionPiece = EMPTY)
+    void movePiece(Square from, Square to, Piece promotionPiece = NO_PIECE)
     {
-      updatePiece(to, (promotionPiece & TYPE) == EMPTY ? m_board[from] : promotionPiece);
-      updatePiece(from, EMPTY);
+      updatePiece(to, (promotionPiece & TYPE) == NO_TYPE ? m_board[from] : promotionPiece);
+      updatePiece(from, NO_PIECE);
     }
 
     /**
@@ -345,9 +345,9 @@ namespace TungstenChess
      * @param movedPiece The piece that was moved (Used for undoing promotions)
      * @param capturedPiece The piece that was captured (Used for undoing captures)
      */
-    void unmovePiece(Square from, Square to, Piece movedPiece = EMPTY, Piece capturedPiece = EMPTY)
+    void unmovePiece(Square from, Square to, Piece movedPiece = NO_PIECE, Piece capturedPiece = NO_PIECE)
     {
-      updatePiece(from, movedPiece == EMPTY ? m_board[to] : movedPiece);
+      updatePiece(from, movedPiece == NO_PIECE ? m_board[to] : movedPiece);
       updatePiece(to, capturedPiece);
     }
 

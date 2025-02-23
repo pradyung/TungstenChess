@@ -5,6 +5,7 @@
 
 #include "move_gen_helpers.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 namespace TungstenChess
 {

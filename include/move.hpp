@@ -27,7 +27,7 @@ namespace TungstenChess
       uci += 'a' + (to % 8);
       uci += '8' - (to / 8);
 
-      if (promotionPieceType != EMPTY)
+      if (promotionPieceType != NO_TYPE)
         uci += ".pnbrqk"[promotionPieceType];
 
       return uci;
@@ -40,7 +40,7 @@ namespace TungstenChess
      * @param promotionPieceType The piece type to promote to (if any)
      * @return The created move
      */
-    static Move createMove(Square from, Square to, PieceType promotionPieceType = EMPTY)
+    static Move createMove(Square from, Square to, PieceType promotionPieceType = NO_TYPE)
     {
       return from | (to << 6) | (promotionPieceType << 12);
     }
@@ -65,7 +65,7 @@ namespace TungstenChess
       {
         if (from - to == 16 || from - to == -16)
           return PAWN_DOUBLE;
-        else if (capturedPiece == EMPTY && (to - from) % 8)
+        else if (capturedPiece == NO_PIECE && (to - from) % 8)
           return EP_CAPTURE;
         else if (to <= 7 || to >= 56)
           return PROMOTION | bool(capturedPiece);
