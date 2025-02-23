@@ -62,7 +62,7 @@ namespace TungstenChess
     std::mutex mtx;
   };
 
-  struct flag
+  struct bool_flag
   {
     operator bool() const { return value; }
     void set() { value = true; }

@@ -134,7 +134,7 @@ namespace TungstenChess
 
     Square m_draggingPieceIndex = NO_SQUARE;
     Sprite m_draggingPieceSprite;
-    flag m_draggingPieceReleased;
+    bool_flag m_draggingPieceReleased;
 
     Sprite m_whitePromotionPieces[4];
     Sprite m_blackPromotionPieces[4];
@@ -142,7 +142,7 @@ namespace TungstenChess
     bool m_awaitingPromotion = false;
     Move m_promotionMove;
 
-    flag m_boardUpdated;
+    bool_flag m_boardUpdated;
 
     bool m_gameOver = false;
 
