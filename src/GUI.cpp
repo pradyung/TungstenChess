@@ -26,7 +26,7 @@ namespace TungstenChess
 
     while (m_window->isOpen())
     {
-      if (needsRefresh || m_boardUpdated.pop() || m_draggingPieceReleased.pop())
+      if (needsRefresh || m_boardUpdated.pop_flag() || m_draggingPieceReleased.pop_flag())
       {
         render();
         needsRefresh = false;
@@ -108,7 +108,7 @@ namespace TungstenChess
     if (!Bitboards::hasBit(m_grayHighlightsBitboard, GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y)))
     {
       m_draggingPieceIndex = NO_SQUARE;
-      m_draggingPieceReleased.set();
+      m_draggingPieceReleased.set_flag();
       clearHighlights(GRAY_HIGHLIGHT);
       return false;
     }
@@ -336,19 +336,15 @@ namespace TungstenChess
       m_gameOver = true;
 
       if (gameStatus == LOSE)
-      {
         std::cout << "Checkmate" << std::endl;
-      }
       else
-      {
         std::cout << "Stalemate" << std::endl;
-      }
     }
 
     Bitboards::addBit(m_yellowHighlightsBitboard, from);
     Bitboards::addBit(m_yellowHighlightsBitboard, to);
 
-    m_boardUpdated.set();
+    m_boardUpdated.set_flag();
   }
 
   void GUIHandler::makeBotMove()

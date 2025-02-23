@@ -131,8 +131,6 @@ namespace TungstenChess
           PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN, square] = position >> 16;
       }
 
-      std::cout << PAWN_CAPTURE_MOVES[WHITE_PAWN, 53] << std::endl;
-
       PAWN_CAPTURE_MOVES.copyRow(WHITE_PAWN, WHITE);
       PAWN_CAPTURE_MOVES.copyRow(BLACK_PAWN, BLACK);
 

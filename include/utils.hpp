@@ -39,8 +39,8 @@ namespace TungstenChess
   struct bool_flag
   {
     operator bool() const { return value; }
-    void set() { value = true; }
-    bool pop()
+    void set_flag() { value = true; }
+    bool pop_flag()
     {
       bool temp = value;
       value = false;

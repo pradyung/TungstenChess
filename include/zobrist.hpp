@@ -25,7 +25,7 @@ namespace TungstenChess
       std::uniform_int_distribution<ZobristKey> dis(0, 0xFFFFFFFFFFFFFFFF);
 
       for (Piece piece : validPieces)
-        for (Square square = 0; i < 64; i++)
+        for (Square square = 0; square < 64; square++)
           pieceKeys[piece, square] = dis(gen);
 
       for (int i = 0; i < 16; i++)
@@ -38,8 +38,8 @@ namespace TungstenChess
 
       for (Piece piece1 : validPieces)
         for (Piece piece2 : validPieces)
-          for (Square square = 0; i < 64; i++)
-            precomputedPieceCombinationKeys[i | (j << 6) | (k << 11)] = pieceKeys[piece1, square] ^ pieceKeys[piece2, square];
+          for (Square square = 0; square < 64; square++)
+            precomputedPieceCombinationKeys[square | (piece1 << 6) | (piece2 << 11)] = pieceKeys[piece1, square] ^ pieceKeys[piece2, square];
     }
 
   private:
