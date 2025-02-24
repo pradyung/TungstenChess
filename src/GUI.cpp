@@ -2,10 +2,8 @@
 
 namespace TungstenChess
 {
-  GUIHandler::GUIHandler(RenderWindow &window)
+  GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
   {
-    m_window = &window;
-
     m_whiteBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
     m_blackBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
 
@@ -15,7 +13,7 @@ namespace TungstenChess
     loadPieces();
     loadPromotionPieces();
 
-    window.setIcon(m_resourceManager.m_icon.getSize().x, m_resourceManager.m_icon.getSize().y, m_resourceManager.m_icon.getPixelsPtr());
+    m_window.setIcon(m_resourceManager.m_icon.getSize().x, m_resourceManager.m_icon.getSize().y, m_resourceManager.m_icon.getPixelsPtr());
   }
 
   void GUIHandler::runMainLoop()
@@ -24,7 +22,7 @@ namespace TungstenChess
 
     bool needsRefresh = true;
 
-    while (m_window->isOpen())
+    while (m_window.isOpen())
     {
       if (needsRefresh || m_boardUpdated.pop_flag() || m_draggingPieceReleased.pop_flag())
       {
@@ -41,13 +39,13 @@ namespace TungstenChess
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
       if (m_isThinking || m_boardUpdated)
-        m_window->pollEvent(event);
+        m_window.pollEvent(event);
       else
-        m_window->waitEvent(event);
+        m_window.waitEvent(event);
 
       if (event.type == Event::Closed)
       {
-        m_window->close();
+        m_window.close();
         return;
       }
 
@@ -134,8 +132,7 @@ namespace TungstenChess
 
   Square GUIHandler::getMouseSquareIndex()
   {
-    int x = Mouse::getPosition(*m_window).x;
-    int y = Mouse::getPosition(*m_window).y;
+    auto [x, y] = Mouse::getPosition(m_window);
 
     if (x >= 0 && x <= 8 * SQUARE_SIZE && y >= 0 && y <= 8 * SQUARE_SIZE)
       return getSquareIndex(x, y);
@@ -147,7 +144,7 @@ namespace TungstenChess
   {
     m_yellowOutlineIndex = getMouseSquareIndex();
 
-    m_window->clear();
+    m_window.clear();
 
     drawBoardSquares();
 
@@ -161,7 +158,7 @@ namespace TungstenChess
       drawPieces();
     }
 
-    m_window->display();
+    m_window.display();
   }
 
   void GUIHandler::loadSquareTextures()
@@ -238,7 +235,7 @@ namespace TungstenChess
   {
     for (Square i = 0; i < 64; i++)
     {
-      m_window->draw(m_boardSquares[i]);
+      m_window.draw(m_boardSquares[i]);
     }
   }
 
@@ -250,9 +247,9 @@ namespace TungstenChess
         continue;
 
       if (!m_isThinking)
-        m_window->draw(m_pieceSprites[m_board[i]][i]);
+        m_window.draw(m_pieceSprites[m_board[i]][i]);
       else
-        m_window->draw(m_pieceSprites[m_bufferBoard[i]][i]);
+        m_window.draw(m_pieceSprites[m_bufferBoard[i]][i]);
     }
 
     if (m_isThinking)
@@ -261,8 +258,10 @@ namespace TungstenChess
     if (m_draggingPieceIndex != NO_SQUARE)
     {
       m_draggingPieceSprite.setTexture(m_resourceManager.m_pieceTextures[m_board[m_draggingPieceIndex]]);
-      m_draggingPieceSprite.setPosition(Mouse::getPosition(*m_window).x - SQUARE_SIZE / 2, Mouse::getPosition(*m_window).y - SQUARE_SIZE / 2);
-      m_window->draw(m_draggingPieceSprite);
+
+      auto [mouseX, mouseY] = Mouse::getPosition(m_window);
+      m_draggingPieceSprite.setPosition(mouseX - SQUARE_SIZE / 2, mouseY - SQUARE_SIZE / 2);
+      m_window.draw(m_draggingPieceSprite);
     }
   }
 
@@ -271,14 +270,14 @@ namespace TungstenChess
     for (Square i = 0; i < 64; i++)
     {
       if (Bitboards::hasBit(m_redHighlightsBitboard, i))
-        m_window->draw(m_redHighlightsSprites[i]);
+        m_window.draw(m_redHighlightsSprites[i]);
       else if (Bitboards::hasBit(m_grayHighlightsBitboard, i))
-        m_window->draw(m_grayHighlightsSprites[i]);
+        m_window.draw(m_grayHighlightsSprites[i]);
       else if (Bitboards::hasBit(m_yellowHighlightsBitboard, i) || m_draggingPieceIndex == i)
-        m_window->draw(m_yellowHighlightsSprites[i]);
+        m_window.draw(m_yellowHighlightsSprites[i]);
 
       if (m_yellowOutlineIndex == i)
-        m_window->draw(m_yellowOutlineSprites[i]);
+        m_window.draw(m_yellowOutlineSprites[i]);
     }
   }
 
@@ -288,11 +287,11 @@ namespace TungstenChess
     {
       if (m_board.sideToMove() == WHITE)
       {
-        m_window->draw(m_whitePromotionPieces[i]);
+        m_window.draw(m_whitePromotionPieces[i]);
       }
       else
       {
-        m_window->draw(m_blackPromotionPieces[i]);
+        m_window.draw(m_blackPromotionPieces[i]);
       }
     }
   }

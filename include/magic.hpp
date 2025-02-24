@@ -65,13 +65,13 @@ namespace TungstenChess
      */
     static std::vector<Bitboard> getAllBlockers(Square square, Bitboard mask)
     {
-      std::vector<Square> setBits = std::vector<Square>();
+      std::vector<Square> setBits;
 
       for (Square i = 0; i < 64; i++)
         if (mask & (1ULL << i))
           setBits.push_back(i);
 
-      std::vector<Bitboard> blockers = std::vector<Bitboard>();
+      std::vector<Bitboard> blockers;
 
       for (int i = 0; i < (1 << setBits.size()); i++)
       {
@@ -96,7 +96,7 @@ namespace TungstenChess
      */
     static std::vector<Bitboard> getShiftedBlockers(Magic magic, Shift shift, Square square, std::vector<Bitboard> blocks)
     {
-      std::vector<Bitboard> shifts = std::vector<Bitboard>();
+      std::vector<Bitboard> shifts;
 
       for (size_t i = 0; i < blocks.size(); i++)
         shifts.push_back((magic * blocks[i]) >> shift);
@@ -178,7 +178,7 @@ namespace TungstenChess
      */
     static std::vector<Bitboard> getAllMovesBitboards(Square square, std::vector<Bitboard> blockers, bool rook)
     {
-      std::vector<Bitboard> moves = std::vector<Bitboard>();
+      std::vector<Bitboard> moves;
 
       for (size_t i = 0; i < blockers.size(); i++)
       {
@@ -218,8 +218,6 @@ namespace TungstenChess
      */
     static void initRookLookupTables()
     {
-      ROOK_LOOKUP_TABLES = std::array<std::vector<Bitboard>, 64>();
-
       for (Square i = 0; i < 64; i++)
       {
         ROOK_LOOKUP_TABLES[i] = getMovesLookupTable(i, true);
@@ -231,8 +229,6 @@ namespace TungstenChess
      */
     static void initBishopLookupTables()
     {
-      BISHOP_LOOKUP_TABLES = std::array<std::vector<Bitboard>, 64>();
-
       for (Square i = 0; i < 64; i++)
       {
         BISHOP_LOOKUP_TABLES[i] = getMovesLookupTable(i, false);

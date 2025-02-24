@@ -113,7 +113,7 @@ namespace TungstenChess
 
     Piece m_bufferBoard[64];
 
-    RenderWindow *m_window;
+    RenderWindow &m_window;
 
     Texture m_squareTextures[5];
 

@@ -215,7 +215,7 @@ namespace TungstenChess
     Move iterativeDeepening(int time);
 
     /**
-     * @brief Gets the static evaluation of the current position, from the perspective of the side to move
+     * @brief Gets the static evaluation of the current position, from the perspective of the side to move (positive if favorable, negative if unfavorable)
      */
     int getStaticEvaluation();
 
@@ -240,6 +240,7 @@ namespace TungstenChess
      * @param alpha The alpha value for alpha-beta pruning
      * @param beta The beta value for alpha-beta pruning
      * @param quiesce Whether the search is in quiescence mode (captures only)
+     * @return The evaluation of the current position, from the perspective of the side to move (positive if favorable, negative if unfavorable)
      */
     int negamax(int depth, int alpha = NEGATIVE_INFINITY, int beta = POSITIVE_INFINITY, bool quiesce = false);
 

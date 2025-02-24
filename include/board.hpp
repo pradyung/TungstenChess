@@ -131,6 +131,15 @@ namespace TungstenChess
     UnmoveData makeMove(Move move);
 
     /**
+     * @brief Makes a move on the board
+     * @param move The move to make (UCI string)
+     */
+    UnmoveData makeMove(std::string move)
+    {
+      return makeMove(generateMoveFromUCI(move));
+    }
+
+    /**
      * @brief Undoes a move, handling all board state changes
      * @param move The move to undo
      */
