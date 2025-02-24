@@ -331,9 +331,10 @@ namespace TungstenChess
     return attackingPiecesBitboard;
   }
 
-  std::vector<Move> Board::getLegalMoves(PieceColor color, bool onlyCaptures)
+  void Board::getLegalMoves(std::vector<Move> &legalMoves, PieceColor color, bool onlyCaptures)
   {
-    std::vector<Move> legalMoves;
+    assert(legalMoves.empty());
+
     legalMoves.reserve(256);
 
     Bitboard movablePiecesBitboard = 0;
@@ -427,8 +428,6 @@ namespace TungstenChess
         quickUnmakeMove(attackerIndex, targetSquare, flag);
       }
     }
-
-    return legalMoves;
   }
 
   bool Board::isAttacked(Square square, PieceColor color) const
@@ -589,7 +588,8 @@ namespace TungstenChess
     if (depth == 0)
       return 1;
 
-    std::vector<Move> legalMoves = getLegalMoves(m_sideToMove);
+    std::vector<Move> legalMoves;
+    getLegalMoves(legalMoves, m_sideToMove);
 
     int legalMovesCount = legalMoves.size();
 

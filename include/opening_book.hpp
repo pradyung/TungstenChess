@@ -88,11 +88,10 @@ namespace TungstenChess
   private:
     /**
      * @brief Gets the next possible "children" moves from the opening book
+     * @param childrenMoves The vector to store the moves in
      */
-    std::vector<Move> getChildrenMoves() const
+    void getChildrenMoves(std::vector<Move> &childrenMoves) const
     {
-      std::vector<Move> childrenMoves;
-
       for (size_t i = m_lastMoveIndex + 1; i < m_openingBook.size(); i++)
       {
         if (m_openingBook[i] >> 25 == m_moves.size())
@@ -100,8 +99,6 @@ namespace TungstenChess
         else if (m_openingBook[i] >> 25 == m_moves.size() - 1)
           break;
       }
-
-      return childrenMoves;
     }
 
     /**
@@ -109,7 +106,8 @@ namespace TungstenChess
      */
     Move getWeightedRandomMove() const
     {
-      std::vector<Move> childrenMoves = getChildrenMoves();
+      std::vector<Move> childrenMoves;
+      getChildrenMoves(childrenMoves);
 
       if (childrenMoves.size() == 0)
         return NULL_MOVE;

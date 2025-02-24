@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include <cassert>
 
 #include "bitboard.hpp"
 #include "zobrist.hpp"
@@ -163,10 +164,11 @@ namespace TungstenChess
 
     /**
      * @brief Gets the legal moves for a color
+     * @param legalMoves The vector to store the moves in
      * @param color The color to get the moves for
      * @param onlyCaptures Whether to only include capture moves
      */
-    std::vector<Move> getLegalMoves(PieceColor color, bool onlyCaptures = false);
+    void getLegalMoves(std::vector<Move> &legalMoves, PieceColor color, bool onlyCaptures = false);
 
     /**
      * @brief Counts the number of times a position has been repeated
