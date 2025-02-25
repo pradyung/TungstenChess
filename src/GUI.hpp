@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <SFML/Graphics.hpp>
-#include <CoreFoundation/CoreFoundation.h>
 #include <string>
 #include <thread>
 
@@ -44,7 +43,7 @@ namespace TungstenChess
       return instance;
     }
 
-    std::string m_openingBookPath;
+    std::filesystem::path m_openingBookPath;
     uint m_openingBookSize;
 
     Texture m_yellowOutlineTexture;
@@ -59,15 +58,15 @@ namespace TungstenChess
      */
     ResourceManager()
     {
-      std::string resourcePath = getResourcePath();
+      std::filesystem::path resourcePath = TUNGSTENCHESS_RESOURCES_DIR;
 
-      m_openingBookPath = resourcePath + "opening_book";
+      m_openingBookPath = resourcePath / "opening_book";
       m_openingBookSize = std::ifstream(m_openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(uint);
 
-      m_yellowOutlineTexture.loadFromFile(resourcePath + "yellow_outline.png");
+      m_yellowOutlineTexture.loadFromFile(resourcePath / "yellow_outline.png");
 
       sf::Texture atlas;
-      atlas.loadFromFile(resourcePath + "atlas.png");
+      atlas.loadFromFile(resourcePath / "atlas.png");
 
       m_pieceTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
       m_pieceTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
@@ -83,22 +82,7 @@ namespace TungstenChess
       m_pieceTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
       m_pieceTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
 
-      m_icon.loadFromFile(resourcePath + "high_res_wn.png");
-    }
-
-    static std::string getResourcePath()
-    {
-      std::string resourcePath;
-
-      CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
-      char path[PATH_MAX];
-      if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
-        resourcePath = "";
-      else
-        resourcePath = std::string(path) + "/";
-      CFRelease(resourcesURL);
-
-      return resourcePath;
+      m_icon.loadFromFile(resourcePath / "high_res_wn.png");
     }
   };
 

@@ -24,7 +24,7 @@ namespace TungstenChess
      * @param path The path to the opening book file
      * @param openingBookSize The number of entries in the opening book (i.e. the size of the file in bytes divided by 4)
      */
-    void loadOpeningBook(const std::string &path, uint openingBookSize)
+    void loadOpeningBook(const std::filesystem::path &path, uint openingBookSize)
     {
       std::ifstream file(path);
 
