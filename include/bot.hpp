@@ -63,17 +63,17 @@ namespace TungstenChess
 
     struct SearchInfo
     {
-      int positionsEvaluated;
-      int transpositionsUsed;
-      int depthSearched;
+      int positionsEvaluated = 0;
+      int transpositionsUsed = 0;
+      int depthSearched = 0;
 
-      int nextDepthNumMovesSearched;
-      int nextDepthTotalMoves;
+      int nextDepthNumMovesSearched = 0;
+      int nextDepthTotalMoves = 0;
 
-      int evaluation;
-      bool mateFound;
-      int mateIn;
-      bool lossFound;
+      int evaluation = 0;
+      bool mateFound = false;
+      int mateIn = 0;
+      bool lossFound = false;
 
       std::string evalString(PieceColor sideToMove) const
       {

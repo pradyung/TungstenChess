@@ -19,7 +19,7 @@ namespace TungstenChess
       }
     }
 
-    m_previousSearchInfo.positionsEvaluated = 0;
+    m_previousSearchInfo = SearchInfo();
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -333,6 +333,8 @@ namespace TungstenChess
           return NULL_MOVE;
       }
 
+      numMovesSearched++;
+
       if (evaluation > alpha)
       {
         alpha = evaluation;
@@ -344,8 +346,6 @@ namespace TungstenChess
           break;
         }
       }
-
-      numMovesSearched++;
     }
 
     if (!m_searchCancelled && !m_previousSearchInfo.mateFound)
@@ -362,9 +362,6 @@ namespace TungstenChess
   Move Bot::iterativeDeepening(int time)
   {
     m_searchCancelled = false;
-    m_previousSearchInfo.mateFound = false;
-    m_previousSearchInfo.lossFound = false;
-    m_previousSearchInfo.transpositionsUsed = 0;
 
     int depth = 1;
 
