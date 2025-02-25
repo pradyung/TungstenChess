@@ -88,6 +88,13 @@ namespace TungstenChess
 
   class GUIHandler
   {
+  public:
+    /**
+     * @brief Construct a new GUIHandler object
+     * @param window The window to render to
+     */
+    GUIHandler();
+
   private:
     ResourceManager &m_resourceManager = ResourceManager::getInstance();
 
@@ -97,7 +104,7 @@ namespace TungstenChess
 
     Piece m_bufferBoard[64];
 
-    RenderWindow &m_window;
+    RenderWindow m_window = RenderWindow(VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE * 8), "TungstenChess", sf::Style::Titlebar | sf::Style::Close);
 
     Texture m_squareTextures[5];
 
@@ -136,12 +143,6 @@ namespace TungstenChess
     std::thread m_thinkingThread;
 
   public:
-    /**
-     * @brief Construct a new GUIHandler object
-     * @param window The window to render to
-     */
-    GUIHandler(RenderWindow &window);
-
     /**
      * @brief Runs the main loop of the GUI, including rendering, input handling, and move making
      */
