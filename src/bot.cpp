@@ -265,17 +265,20 @@ namespace TungstenChess
     if (m_board.countRepetitions(m_board.zobristKey()) >= 3 || m_board.halfmoveClock() >= 100)
       return -CONTEMPT;
 
-    std::vector<Move> legalMoves;
-    getSortedLegalMoves(legalMoves, m_board.sideToMove(), quiesce);
+    MoveArray legalMoves;
+    int legalMovesCount = getSortedLegalMoves(legalMoves, m_board.sideToMove(), quiesce);
 
-    if (legalMoves.empty())
-      return (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY + (quiesce ? 1 : 0) : -CONTEMPT);
+    if (legalMovesCount == 0)
+      return (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY + (quiesce ? 10000 : 0) : -CONTEMPT);
 
-    if (legalMoves.size() == 1)
+    if (legalMovesCount == 1)
       depth++;
 
     for (Move &move : legalMoves)
     {
+      if (move == NULL_MOVE)
+        break;
+
       Board::UnmoveData unmoveData = m_board.makeMove(move);
       int evaluation = -negamax(depth - 1, -beta, -alpha, quiesce);
       m_board.unmakeMove(move, unmoveData);
@@ -305,22 +308,25 @@ namespace TungstenChess
 
   Move Bot::generateBestMove(int depth, Move bestMoveSoFar)
   {
-    std::vector<Move> legalMoves;
-    getSortedLegalMoves(legalMoves, m_board.sideToMove(), false, bestMoveSoFar);
+    MoveArray legalMoves;
+    int legalMovesCount = getSortedLegalMoves(legalMoves, m_board.sideToMove(), false, bestMoveSoFar);
+
+    if (legalMovesCount == 0)
+      return NULL_MOVE;
 
     Move bestMove = legalMoves[0];
-
-    if (legalMoves.empty())
-      return NULL_MOVE;
 
     int alpha = NEGATIVE_INFINITY;
     int numMovesSearched = 0;
 
     m_previousSearchInfo.nextDepthNumMovesSearched = 0;
-    m_previousSearchInfo.nextDepthTotalMoves = legalMoves.size();
+    m_previousSearchInfo.nextDepthTotalMoves = legalMovesCount;
 
     for (Move &move : legalMoves)
     {
+      if (move == NULL_MOVE)
+        break;
+
       Board::UnmoveData unmoveData = m_board.makeMove(move);
       int evaluation = -negamax(depth - 1, NEGATIVE_INFINITY, -alpha, false);
       m_board.unmakeMove(move, unmoveData);
@@ -406,9 +412,10 @@ namespace TungstenChess
     return bestMove;
   }
 
-  void Bot::heuristicSortMoves(std::vector<Move> &moves, Move bestMove)
+  void Bot::heuristicSortMoves(MoveArray &moves, int movesCount, Move bestMove)
   {
-    std::sort(moves.begin(), moves.end(), [this, bestMove](Move a, Move b)
+    std::sort(moves.begin(), moves.begin() + movesCount,
+              [this, bestMove](Move a, Move b)
               { return heuristicEvaluation(a, bestMove) > heuristicEvaluation(b, bestMove); });
   }
 

@@ -13,6 +13,7 @@
 #include "move.hpp"
 
 #define NO_EP 8
+#define MAX_MOVE_COUNT 218
 
 #define DEFAULT_START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -22,6 +23,8 @@
 
 namespace TungstenChess
 {
+  typedef std::array<Move, MAX_MOVE_COUNT> MoveArray;
+
   class Board
   {
   private:
@@ -173,11 +176,12 @@ namespace TungstenChess
 
     /**
      * @brief Gets the legal moves for a color
-     * @param legalMoves The vector to store the moves in
+     * @param legalMoves The array to store the moves in (entry after last generated move will be NULL_MOVE)
      * @param color The color to get the moves for
      * @param onlyCaptures Whether to only include capture moves
+     * @return The number of legal moves
      */
-    void getLegalMoves(std::vector<Move> &legalMoves, PieceColor color, bool onlyCaptures = false);
+    int getLegalMoves(MoveArray &legalMoves, PieceColor color, bool onlyCaptures = false);
 
     /**
      * @brief Counts the number of times a position has been repeated

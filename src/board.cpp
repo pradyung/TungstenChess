@@ -331,11 +331,9 @@ namespace TungstenChess
     return attackingPiecesBitboard;
   }
 
-  void Board::getLegalMoves(std::vector<Move> &legalMoves, PieceColor color, bool onlyCaptures)
+  int Board::getLegalMoves(MoveArray &legalMoves, PieceColor color, bool onlyCaptures)
   {
-    assert(legalMoves.empty());
-
-    legalMoves.reserve(256);
+    int legalMovesIndex = 0;
 
     Bitboard movablePiecesBitboard = 0;
     Bitboard targetSquaresBitboard = 0;
@@ -379,15 +377,15 @@ namespace TungstenChess
       {
         Square toIndex = Bitboards::popBit(movesBitboard);
 
-        legalMoves.push_back(Moves::createMove(pieceIndex, toIndex));
+        legalMoves[legalMovesIndex++] = Moves::createMove(pieceIndex, toIndex);
 
-        Move &move = legalMoves.back();
+        Move &move = legalMoves[legalMovesIndex - 1];
 
         if (Moves::isPromotion(toIndex, m_board[pieceIndex] & TYPE))
         {
-          legalMoves.push_back(move | (KNIGHT_PROMOTION));
-          legalMoves.push_back(move | (BISHOP_PROMOTION));
-          legalMoves.push_back(move | (ROOK_PROMOTION));
+          legalMoves[legalMovesIndex++] = move | (KNIGHT_PROMOTION);
+          legalMoves[legalMovesIndex++] = move | (BISHOP_PROMOTION);
+          legalMoves[legalMovesIndex++] = move | (ROOK_PROMOTION);
           move |= QUEEN_PROMOTION;
         }
       }
@@ -412,15 +410,15 @@ namespace TungstenChess
 
         if (!isInCheck(color))
         {
-          legalMoves.push_back(Moves::createMove(attackerIndex, targetSquare, NO_TYPE));
+          legalMoves[legalMovesIndex++] = Moves::createMove(attackerIndex, targetSquare);
 
-          Move &move = legalMoves.back();
+          Move &move = legalMoves[legalMovesIndex - 1];
 
           if (flag & PROMOTION)
           {
-            legalMoves.push_back(move | (KNIGHT_PROMOTION));
-            legalMoves.push_back(move | (BISHOP_PROMOTION));
-            legalMoves.push_back(move | (ROOK_PROMOTION));
+            legalMoves[legalMovesIndex++] = move | (KNIGHT_PROMOTION);
+            legalMoves[legalMovesIndex++] = move | (BISHOP_PROMOTION);
+            legalMoves[legalMovesIndex++] = move | (ROOK_PROMOTION);
             move |= QUEEN_PROMOTION;
           }
         }
@@ -428,6 +426,11 @@ namespace TungstenChess
         quickUnmakeMove(attackerIndex, targetSquare, flag);
       }
     }
+
+    if (legalMovesIndex < MAX_MOVE_COUNT)
+      legalMoves[legalMovesIndex] = NULL_MOVE;
+
+    return legalMovesIndex;
   }
 
   bool Board::isAttacked(Square square, PieceColor color) const
@@ -588,10 +591,8 @@ namespace TungstenChess
     if (depth == 0)
       return 1;
 
-    std::vector<Move> legalMoves;
-    getLegalMoves(legalMoves, m_sideToMove);
-
-    int legalMovesCount = legalMoves.size();
+    MoveArray legalMoves;
+    int legalMovesCount = getLegalMoves(legalMoves, m_sideToMove);
 
     uint games = 0;
 

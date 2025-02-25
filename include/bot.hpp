@@ -172,16 +172,17 @@ namespace TungstenChess
   private:
     /**
      * @brief Gets the legal moves for a color, sorted by heuristic evaluation
-     * @param moves The vector to store the moves in
+     * @param moves The array to store the moves in
      * @param color The color to get the moves for
      * @param onlyCaptures Whether to only get captures
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
+     * @return The number of legal moves
      */
-    void getSortedLegalMoves(std::vector<Move> &moves, PieceColor color, bool onlyCaptures = false, Move bestMove = NULL_MOVE)
+    int getSortedLegalMoves(MoveArray &moves, PieceColor color, bool onlyCaptures = false, Move bestMove = NULL_MOVE)
     {
-      assert(moves.empty());
-      m_board.getLegalMoves(moves, color, onlyCaptures);
-      heuristicSortMoves(moves, bestMove);
+      int legalMovesCount = m_board.getLegalMoves(moves, color, onlyCaptures);
+      heuristicSortMoves(moves, legalMovesCount, bestMove);
+      return legalMovesCount;
     }
 
     /**
@@ -254,8 +255,9 @@ namespace TungstenChess
     /**
      * @brief Sorts moves by heuristic evaluation (in place) to improve alpha-beta pruning
      * @param moves The moves to sort
+     * @param movesCount The number of moves in the array
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      */
-    void heuristicSortMoves(std::vector<Move> &moves, Move bestMove = NULL_MOVE);
+    void heuristicSortMoves(MoveArray &moves, int movesCount, Move bestMove = NULL_MOVE);
   };
 }
