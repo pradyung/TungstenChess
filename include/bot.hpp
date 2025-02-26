@@ -12,6 +12,7 @@
 #include "opening_book.hpp"
 #include "piece_eval_tables.hpp"
 #include "utils.hpp"
+#include "transposition_table.hpp"
 
 #define POSITIVE_INFINITY 1000000
 #define NEGATIVE_INFINITY -1000000
@@ -24,15 +25,7 @@ namespace TungstenChess
     Board &m_board;
     OpeningBook m_openingBook;
 
-    struct TranspositionTableEntry
-    {
-      int evaluation;
-      int depth;
-      bool quiesce;
-    };
-
-    std::unordered_map<ZobristKey, TranspositionTableEntry> m_transpositionTable;
-    uint64_t m_transpositionTablePieceKey = 0;
+    TranspositionTable m_transpositionTable;
 
     enum EvaluationConstants : int
     {
@@ -52,7 +45,7 @@ namespace TungstenChess
 
     struct BotSettings
     {
-      int maxSearchTime = 1000; // In milliseconds
+      int maxSearchTime = 2000; // In milliseconds
       int quiesceDepth = -1;    // for quiescence search, set to -1 to search indefinitely (recommended)
       bool useOpeningBook = DEF_USE_OPENING_BOOK;
       bool logSearchInfo = true;
@@ -86,7 +79,7 @@ namespace TungstenChess
         return std::to_string(evaluation * (sideToMove == WHITE ? 1 : -1));
       }
 
-      std::string to_string(std::string move, std::chrono::milliseconds time, PieceColor sideToMove) const
+      std::string to_string(std::string move, std::chrono::milliseconds time, PieceColor sideToMove, int transpositionsOccupied) const
       {
         std::string str = "";
 
@@ -95,6 +88,7 @@ namespace TungstenChess
         str += "Time: " + padString(std::to_string(time.count()) + " ms", 12);
         str += "Positions evaluated: " + padString(std::to_string(positionsEvaluated), 12);
         str += "Transpositions used: " + padString(std::to_string(transpositionsUsed), 10);
+        str += "Occupied: " + padString(std::to_string(transpositionsOccupied), 12);
         str += "Evaluation: " + evalString(sideToMove);
 
         return str;

@@ -99,8 +99,8 @@ namespace TungstenChess
     ResourceManager &m_resourceManager = ResourceManager::getInstance();
 
     Board m_board;
-    Bot m_whiteBot = Bot(m_board, 2000);
-    Bot m_blackBot = Bot(m_board, 2000);
+    Bot m_whiteBot = Bot(m_board);
+    Bot m_blackBot = Bot(m_board);
 
     Piece m_bufferBoard[64];
 
