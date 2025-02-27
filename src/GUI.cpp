@@ -2,7 +2,7 @@
 
 namespace TungstenChess
 {
-  GUIHandler::GUIHandler()
+  GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
   {
     m_whiteBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
     m_blackBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);

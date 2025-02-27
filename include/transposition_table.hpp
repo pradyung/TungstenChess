@@ -68,7 +68,7 @@ namespace TungstenChess
       return m_transpositionTable[key % TABLE_SIZE].isSameKey(key);
     }
 
-    Entry retrieve(ZobristKey key, bool &found)
+    const Entry &retrieve(ZobristKey key, bool &found)
     {
       Entry &entry = m_transpositionTable[key % TABLE_SIZE];
       found = entry.isSameKey(key);

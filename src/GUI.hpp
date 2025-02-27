@@ -93,7 +93,7 @@ namespace TungstenChess
      * @brief Construct a new GUIHandler object
      * @param window The window to render to
      */
-    GUIHandler();
+    GUIHandler(RenderWindow &window);
 
   private:
     ResourceManager &m_resourceManager = ResourceManager::getInstance();
@@ -104,7 +104,7 @@ namespace TungstenChess
 
     Piece m_bufferBoard[64];
 
-    RenderWindow m_window = RenderWindow(VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE * 8), "TungstenChess", sf::Style::Titlebar | sf::Style::Close);
+    RenderWindow &m_window;
 
     Texture m_squareTextures[5];
 

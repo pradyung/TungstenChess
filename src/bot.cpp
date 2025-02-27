@@ -282,9 +282,9 @@ namespace TungstenChess
       return 0;
 
     bool found;
-    TranspositionTable::Entry entry = m_transpositionTable.retrieve(m_board.zobristKey(), found);
+    const TranspositionTable::Entry &entry = m_transpositionTable.retrieve(m_board.zobristKey(), found);
 
-    if (found && (!entry.quiesce() || quiesce) && entry.depth() >= depth)
+    if (found && entry.quiesce() == quiesce && entry.depth() >= depth)
     {
       if (!((entry.evaluation() == POSITIVE_INFINITY || entry.evaluation() == NEGATIVE_INFINITY) && entry.searchId() != m_currentSearchId && entry.depth() != depth))
       {
