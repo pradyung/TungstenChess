@@ -2,6 +2,31 @@
 
 namespace TungstenChess
 {
+  Bot::Bot(Board &board, const BotSettings &settings) : m_board(board), m_botSettings(settings), m_openingBook(board.isDefaultStartPosition())
+  {
+    if (m_botSettings.maxSearchTime > 0)
+    {
+      m_searchTimerThread = std::thread(
+          [this]()
+          {
+            std::unique_lock<std::mutex> lock(m_searchTimerMutex);
+            m_searchTimerEvent.wait(lock);
+            while (!m_searchTimerTerminated)
+            {
+              m_searchTimerReset = false;
+
+              if (m_searchTimerEvent.wait_for(lock, std::chrono::milliseconds(m_maxSearchTime), [this]
+                                              { return m_searchTimerReset.load(); }))
+                continue;
+
+              m_searchCancelled = true;
+            }
+          });
+
+      m_searchTimerThread.detach();
+    }
+  }
+
   Move Bot::generateBotMove(int maxSearchTime)
   {
     if (m_botSettings.useOpeningBook && m_openingBookLoaded.peek() && m_openingBook.updateMoveHistory(m_board.moveHistory()))
@@ -151,7 +176,7 @@ namespace TungstenChess
       if (pieceType <= PAWN || pieceType == KING)
         continue;
 
-      mobilityEvaluation += Bitboards::countBits(m_board.getPseudoLegalPieceMovesBitboard(i)) * PER_SQUARE_MOBILITY_BONUSES[pieceType] * (m_board[i] & WHITE ? 1 : -1);
+      mobilityEvaluation += Bitboards::countBits(m_board.getPseudoLegalPieceMovesBitboard(i)) * (m_board[i] & WHITE ? 1 : -1);
     }
 
     return mobilityEvaluation;

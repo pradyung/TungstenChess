@@ -43,8 +43,6 @@ namespace TungstenChess
       CONTEMPT = 100,
     };
 
-    static const inline int PER_SQUARE_MOBILITY_BONUSES[] = {0, 0, 2, 2, 4, 4, 0};
-
     struct BotSettings
     {
       int maxSearchTime = 2000; // In milliseconds
@@ -96,33 +94,8 @@ namespace TungstenChess
     once<false> m_openingBookLoaded;
 
   public:
-    Bot(Board &board, const BotSettings &settings) : m_board(board), m_botSettings(settings), m_openingBook(board.isDefaultStartPosition())
-    {
-      if (m_botSettings.maxSearchTime > 0)
-      {
-        m_searchTimerThread = std::thread(
-            [this]()
-            {
-              std::unique_lock<std::mutex> lock(m_searchTimerMutex);
-              m_searchTimerEvent.wait(lock);
-              while (!m_searchTimerTerminated)
-              {
-                m_searchTimerReset = false;
-
-                if (m_searchTimerEvent.wait_for(lock, std::chrono::milliseconds(m_maxSearchTime), [this]
-                                                { return m_searchTimerReset.load(); }))
-                  continue;
-
-                m_searchCancelled = true;
-              }
-            });
-
-        m_searchTimerThread.detach();
-      }
-    }
-
+    Bot(Board &board, const BotSettings &settings);
     Bot(Board &board) : Bot(board, BotSettings()) {}
-
     Bot(Board &board, int maxSearchTime) : Bot(board, BotSettings{maxSearchTime}) {}
 
     ~Bot()
