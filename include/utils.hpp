@@ -51,13 +51,6 @@ namespace TungstenChess
     bool value;
   };
 
-  static inline std::string padString(std::string str, size_t length)
-  {
-    if (str.length() < length)
-      str += std::string(length - str.length(), ' ');
-    return str;
-  }
-
   template <typename T, size_t R, size_t C>
   struct array2d // 2d array implemented as flat std::array
   {

@@ -93,6 +93,15 @@ namespace TungstenChess
       return getLegalPieceMovesBitboard(pieceIndex, m_board[pieceIndex] & COLOR);
     }
 
+    /**
+     * @brief Returns the bitboard of the squares a piece can move to, not excluding moves that leave the king in check
+     * @param pieceIndex The index of the piece
+     */
+    Bitboard getPseudoLegalPieceMovesBitboard(Square pieceIndex)
+    {
+      return getPseudoLegalPieceMoves(pieceIndex, m_board[pieceIndex] & COLOR);
+    }
+
     struct UnmoveData
     {
       Piece piece;

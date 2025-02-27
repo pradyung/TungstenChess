@@ -26,11 +26,18 @@ namespace TungstenChess
     Move bestMove = iterativeDeepening(maxSearchTime == -1 ? m_botSettings.maxSearchTime : maxSearchTime);
 
     if (m_botSettings.logSearchInfo)
-      std::cout << m_previousSearchInfo.to_string(m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove),
-                                                  std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start),
-                                                  m_board.sideToMove(),
-                                                  m_transpositionTable.occupied())
+    {
+      std::cout << std::format(
+                       "Move: {:<9} Depth: {:<12} Time: {:<11} Positions evaluated: {:<11} Transpositions used: {:<9} Occupied: {:<14} Evaluation: {}",
+                       m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove),
+                       std::format("{} + {}/{}", m_previousSearchInfo.depthSearched, m_previousSearchInfo.nextDepthNumMovesSearched, m_previousSearchInfo.nextDepthTotalMoves),
+                       std::format("{} ms", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count()),
+                       m_previousSearchInfo.positionsEvaluated,
+                       m_previousSearchInfo.transpositionsUsed,
+                       m_transpositionTable.occupancy(),
+                       m_previousSearchInfo.evalString(m_board.sideToMove()))
                 << std::endl;
+    }
 
     return bestMove;
   }
@@ -49,7 +56,7 @@ namespace TungstenChess
         return -CONTEMPT;
     }
 
-    int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getEvaluationBonus();
+    int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getMobilityEvaluation() + getEvaluationBonus();
 
     return m_board.sideToMove() == WHITE ? staticEvaluation : -staticEvaluation;
   }
@@ -130,6 +137,24 @@ namespace TungstenChess
     }
 
     return positionalEvaluation;
+  }
+
+  int Bot::getMobilityEvaluation() const
+  {
+    int mobilityEvaluation = 0;
+
+    for (Square i = 0; i < 64; i++)
+    {
+      Piece piece = m_board[i];
+      PieceType pieceType = piece & TYPE;
+
+      if (pieceType <= PAWN || pieceType == KING)
+        continue;
+
+      mobilityEvaluation += Bitboards::countBits(m_board.getPseudoLegalPieceMovesBitboard(i)) * PER_SQUARE_MOBILITY_BONUSES[pieceType] * (m_board[i] & WHITE ? 1 : -1);
+    }
+
+    return mobilityEvaluation;
   }
 
   int Bot::getEvaluationBonus() const
@@ -234,12 +259,12 @@ namespace TungstenChess
     bool found;
     TranspositionTable::Entry entry = m_transpositionTable.retrieve(m_board.zobristKey(), found);
 
-    if (found && entry.quiesce == quiesce && entry.depth >= depth)
+    if (found && (!entry.quiesce() || quiesce) && entry.depth() >= depth)
     {
-      if (!((entry.evaluation == POSITIVE_INFINITY || entry.evaluation == NEGATIVE_INFINITY) && entry.depth != depth))
+      if (!((entry.evaluation() == POSITIVE_INFINITY || entry.evaluation() == NEGATIVE_INFINITY) && entry.searchId() != m_currentSearchId && entry.depth() != depth))
       {
         m_previousSearchInfo.transpositionsUsed++;
-        return entry.evaluation;
+        return entry.evaluation();
       }
     }
 
@@ -302,7 +327,7 @@ namespace TungstenChess
 
     if (!m_searchCancelled)
     {
-      m_transpositionTable.store(m_board.zobristKey(), alpha, depth, quiesce);
+      m_transpositionTable.store(m_board.zobristKey(), m_currentSearchId, alpha, depth, quiesce);
     }
 
     return alpha;
@@ -376,6 +401,8 @@ namespace TungstenChess
     m_maxSearchTime = time;
     m_searchTimerReset = true;
     m_searchTimerEvent.notify_one();
+
+    m_currentSearchId++;
 
     Move bestMove = generateBestMove(depth);
 

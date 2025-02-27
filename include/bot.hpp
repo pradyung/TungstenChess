@@ -43,6 +43,8 @@ namespace TungstenChess
       CONTEMPT = 100,
     };
 
+    static const inline int PER_SQUARE_MOBILITY_BONUSES[] = {0, 0, 2, 2, 4, 4, 0};
+
     struct BotSettings
     {
       int maxSearchTime = 2000; // In milliseconds
@@ -71,31 +73,17 @@ namespace TungstenChess
       std::string evalString(PieceColor sideToMove) const
       {
         if (lossFound)
-          return "Loss in " + std::to_string(mateIn);
+          return std::format("Loss in {}", mateIn);
 
         if (mateFound)
-          return "Mate" + (mateIn > 0 ? " in " + std::to_string(mateIn) : "");
+          return mateIn == 0 ? "Mate" : std::format("Mate in {}", mateIn);
 
         return std::to_string(evaluation * (sideToMove == WHITE ? 1 : -1));
       }
-
-      std::string to_string(std::string move, std::chrono::milliseconds time, PieceColor sideToMove, int transpositionsOccupied) const
-      {
-        std::string str = "";
-
-        str += "Move: " + padString(move, 10);
-        str += "Depth: " + padString(std::to_string(depthSearched) + " + " + std::to_string(nextDepthNumMovesSearched) + "/" + std::to_string(nextDepthTotalMoves), 11);
-        str += "Time: " + padString(std::to_string(time.count()) + " ms", 12);
-        str += "Positions evaluated: " + padString(std::to_string(positionsEvaluated), 12);
-        str += "Transpositions used: " + padString(std::to_string(transpositionsUsed), 10);
-        str += "Occupied: " + padString(std::to_string(transpositionsOccupied), 12);
-        str += "Evaluation: " + evalString(sideToMove);
-
-        return str;
-      }
     };
 
-    SearchInfo m_previousSearchInfo = {0, 0};
+    SearchInfo m_previousSearchInfo;
+    uint m_currentSearchId = 0;
 
     std::atomic<bool> m_searchCancelled = false;
     std::atomic<int> m_maxSearchTime = 0;
@@ -223,6 +211,11 @@ namespace TungstenChess
      * @brief Gets the positional evaluation of the current position, independent of the side to move (positive for white favor, negative for black favor)
      */
     int getPositionalEvaluation() const;
+
+    /**
+     * @brief Gets the mobility evaluation of the current position, independent of the side to move (positive for white favor, negative for black favor)
+     */
+    int getMobilityEvaluation() const;
 
     /**
      * @brief Gets the evaluation bonus for the current position, independent of the side to move (positive for white favor, negative for black favor)
