@@ -31,6 +31,7 @@ namespace TungstenChess
     std::array<Piece, 64> m_board;
     std::array<Bitboard, ALL_PIECES + 1> m_bitboards;
     std::array<Piece, PIECE_NUMBER> m_kingIndices; // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
+    std::array<uint, PIECE_NUMBER> m_pieceCounts;
 
     PieceColor m_sideToMove;
 
@@ -68,6 +69,7 @@ namespace TungstenChess
     const std::vector<Move> &moveHistory() const { return m_moveHistory; }
     bool isDefaultStartPosition() const { return m_isDefaultStartPosition; }
     Square kingIndex(Piece piece) const { return m_kingIndices[piece]; }
+    uint pieceCount(Piece piece) const { return m_pieceCounts[piece]; }
 
     /**
      * @brief Resets the board to the provided fen
@@ -216,7 +218,7 @@ namespace TungstenChess
     }
 
     /**
-     * @brief Quickly makes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array or Zobrist key
+     * @brief Quickly makes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array, Zobrist key or piece counts
      * @param from The index of the piece to move
      * @param to The index to move the piece to
      * @return MoveFlags returns flag only if move was en passant, promotion, kingside castle, or queenside castle
@@ -316,6 +318,9 @@ namespace TungstenChess
     void updatePiece(Square pieceIndex, Piece newPiece)
     {
       Piece oldPiece = m_board[pieceIndex];
+
+      m_pieceCounts[oldPiece]--;
+      m_pieceCounts[newPiece]++;
 
       m_zobristKey ^= Zobrist::getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
 

@@ -88,21 +88,19 @@ namespace TungstenChess
 
   int Bot::getMaterialEvaluation() const
   {
-    int materialEvaluation = 0;
+    int whiteMaterial = 0;
+    int blackMaterial = 0;
 
-    materialEvaluation += Bitboards::countBits(m_board.bitboard(WHITE_PAWN)) * PIECE_VALUES[PAWN];
-    materialEvaluation += Bitboards::countBits(m_board.bitboard(WHITE_KNIGHT)) * PIECE_VALUES[KNIGHT];
-    materialEvaluation += Bitboards::countBits(m_board.bitboard(WHITE_BISHOP)) * PIECE_VALUES[BISHOP];
-    materialEvaluation += Bitboards::countBits(m_board.bitboard(WHITE_ROOK)) * PIECE_VALUES[ROOK];
-    materialEvaluation += Bitboards::countBits(m_board.bitboard(WHITE_QUEEN)) * PIECE_VALUES[QUEEN];
+    for (PieceType pieceType = PAWN; pieceType <= QUEEN; pieceType++)
+    {
+      whiteMaterial += PIECE_VALUES[pieceType] * m_board.pieceCount(WHITE | pieceType);
+      blackMaterial += PIECE_VALUES[pieceType] * m_board.pieceCount(BLACK | pieceType);
+    }
 
-    materialEvaluation -= Bitboards::countBits(m_board.bitboard(BLACK_PAWN)) * PIECE_VALUES[PAWN];
-    materialEvaluation -= Bitboards::countBits(m_board.bitboard(BLACK_KNIGHT)) * PIECE_VALUES[KNIGHT];
-    materialEvaluation -= Bitboards::countBits(m_board.bitboard(BLACK_BISHOP)) * PIECE_VALUES[BISHOP];
-    materialEvaluation -= Bitboards::countBits(m_board.bitboard(BLACK_ROOK)) * PIECE_VALUES[ROOK];
-    materialEvaluation -= Bitboards::countBits(m_board.bitboard(BLACK_QUEEN)) * PIECE_VALUES[QUEEN];
+    whiteMaterial -= (whiteMaterial * whiteMaterial) >> MATERIAL_DIMINISH_SHIFT;
+    blackMaterial -= (blackMaterial * blackMaterial) >> MATERIAL_DIMINISH_SHIFT;
 
-    return materialEvaluation;
+    return whiteMaterial - blackMaterial;
   }
 
   int Bot::getPositionalEvaluation() const
@@ -186,24 +184,34 @@ namespace TungstenChess
   {
     int evaluationBonus = 0;
 
-    if (Bitboards::countBits(m_board.bitboard(WHITE_BISHOP)) >= 2)
-      evaluationBonus += BISHOP_PAIR_BONUS;
-    if (Bitboards::countBits(m_board.bitboard(BLACK_BISHOP)) >= 2)
-      evaluationBonus -= BISHOP_PAIR_BONUS;
+    evaluationBonus += BISHOP_PAIR_BONUS * ((m_board.pieceCount(WHITE_BISHOP) >= 2) - (m_board.pieceCount(BLACK_BISHOP) >= 2));
 
-    if (m_board.castlingRights() & WHITE_KINGSIDE)
-      evaluationBonus += CAN_CASTLE_BONUS;
-    if (m_board.castlingRights() & BLACK_KINGSIDE)
-      evaluationBonus -= CAN_CASTLE_BONUS;
-    if (m_board.castlingRights() & WHITE_QUEENSIDE)
-      evaluationBonus += CAN_CASTLE_BONUS;
-    if (m_board.castlingRights() & BLACK_QUEENSIDE)
-      evaluationBonus -= CAN_CASTLE_BONUS;
+    evaluationBonus += CAN_CASTLE_BONUS * CASTLING_BONUS_MULTIPLIERS[m_board.castlingRights()];
 
-    if (m_board.hasCastled() & WHITE)
-      evaluationBonus += CASTLED_KING_BONUS;
-    if (m_board.hasCastled() & BLACK)
-      evaluationBonus -= CASTLED_KING_BONUS;
+    evaluationBonus += CASTLED_KING_BONUS * (bool(m_board.hasCastled() & WHITE) - bool(m_board.hasCastled() & BLACK));
+
+    std::array<uint, 8> whitePawnsOnFiles = {0};
+    std::array<uint, 8> blackPawnsOnFiles = {0};
+
+    std::array<bool, 8> whitePawnsOnNeighboringFiles = {false};
+    std::array<bool, 8> blackPawnsOnNeighboringFiles = {false};
+
+    for (File file = 0; file < 8; file++)
+    {
+      whitePawnsOnFiles[file] = Bitboards::countBits(Bitboards::file(m_board.bitboard(WHITE_PAWN), file));
+      blackPawnsOnFiles[file] = Bitboards::countBits(Bitboards::file(m_board.bitboard(BLACK_PAWN), file));
+
+      if (file > 0)
+      {
+        whitePawnsOnNeighboringFiles[file - 1] |= bool(whitePawnsOnFiles[file]);
+        blackPawnsOnNeighboringFiles[file - 1] |= bool(blackPawnsOnFiles[file]);
+      }
+      if (file < 7)
+      {
+        whitePawnsOnNeighboringFiles[file + 1] |= bool(whitePawnsOnFiles[file]);
+        blackPawnsOnNeighboringFiles[file + 1] |= bool(blackPawnsOnFiles[file]);
+      }
+    }
 
     for (Square i = 0; i < 64; i++)
     {
@@ -212,23 +220,22 @@ namespace TungstenChess
 
       if (rank == 0)
       {
-        if (Bitboards::countBits(Bitboards::file(m_board.bitboard(WHITE_PAWN), file)) > 1)
-          evaluationBonus -= DOUBLED_PAWN_PENALTY;
-        if (Bitboards::countBits(Bitboards::file(m_board.bitboard(BLACK_PAWN), file)) > 1)
-          evaluationBonus += DOUBLED_PAWN_PENALTY;
+        evaluationBonus -= DOUBLED_PAWN_PENALTY * ((whitePawnsOnFiles[file] > 1) - (blackPawnsOnFiles[file] > 1));
 
-        if (Bitboards::file(m_board.bitboard(WHITE_PAWN), file))
+        if (whitePawnsOnFiles[file])
         {
-          if (!Bitboards::file(m_board.bitboard(BLACK_PAWN), file - 1) && !Bitboards::file(m_board.bitboard(BLACK_PAWN), file + 1))
+          if (!blackPawnsOnNeighboringFiles[file])
             evaluationBonus += PASSED_PAWN_BONUS;
-          if (!Bitboards::file(m_board.bitboard(WHITE_PAWN), file - 1) && !Bitboards::file(m_board.bitboard(WHITE_PAWN), file + 1))
+
+          if (!whitePawnsOnNeighboringFiles[file])
             evaluationBonus -= ISOLATED_PAWN_PENALTY;
         }
-        if (Bitboards::file(m_board.bitboard(BLACK_PAWN), file))
+        if (blackPawnsOnFiles[file])
         {
-          if (!Bitboards::file(m_board.bitboard(WHITE_PAWN), file - 1) && !Bitboards::file(m_board.bitboard(WHITE_PAWN), file + 1))
+          if (!whitePawnsOnNeighboringFiles[file])
             evaluationBonus -= PASSED_PAWN_BONUS;
-          if (!Bitboards::file(m_board.bitboard(BLACK_PAWN), file - 1) && !Bitboards::file(m_board.bitboard(BLACK_PAWN), file + 1))
+
+          if (!blackPawnsOnNeighboringFiles[file])
             evaluationBonus += ISOLATED_PAWN_PENALTY;
         }
       }
@@ -238,22 +245,18 @@ namespace TungstenChess
 
       if (m_board[i] == WHITE_ROOK)
       {
-        Bitboard pawns = m_board.bitboard(WHITE_PAWN) | m_board.bitboard(BLACK_PAWN);
-
-        if (!Bitboards::file(pawns, file))
+        if (!(blackPawnsOnFiles[file] || whitePawnsOnFiles[file]))
           evaluationBonus += ROOK_ON_OPEN_FILE_BONUS;
-        else if (!Bitboards::file(m_board.bitboard(BLACK_PAWN), file))
+        else if (!blackPawnsOnFiles[file])
           evaluationBonus += ROOK_ON_SEMI_OPEN_FILE_BONUS;
 
         continue;
       }
       if (m_board[i] == BLACK_ROOK)
       {
-        Bitboard pawns = m_board.bitboard(WHITE_PAWN) | m_board.bitboard(BLACK_PAWN);
-
-        if (!Bitboards::file(pawns, file))
+        if (!(blackPawnsOnFiles[file] || whitePawnsOnFiles[file]))
           evaluationBonus -= ROOK_ON_OPEN_FILE_BONUS;
-        else if (!Bitboards::file(m_board.bitboard(WHITE_PAWN), file))
+        else if (!whitePawnsOnFiles[file])
           evaluationBonus -= ROOK_ON_SEMI_OPEN_FILE_BONUS;
 
         continue;
@@ -261,13 +264,13 @@ namespace TungstenChess
 
       if (m_board[i] == WHITE_KNIGHT)
       {
-        if (file > 0 && file < 7 && !Bitboards::file(m_board.bitboard(BLACK_PAWN), file - 1) && !Bitboards::file(m_board.bitboard(BLACK_PAWN), file + 1))
+        if (file > 0 && file < 7 && !blackPawnsOnNeighboringFiles[file])
           evaluationBonus += KNIGHT_OUTPOST_BONUS;
         continue;
       }
       if (m_board[i] == BLACK_KNIGHT)
       {
-        if (file > 0 && file < 7 && !Bitboards::file(m_board.bitboard(WHITE_PAWN), file - 1) && !Bitboards::file(m_board.bitboard(WHITE_PAWN), file + 1))
+        if (file > 0 && file < 7 && !whitePawnsOnNeighboringFiles[file])
           evaluationBonus -= KNIGHT_OUTPOST_BONUS;
         continue;
       }
