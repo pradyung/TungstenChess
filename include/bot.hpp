@@ -45,7 +45,7 @@ namespace TungstenChess
 
     static constexpr inline int CASTLING_BONUS_MULTIPLIERS[16] = {0, 1, 1, 2, 0, -1, 1, 0, 0, 1, -1, 0, 0, -1, -1, -2};
 
-    static const int MATERIAL_DIMINISH_SHIFT = 13;
+    static const int MATERIAL_DIMINISH_SHIFT = 14;
 
     struct BotSettings
     {
@@ -55,8 +55,6 @@ namespace TungstenChess
       bool logSearchInfo = true;
       bool logPGNMoves = true;
     };
-
-    const BotSettings m_botSettings;
 
     struct SearchInfo
     {
@@ -83,6 +81,8 @@ namespace TungstenChess
         return std::to_string(evaluation * (sideToMove == WHITE ? 1 : -1));
       }
     };
+
+    const BotSettings m_botSettings;
 
     SearchInfo m_previousSearchInfo;
     uint m_currentSearchId = 0;
