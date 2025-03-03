@@ -2,6 +2,7 @@
 
 #include <string>
 #include <array>
+#include <mutex>
 
 namespace TungstenChess
 {

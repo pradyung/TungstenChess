@@ -1,16 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <mutex>
-#include <string>
-
-#define NULL_MOVE 0
-
-#define DEBUG_MODE false
-
-#define DEF_USE_OPENING_BOOK !DEBUG_MODE
-#define DEF_GUI_THREADING !DEBUG_MODE
-#define DEF_PLAYER_COLOR DEBUG_MODE ? NO_COLOR : WHITE
 
 namespace TungstenChess
 {
@@ -18,68 +8,9 @@ namespace TungstenChess
   typedef uint8_t PieceColor;
   typedef uint8_t PieceType;
 
-  typedef uint16_t Move;
-
   typedef uint8_t Square;
   typedef uint8_t Rank;
   typedef uint8_t File;
-
-  typedef uint64_t Bitboard;
-
-  typedef uint64_t ZobristKey;
-
-  typedef uint64_t Magic;
-  typedef uint8_t Shift;
-
-  enum CastlingRights : uint8_t
-  {
-    WHITE_KINGSIDE = 1,
-    WHITE_QUEENSIDE = 2,
-    BLACK_KINGSIDE = 4,
-    BLACK_QUEENSIDE = 8,
-    KINGSIDE = 16,
-    QUEENSIDE = 32,
-    BOTHSIDES = KINGSIDE | QUEENSIDE,
-    WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
-    BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
-  };
-
-  enum GameStatus : uint8_t
-  {
-    NO_MATE = 0,
-    STALEMATE = 1,
-    LOSE = 2,
-  };
-
-  enum MoveFlags : uint8_t
-  {
-    NORMAL = 0,
-    CAPTURE = 1,
-    PAWN_DOUBLE = 2,
-    EP_CAPTURE = 4,
-    PROMOTION = 8,
-    KSIDE_CASTLE = 16,
-    QSIDE_CASTLE = 32,
-    CASTLE = KSIDE_CASTLE | QSIDE_CASTLE
-  };
-
-  enum MoveMasks : uint16_t
-  {
-    FROM = 0x3F,
-    TO = 0xFC0,
-    FROM_TO = FROM | TO,
-    PROMOTION_PIECE = 0x7000
-  };
-
-  enum FenParts : uint8_t
-  {
-    FEN_BOARD = 0,
-    FEN_SIDE_TO_MOVE = 1,
-    FEN_CASTLING_RIGHTS = 2,
-    FEN_EN_PASSANT = 3,
-    FEN_HALFMOVE_CLOCK = 4,
-    FEN_FULLMOVE_NUMBER = 5
-  };
 
   enum PieceMasks : Piece
   {
@@ -97,14 +28,6 @@ namespace TungstenChess
     QUEEN = 5,
     KING = 6,
     PIECE_TYPE_NUMBER = 7
-  };
-
-  enum MovePromotions : uint16_t
-  {
-    KNIGHT_PROMOTION = KNIGHT << 12,
-    BISHOP_PROMOTION = BISHOP << 12,
-    ROOK_PROMOTION = ROOK << 12,
-    QUEEN_PROMOTION = QUEEN << 12
   };
 
   enum PieceColors : PieceColor

@@ -8,14 +8,19 @@
 #include <condition_variable>
 #include <unordered_map>
 
-#include "board.hpp"
-#include "opening_book.hpp"
-#include "piece_eval_tables.hpp"
-#include "utils.hpp"
-#include "transposition_table.hpp"
+#include "core/board.hpp"
+#include "utils/utils.hpp"
+#include "bot/opening_book.hpp"
+#include "bot/piece_eval_tables.hpp"
+#include "bot/transposition_table.hpp"
 
 #define POSITIVE_INFINITY 1000000
 #define NEGATIVE_INFINITY -1000000
+
+#define DEBUG_MODE false
+
+#define DEF_USE_OPENING_BOOK !DEBUG_MODE
+#define DEF_PLAYER_COLOR DEBUG_MODE ? NO_COLOR : WHITE
 
 namespace TungstenChess
 {
@@ -26,22 +31,6 @@ namespace TungstenChess
     OpeningBook m_openingBook;
 
     TranspositionTable m_transpositionTable;
-
-    enum EvaluationConstants : int
-    {
-      BISHOP_PAIR_BONUS = 100,
-      CASTLED_KING_BONUS = 25,
-      CAN_CASTLE_BONUS = 25,
-      ROOK_ON_OPEN_FILE_BONUS = 50,
-      ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
-      KNIGHT_OUTPOST_BONUS = 50,
-      PASSED_PAWN_BONUS = 50,
-      DOUBLED_PAWN_PENALTY = 50,
-      ISOLATED_PAWN_PENALTY = 25,
-      BACKWARDS_PAWN_PENALTY = 50,
-      KING_SAFETY_PAWN_SHIELD_BONUS = 50,
-      CONTEMPT = 100,
-    };
 
     static constexpr inline int CASTLING_BONUS_MULTIPLIERS[16] = {0, 1, 1, 2, 0, -1, 1, 0, 0, 1, -1, 0, 0, -1, -1, -2};
 
@@ -69,17 +58,6 @@ namespace TungstenChess
       bool mateFound = false;
       int mateIn = 0;
       bool lossFound = false;
-
-      std::string evalString(PieceColor sideToMove) const
-      {
-        if (lossFound)
-          return std::format("Loss in {}", mateIn);
-
-        if (mateFound)
-          return mateIn == 0 ? "Mate" : std::format("Mate in {}", mateIn);
-
-        return std::to_string(evaluation * (sideToMove == WHITE ? 1 : -1));
-      }
     };
 
     const BotSettings m_botSettings;
@@ -102,25 +80,14 @@ namespace TungstenChess
     Bot(Board &board) : Bot(board, BotSettings()) {}
     Bot(Board &board, int maxSearchTime) : Bot(board, BotSettings{maxSearchTime}) {}
 
-    ~Bot()
-    {
-      m_searchCancelled = true;
-      m_searchTimerTerminated = true;
-      m_searchTimerReset = true;
-      if (m_searchTimerThread.joinable())
-        m_searchTimerThread.join();
-    }
+    ~Bot();
 
     /**
      * @brief Loads the opening book from a file
      * @param path The path to the opening book file
      * @param openingBookSize The number of entries in the opening book (i.e. the size of the file in bytes divided by 4)
      */
-    void loadOpeningBook(const std::filesystem::path path, uint openingBookSize)
-    {
-      if (!m_openingBookLoaded)
-        m_openingBook.loadOpeningBook(path, openingBookSize);
-    }
+    void loadOpeningBook(const std::filesystem::path path, uint openingBookSize);
 
     /**
      * @brief Generates the best move for the bot
@@ -137,29 +104,14 @@ namespace TungstenChess
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      * @return The number of legal moves
      */
-    int getSortedLegalMoves(MoveArray &moves, PieceColor color, bool onlyCaptures = false, Move bestMove = NULL_MOVE)
-    {
-      int legalMovesCount = m_board.getLegalMoves(moves, color, onlyCaptures);
-      heuristicSortMoves(moves, legalMovesCount, bestMove);
-      return legalMovesCount;
-    }
+    int getSortedLegalMoves(MoveArray &moves, PieceColor color, bool onlyCaptures = false, Move bestMove = NULL_MOVE);
 
     /**
      * @brief Gets the positional evaluation of a single piece
      * @param pieceIndex The index of the piece
      * @param absolute Whether to return the value of the evaluation as if the piece was white (true for heuristic evaluation, false for static evaluation)
      */
-    int getPiecePositionalEvaluation(Square pieceIndex, bool absolute = false) const
-    {
-      int positionalEvaluation = 0;
-
-      positionalEvaluation = PIECE_EVAL_TABLES[m_board[pieceIndex]][pieceIndex];
-
-      if (!absolute && (m_board[pieceIndex] & BLACK))
-        positionalEvaluation = -positionalEvaluation;
-
-      return positionalEvaluation;
-    }
+    int getPiecePositionalEvaluation(Square pieceIndex, bool absolute = false) const;
 
     /**
      * @brief Generates the best move for the bot

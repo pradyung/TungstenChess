@@ -3,10 +3,42 @@
 #include <cstdint>
 #include <string>
 
-#include "types.hpp"
+#include "utils/types.hpp"
+
+#define NULL_MOVE 0
 
 namespace TungstenChess
 {
+  typedef uint16_t Move;
+
+  enum MoveFlags : uint8_t
+  {
+    NORMAL = 0,
+    CAPTURE = 1,
+    PAWN_DOUBLE = 2,
+    EP_CAPTURE = 4,
+    PROMOTION = 8,
+    KSIDE_CASTLE = 16,
+    QSIDE_CASTLE = 32,
+    CASTLE = KSIDE_CASTLE | QSIDE_CASTLE
+  };
+
+  enum MoveMasks : uint16_t
+  {
+    FROM = 0x3F,
+    TO = 0xFC0,
+    FROM_TO = FROM | TO,
+    PROMOTION_PIECE = 0x7000
+  };
+
+  enum MovePromotions : uint16_t
+  {
+    KNIGHT_PROMOTION = KNIGHT << 12,
+    BISHOP_PROMOTION = BISHOP << 12,
+    ROOK_PROMOTION = ROOK << 12,
+    QUEEN_PROMOTION = QUEEN << 12
+  };
+
   class Moves
   {
   public:

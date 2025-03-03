@@ -1,192 +1,7 @@
-#include "board.hpp" // See for documentation and helper function implementations
+#include "core/board.hpp"
 
 namespace TungstenChess
 {
-  ZobristKey Board::calculateInitialZobristKey() const
-  {
-    ZobristKey zobristKey = 0;
-
-    for (Square i = 0; i < 64; i++)
-    {
-      if (m_board[i])
-      {
-        zobristKey ^= Zobrist::pieceKeys[m_board[i], i];
-      }
-    }
-
-    zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
-    zobristKey ^= Zobrist::enPassantKeys[m_enPassantFile];
-
-    if (m_sideToMove == WHITE)
-      zobristKey ^= Zobrist::sideKey;
-
-    return zobristKey;
-  }
-
-  void Board::resetBoard(std::string fen)
-  {
-    std::string fenParts[6];
-
-    int fenPartIndex = 0;
-
-    for (size_t i = 0; i < fen.length(); i++)
-    {
-      if (fen[i] == ' ')
-      {
-        fenPartIndex++;
-        continue;
-      }
-
-      fenParts[fenPartIndex] += fen[i];
-    }
-
-    m_castlingRights = 0;
-    m_enPassantFile = NO_EP;
-
-    for (Piece i = 0; i < ALL_PIECES + 1; i++)
-      m_bitboards[i] = 0;
-
-    m_sideToMove = WHITE;
-
-    Square pieceIndex = 0;
-    for (size_t i = 0; i < fenParts[FEN_BOARD].length(); i++)
-    {
-      if (fen[i] == '/')
-        continue;
-      else if (isdigit(fen[i]))
-      {
-        for (int j = 0; j < fen[i] - '0'; j++)
-        {
-          m_board[pieceIndex] = NO_PIECE;
-          pieceIndex++;
-        }
-      }
-      else
-      {
-        updatePiece(pieceIndex, std::string("PNBRQK..pnbrqk").find(fen[i]) + WHITE_PAWN);
-
-        pieceIndex++;
-      }
-    }
-
-    m_sideToMove = fenParts[FEN_SIDE_TO_MOVE] == "w" ? WHITE : BLACK;
-
-    if (fenParts[FEN_CASTLING_RIGHTS] != "-")
-    {
-      for (size_t i = 0; i < fenParts[FEN_CASTLING_RIGHTS].length(); i++)
-      {
-        if (fenParts[FEN_CASTLING_RIGHTS][i] == 'K')
-          m_castlingRights |= WHITE_KINGSIDE;
-        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'Q')
-          m_castlingRights |= WHITE_QUEENSIDE;
-        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'k')
-          m_castlingRights |= BLACK_KINGSIDE;
-        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'q')
-          m_castlingRights |= BLACK_QUEENSIDE;
-      }
-    }
-
-    if (fenParts[FEN_EN_PASSANT] != "-")
-    {
-      m_enPassantFile = fenParts[FEN_EN_PASSANT][0] - 'a';
-    }
-
-    m_zobristKey = calculateInitialZobristKey();
-
-    m_positionHistory.push_back(m_zobristKey);
-
-    m_moveHistory.clear();
-  }
-
-  Board::UnmoveData Board::makeMove(Move move)
-  {
-    switchSideToMove();
-
-    uint8_t from = move & FROM;
-    uint8_t to = (move & TO) >> 6;
-    PieceType promotionPieceType = move >> 12;
-
-    Piece piece = m_board[from];
-    PieceType pieceType = piece & TYPE;
-    PieceColor pieceColor = piece & COLOR;
-
-    Piece capturedPiece = m_board[to];
-    PieceType capturedPieceType = capturedPiece & TYPE;
-    PieceColor capturedPieceColor = capturedPiece & COLOR;
-
-    uint8_t flags = Moves::getMoveFlags(from, to, pieceType, capturedPiece);
-
-    UnmoveData unmoveData = {piece, capturedPiece, m_castlingRights, m_enPassantFile, m_halfmoveClock, flags};
-
-    m_halfmoveClock++;
-    if (m_board[to] || pieceType == PAWN)
-      m_halfmoveClock = 0;
-
-    m_moveHistory.push_back(move & FROM_TO);
-
-    movePiece(from, to, promotionPieceType | pieceColor);
-
-    updateEnPassantFile(flags & PAWN_DOUBLE ? to % 8 : NO_EP);
-
-    if (pieceType == KING)
-      removeCastlingRights(pieceColor, BOTHSIDES);
-
-    if (pieceType == ROOK && ((pieceColor == WHITE && (from == A1 || from == H1)) || (pieceColor == BLACK && (from == A8 || from == H8))))
-      removeCastlingRights(pieceColor, from % 8 == 0 ? QUEENSIDE : KINGSIDE);
-    if (capturedPieceType == ROOK && ((capturedPieceColor == WHITE && (to == A1 || to == H1)) || (capturedPieceColor == BLACK && (to == A8 || to == H8))))
-      removeCastlingRights(capturedPieceColor, to % 8 == 0 ? QUEENSIDE : KINGSIDE);
-
-    if (flags & EP_CAPTURE)
-      updatePiece(to + (piece & WHITE ? 8 : -8), NO_PIECE);
-
-    if (flags & CASTLE)
-    {
-      m_hasCastled |= pieceColor;
-
-      if (flags & KSIDE_CASTLE)
-        movePiece(to + 1, to - 1);
-      else
-        movePiece(to - 2, to + 1);
-    }
-
-    m_positionHistory.push_back(m_zobristKey);
-
-    return unmoveData;
-  }
-
-  void Board::unmakeMove(Move move, UnmoveData unmoveData)
-  {
-    m_positionHistory.pop_back();
-    m_moveHistory.pop_back();
-
-    uint8_t from = move & FROM;
-    uint8_t to = (move & TO) >> 6;
-
-    auto [piece, capturedPiece, castlingRights, enPassantFile, halfmoveClock, flags] = unmoveData;
-
-    switchSideToMove();
-
-    m_halfmoveClock = halfmoveClock;
-
-    unmovePiece(from, to, piece, capturedPiece);
-
-    if (flags & CASTLE)
-    {
-      m_hasCastled &= ~(piece & COLOR);
-
-      if (flags & KSIDE_CASTLE)
-        unmovePiece(to + 1, to - 1);
-      else
-        unmovePiece(to - 2, to + 1);
-    }
-
-    updateEnPassantFile(enPassantFile);
-    updateCastlingRights(castlingRights);
-
-    if (flags & EP_CAPTURE)
-      updatePiece((piece & WHITE) ? to + 8 : to - 8, piece ^ COLOR);
-  }
-
   Bitboard Board::getPawnMoves(Square pieceIndex, PieceColor color, bool _) const
   {
     Bitboard movesBitboard = 0;
@@ -267,6 +82,16 @@ namespace TungstenChess
     return movesBitboard;
   }
 
+  Bitboard Board::getPseudoLegalPieceMoves(Square pieceIndex, PieceColor color, bool includeCastling) const
+  {
+    return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling);
+  }
+
+  Bitboard Board::getPseudoLegalPieceMovesBitboard(Square pieceIndex) const
+  {
+    return getPseudoLegalPieceMoves(pieceIndex, m_board[pieceIndex] & COLOR);
+  }
+
   Bitboard Board::getLegalPieceMovesBitboard(Square pieceIndex, PieceColor color, bool onlyCaptures)
   {
     Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, color, !onlyCaptures);
@@ -289,6 +114,11 @@ namespace TungstenChess
     }
 
     return legalMovesBitboard;
+  }
+
+  Bitboard Board::getLegalPieceMovesBitboard(Square pieceIndex)
+  {
+    return getLegalPieceMovesBitboard(pieceIndex, m_board[pieceIndex] & COLOR);
   }
 
   Bitboard Board::getAttackingPiecesBitboard(Square targetSquare, Piece targetPiece, PieceColor color) const
@@ -468,7 +298,23 @@ namespace TungstenChess
     return false;
   }
 
-  GameStatus Board::getGameStatus(PieceColor color)
+  bool Board::isInCheck(PieceColor color) const
+  {
+    return isAttacked(m_kingIndices[color | KING], color ^ COLOR);
+  }
+
+  uint8_t Board::countRepetitions(ZobristKey key) const
+  {
+    uint8_t count = 0;
+
+    for (size_t i = 0; i < m_positionHistory.size(); i++)
+      if (m_positionHistory[i] == key)
+        count++;
+
+    return count;
+  }
+
+  Board::GameStatus Board::getGameStatus(PieceColor color)
   {
     if (countRepetitions(m_zobristKey) >= 3)
       return STALEMATE;
@@ -484,6 +330,43 @@ namespace TungstenChess
     }
 
     return isInCheck(color) ? LOSE : STALEMATE;
+  }
+
+  uint Board::countGames(uint8_t depth, bool verbose)
+  {
+    if (depth == 0)
+      return 1;
+
+    MoveArray legalMoves;
+    int legalMovesCount = getLegalMoves(legalMoves, m_sideToMove);
+
+    uint games = 0;
+
+    for (int i = 0; i < legalMovesCount; i++)
+    {
+      if (depth == 1)
+      {
+        games++;
+
+        if (verbose)
+          std::cout << Moves::getUCI(legalMoves[i]) << ": 1" << std::endl;
+
+        continue;
+      }
+
+      UnmoveData unmoveData = makeMove(legalMoves[i]);
+
+      uint newGames = countGames(depth - 1, false);
+
+      if (verbose)
+        std::cout << Moves::getUCI(legalMoves[i]) << ": " << newGames << std::endl;
+
+      games += newGames;
+
+      unmakeMove(legalMoves[i], unmoveData);
+    }
+
+    return games;
   }
 
   Move Board::generateMoveFromUCI(std::string uci) const
@@ -589,7 +472,7 @@ namespace TungstenChess
 
     UnmoveData unmoveData = makeMove(move);
 
-    GameStatus gameStatus = getGameStatus(m_sideToMove);
+    Board::GameStatus gameStatus = getGameStatus(m_sideToMove);
 
     if (isInCheck(m_sideToMove))
       pgn += gameStatus == LOSE ? "#" : "+";
@@ -597,42 +480,5 @@ namespace TungstenChess
     unmakeMove(move, unmoveData);
 
     return pgn;
-  }
-
-  uint Board::countGames(uint8_t depth, bool verbose)
-  {
-    if (depth == 0)
-      return 1;
-
-    MoveArray legalMoves;
-    int legalMovesCount = getLegalMoves(legalMoves, m_sideToMove);
-
-    uint games = 0;
-
-    for (int i = 0; i < legalMovesCount; i++)
-    {
-      if (depth == 1)
-      {
-        games++;
-
-        if (verbose)
-          std::cout << Moves::getUCI(legalMoves[i]) << ": 1" << std::endl;
-
-        continue;
-      }
-
-      UnmoveData unmoveData = makeMove(legalMoves[i]);
-
-      uint newGames = countGames(depth - 1, false);
-
-      if (verbose)
-        std::cout << Moves::getUCI(legalMoves[i]) << ": " << newGames << std::endl;
-
-      games += newGames;
-
-      unmakeMove(legalMoves[i], unmoveData);
-    }
-
-    return games;
   }
 }

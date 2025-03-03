@@ -6,8 +6,8 @@
 #include <string>
 #include <thread>
 
-#include "bot.hpp"
-#include "utils.hpp"
+#include "bot/engine.hpp"
+#include "utils/utils.hpp"
 
 using namespace sf;
 
@@ -15,6 +15,8 @@ using namespace sf;
 #define SPRITE_SIZE 100.0f
 
 #define NO_SQUARE 64
+
+#define DEF_GUI_THREADING !DEBUG_MODE
 
 namespace TungstenChess
 {

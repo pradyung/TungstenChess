@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "board.hpp"
-#include "bot.hpp"
+#include "engine.hpp"
 
 using namespace TungstenChess;
 

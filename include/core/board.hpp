@@ -6,11 +6,11 @@
 #include <iostream>
 #include <cassert>
 
-#include "bitboard.hpp"
-#include "zobrist.hpp"
-#include "magic.hpp"
-#include "types.hpp"
-#include "move.hpp"
+#include "core/bitboard.hpp"
+#include "core/zobrist.hpp"
+#include "core/magic.hpp"
+#include "core/move.hpp"
+#include "utils/types.hpp"
 
 #define NO_EP 8
 #define MAX_MOVE_COUNT 218
@@ -24,6 +24,19 @@
 namespace TungstenChess
 {
   typedef std::array<Move, MAX_MOVE_COUNT> MoveArray;
+
+  enum CastlingRights : uint8_t
+  {
+    WHITE_KINGSIDE = 1,
+    WHITE_QUEENSIDE = 2,
+    BLACK_KINGSIDE = 4,
+    BLACK_QUEENSIDE = 8,
+    KINGSIDE = 16,
+    QUEENSIDE = 32,
+    BOTHSIDES = KINGSIDE | QUEENSIDE,
+    WHITE_CASTLING = WHITE_KINGSIDE | WHITE_QUEENSIDE,
+    BLACK_CASTLING = BLACK_KINGSIDE | BLACK_QUEENSIDE,
+  };
 
   class Board
   {
@@ -48,14 +61,7 @@ namespace TungstenChess
     std::vector<Move> m_moveHistory;
 
   public:
-    Board(std::string fen = START_FEN) : m_isDefaultStartPosition(fen == DEFAULT_START_FEN)
-    {
-      Zobrist::init();
-      MovesLookup::init();
-      MagicMoveGen::init();
-
-      resetBoard(fen);
-    }
+    Board(std::string fen = START_FEN);
 
     // Accessor methods
     Piece operator[](Square index) const { return m_board[index]; }
@@ -81,28 +87,19 @@ namespace TungstenChess
      * @brief Checks if a color is in check in the current position
      * @param color The color to check
      */
-    bool isInCheck(PieceColor color) const
-    {
-      return isAttacked(m_kingIndices[color | KING], color ^ COLOR);
-    }
+    bool isInCheck(PieceColor color) const;
 
     /**
      * @brief Returns the bitboard of the squares a piece can move to
      * @param pieceIndex The index of the piece
      */
-    Bitboard getLegalPieceMovesBitboard(Square pieceIndex)
-    {
-      return getLegalPieceMovesBitboard(pieceIndex, m_board[pieceIndex] & COLOR);
-    }
+    Bitboard getLegalPieceMovesBitboard(Square pieceIndex);
 
     /**
      * @brief Returns the bitboard of the squares a piece can move to, not excluding moves that leave the king in check
      * @param pieceIndex The index of the piece
      */
-    Bitboard getPseudoLegalPieceMovesBitboard(Square pieceIndex)
-    {
-      return getPseudoLegalPieceMoves(pieceIndex, m_board[pieceIndex] & COLOR);
-    }
+    Bitboard getPseudoLegalPieceMovesBitboard(Square pieceIndex) const;
 
     struct UnmoveData
     {
@@ -124,10 +121,7 @@ namespace TungstenChess
      * @brief Makes a move on the board
      * @param move The move to make (UCI string)
      */
-    UnmoveData makeMove(std::string move)
-    {
-      return makeMove(generateMoveFromUCI(move));
-    }
+    UnmoveData makeMove(std::string move);
 
     /**
      * @brief Undoes a move, handling all board state changes
@@ -135,6 +129,12 @@ namespace TungstenChess
      */
     void unmakeMove(Move move, UnmoveData unmoveData);
 
+    enum GameStatus : uint8_t
+    {
+      NO_MATE = 0,
+      STALEMATE = 1,
+      LOSE = 2,
+    };
     /**
      * @brief Returns the game status for the current side - see enum GameStatus
      * @param color The color to check
@@ -174,16 +174,7 @@ namespace TungstenChess
      * @brief Counts the number of times a position has been repeated
      * @param key The Zobrist key of the position to check
      */
-    uint8_t countRepetitions(ZobristKey key) const
-    {
-      uint8_t count = 0;
-
-      for (size_t i = 0; i < m_positionHistory.size(); i++)
-        if (m_positionHistory[i] == key)
-          count++;
-
-      return count;
-    }
+    uint8_t countRepetitions(ZobristKey key) const;
 
   private:
     /**
@@ -198,24 +189,7 @@ namespace TungstenChess
      * @param oldPiece The old piece
      * @param newPiece The new piece
      */
-    void updateBitboards(Square pieceIndex, Piece oldPiece, Piece newPiece)
-    {
-      Bitboard squareBitboard = 1ULL << pieceIndex;
-
-      if (oldPiece)
-      {
-        m_bitboards[oldPiece] ^= squareBitboard;
-        m_bitboards[oldPiece & COLOR] ^= squareBitboard;
-        m_bitboards[ALL_PIECES] ^= squareBitboard;
-      }
-
-      if (newPiece)
-      {
-        m_bitboards[newPiece] |= squareBitboard;
-        m_bitboards[newPiece & COLOR] |= squareBitboard;
-        m_bitboards[ALL_PIECES] |= squareBitboard;
-      }
-    }
+    void updateBitboards(Square pieceIndex, Piece oldPiece, Piece newPiece);
 
     /**
      * @brief Quickly makes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array, Zobrist key or piece counts
@@ -223,53 +197,7 @@ namespace TungstenChess
      * @param to The index to move the piece to
      * @return MoveFlags returns flag only if move was en passant, promotion, kingside castle, or queenside castle
      */
-    MoveFlags quickMakeMove(Square from, Square to)
-    {
-      Piece fromPiece = m_board[from];
-      Piece toPiece = m_board[to];
-
-      updateBitboards(from, fromPiece, NO_PIECE);
-      updateBitboards(to, toPiece, fromPiece);
-
-      if ((fromPiece & TYPE) == PAWN)
-      {
-        if (!toPiece && to % 8 != from % 8)
-        {
-          PieceColor color = fromPiece & COLOR;
-          Square epSquare = to + (color & WHITE ? 8 : -8);
-          updateBitboards(epSquare, (color ^ COLOR) | PAWN, NO_PIECE);
-
-          return EP_CAPTURE;
-        }
-
-        if (to <= 7 || to >= 56)
-          return PROMOTION;
-      }
-
-      else if ((fromPiece & TYPE) == KING)
-      {
-        m_kingIndices[fromPiece] = to;
-
-        if (to - from == 2)
-        {
-          Piece rook = (fromPiece & COLOR) | ROOK;
-          updateBitboards(from + 3, rook, NO_PIECE);
-          updateBitboards(from + 1, NO_PIECE, rook);
-
-          return KSIDE_CASTLE;
-        }
-        else if (from - to == 2)
-        {
-          Piece rook = (fromPiece & COLOR) | ROOK;
-          updateBitboards(from - 4, rook, NO_PIECE);
-          updateBitboards(from - 1, NO_PIECE, rook);
-
-          return QSIDE_CASTLE;
-        }
-      }
-
-      return NORMAL;
-    }
+    MoveFlags quickMakeMove(Square from, Square to);
 
     /**
      * @brief Quickly unmakes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array or Zobrist key
@@ -277,58 +205,14 @@ namespace TungstenChess
      * @param to The index to move the piece to
      * @param flag The flag returned by quickMakeMove
      */
-    void quickUnmakeMove(Square from, Square to, MoveFlags flag)
-    {
-      Piece fromPiece = m_board[from];
-      Piece toPiece = m_board[to];
-
-      updateBitboards(to, fromPiece, toPiece);
-      updateBitboards(from, NO_PIECE, fromPiece);
-
-      if ((fromPiece & TYPE) == KING)
-        m_kingIndices[fromPiece] = from;
-
-      if (flag & EP_CAPTURE)
-      {
-        PieceColor color = fromPiece & COLOR;
-        Square epSquare = to + (color & WHITE ? 8 : -8);
-        updateBitboards(epSquare, NO_PIECE, (color ^ COLOR) | PAWN);
-      }
-
-      else if (flag & KSIDE_CASTLE)
-      {
-        Piece rook = (fromPiece & COLOR) | ROOK;
-        updateBitboards(from + 3, NO_PIECE, rook);
-        updateBitboards(from + 1, rook, NO_PIECE);
-      }
-
-      else if (flag & QSIDE_CASTLE)
-      {
-        Piece rook = (fromPiece & COLOR) | ROOK;
-        updateBitboards(from - 4, NO_PIECE, rook);
-        updateBitboards(from - 1, rook, NO_PIECE);
-      }
-    }
+    void quickUnmakeMove(Square from, Square to, MoveFlags flag);
 
     /**
      * @brief Updates the piece at a given index and handles bitboard and Zobrist key updates
      * @param pieceIndex The index of the piece to update
      * @param newPiece The new piece
      */
-    void updatePiece(Square pieceIndex, Piece newPiece)
-    {
-      Piece oldPiece = m_board[pieceIndex];
-
-      m_pieceCounts[oldPiece]--;
-      m_pieceCounts[newPiece]++;
-
-      m_zobristKey ^= Zobrist::getPieceCombinationKey(pieceIndex, oldPiece, newPiece);
-
-      m_kingIndices[newPiece] = pieceIndex;
-      m_board[pieceIndex] = newPiece;
-
-      updateBitboards(pieceIndex, oldPiece, newPiece);
-    }
+    void updatePiece(Square pieceIndex, Piece newPiece);
 
     /**
      * @brief Moves a piece from one square to another and handles bitboard and Zobrist key updates
@@ -336,11 +220,7 @@ namespace TungstenChess
      * @param to The index to move the piece to
      * @param promotionPiece The piece to promote to (if any)
      */
-    void movePiece(Square from, Square to, Piece promotionPiece = NO_PIECE)
-    {
-      updatePiece(to, (promotionPiece & TYPE) == NO_TYPE ? m_board[from] : promotionPiece);
-      updatePiece(from, NO_PIECE);
-    }
+    void movePiece(Square from, Square to, Piece promotionPiece = NO_PIECE);
 
     /**
      * @brief Unmoves a piece from one square to another and handles bitboard and Zobrist key updates
@@ -350,73 +230,44 @@ namespace TungstenChess
      * @param movedPiece The piece that was moved (Used for undoing promotions)
      * @param capturedPiece The piece that was captured (Used for undoing captures)
      */
-    void unmovePiece(Square from, Square to, Piece movedPiece = NO_PIECE, Piece capturedPiece = NO_PIECE)
-    {
-      updatePiece(from, movedPiece == NO_PIECE ? m_board[to] : movedPiece);
-      updatePiece(to, capturedPiece);
-    }
+    void unmovePiece(Square from, Square to, Piece movedPiece = NO_PIECE, Piece capturedPiece = NO_PIECE);
 
     /**
      * @brief Removes castling rights
      * @param rights The rights to remove, see enum CastlingRights
      */
-    void removeCastlingRights(uint8_t rights)
-    {
-      m_zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
-      m_castlingRights &= ~rights;
-      m_zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
-    }
+    void removeCastlingRights(uint8_t rights);
 
     /**
      * @brief Removes castling rights
      * @param color The color to remove the rights from
      * @param side The side to remove the rights from, see enum CastlingRights (KINGSIDE/QUEENSIDE/CASTLING)
      */
-    void removeCastlingRights(PieceColor color, CastlingRights side)
-    {
-      removeCastlingRights(color == WHITE ? side >> 4 : side >> 2);
-    }
+    void removeCastlingRights(PieceColor color, CastlingRights side);
 
     /**
      * @brief Updates the en passant file and handles Zobrist key updates
      * @param file The new en passant file (0-7), or NO_EP (8) if there is no en passant
      */
-    void updateEnPassantFile(File file)
-    {
-      m_zobristKey ^= Zobrist::enPassantKeys[m_enPassantFile];
-      m_enPassantFile = file;
-      m_zobristKey ^= Zobrist::enPassantKeys[file];
-    }
+    void updateEnPassantFile(File file);
 
     /**
      * @brief Updates the castling rights and handles Zobrist key updates
      * @param rights The new castling rights, see enum CastlingRights
      */
-    void updateCastlingRights(uint8_t rights)
-    {
-      m_zobristKey ^= Zobrist::castlingKeys[m_castlingRights];
-      m_castlingRights = rights;
-      m_zobristKey ^= Zobrist::castlingKeys[rights];
-    }
+    void updateCastlingRights(uint8_t rights);
 
     /**
      * @brief Switches the side to move and handles Zobrist key updates
      */
-    void switchSideToMove()
-    {
-      m_sideToMove ^= COLOR;
-      m_zobristKey ^= Zobrist::sideKey;
-    }
+    void switchSideToMove();
 
     /**
      * @brief Gets a bitboard of pseudo-legal moves for a piece (does not check for pins or checks)
      * @param pieceIndex The index of the piece
      * @param includeCastling Whether to include castling moves (should be false when checking for attacks on the king)
      */
-    Bitboard getPseudoLegalPieceMoves(Square pieceIndex, PieceColor color, bool includeCastling = true) const
-    {
-      return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling);
-    }
+    Bitboard getPseudoLegalPieceMoves(Square pieceIndex, PieceColor color, bool includeCastling = true) const;
 
     /**
      * @brief Returns the bitboard of the squares a piece can move to

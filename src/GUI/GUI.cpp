@@ -328,13 +328,13 @@ namespace TungstenChess
     if (m_board.isInCheck(m_board.sideToMove()))
       Bitboards::addBit(m_redHighlightsBitboard, m_board.kingIndex(m_board.sideToMove() | KING));
 
-    GameStatus gameStatus = m_board.getGameStatus(m_board.sideToMove());
+    Board::GameStatus gameStatus = m_board.getGameStatus(m_board.sideToMove());
 
     if (gameStatus)
     {
       m_gameOver = true;
 
-      if (gameStatus == LOSE)
+      if (gameStatus == Board::LOSE)
         std::cout << "Checkmate" << std::endl;
       else
         std::cout << "Stalemate" << std::endl;
