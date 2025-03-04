@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-#include "core/moves_lookup.hpp"
-#include "core/magic.hpp"
+#include "core/moves_lookup/lookup.hpp"
+#include "core/moves_lookup/magic.hpp"
 
 namespace TungstenChess
 {

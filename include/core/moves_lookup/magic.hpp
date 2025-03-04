@@ -46,19 +46,20 @@ namespace TungstenChess
   private:
     /**
      * @brief Gets all possible blocker bitboards for a given square and mask
+     * @param blockers The vector to store the blockers in
      * @param square The square to get blockers for
      * @param mask The mask to get blockers for
      */
-    static std::vector<Bitboard> getAllBlockers(Square square, Bitboard mask);
+    static void getAllBlockers(std::vector<Bitboard> &blockers, Square square, Bitboard mask);
 
     /**
      * @brief Gets all possible shifted blocker bitboards for a given square, magic number, shift, and blockers
+     * @param blockers The blocker bitboards to be shifted (in place)
      * @param magic The magic number to be used for the calculation
      * @param shift The shift to be used for the calculation
      * @param square The square to get shifted blockers for
-     * @param blocks The blocker bitboards to be shifted
      */
-    static std::vector<Bitboard> getShiftedBlockers(Magic magic, Shift shift, Square square, std::vector<Bitboard> blocks);
+    static void shiftBlockers(std::vector<Bitboard> &blockers, Magic magic, Shift shift, Square square);
 
     /**
      * @brief Gets the rook moves bitboard for a given square and blockers
@@ -76,18 +77,20 @@ namespace TungstenChess
 
     /**
      * @brief Gets all possible moves bitboards for a given square and blockers
+     * @param moves The vector to store the moves in
      * @param square The square to get moves for
      * @param blockers The blockers to be used for the calculation
      * @param rook Whether the moves are for a rook or bishop (true for rook, false for bishop)
      */
-    static std::vector<Bitboard> getAllMovesBitboards(Square square, std::vector<Bitboard> blockers, bool rook);
+    static void getAllMovesBitboards(std::vector<Bitboard> &moves, Square square, std::vector<Bitboard> blockers, bool rook);
 
     /**
      * @brief Gets the lookup table for a given square and piece type
+     * @param lookupTable The vector to store the lookup table in
      * @param square The square to get the lookup table for
      * @param rook Whether the lookup table is for a rook or bishop (true for rook, false for bishop)
      */
-    static std::vector<Bitboard> getMovesLookupTable(Square square, bool rook);
+    static void getMovesLookupTable(std::vector<Bitboard> &lookupTable, Square square, bool rook);
 
     /**
      * @brief Initializes the rook lookup tables

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <array>
+#include <vector>
 #include <mutex>
 
 namespace TungstenChess
@@ -51,9 +51,11 @@ namespace TungstenChess
     bool value;
   };
 
-  template <typename T, size_t R, size_t C>
+  template <typename T, size_t R, size_t C, typename Allocator = std::allocator<T>>
   struct array2d // 2d array implemented as flat std::array
   {
+    array2d() : m_data(R * C) {}
+
     T &operator[](size_t r, size_t c) { return m_data[r * C + c]; }
     const T &operator[](size_t r, size_t c) const { return m_data[r * C + c]; }
 
@@ -74,7 +76,7 @@ namespace TungstenChess
     }
 
   private:
-    std::array<T, R * C> m_data;
+    std::vector<T, Allocator> m_data;
     const size_t m_rows = R;
     const size_t m_cols = C;
   };

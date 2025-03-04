@@ -1,14 +1,12 @@
 #include "core/board.hpp"
 
-#include "core/magic.hpp"
-#include "core/moves_lookup.hpp"
+#include "core/moves_lookup/magic.hpp"
 
 namespace TungstenChess
 {
   Board::Board(std::string fen) : m_wasDefaultStartPosition(fen == DEFAULT_START_FEN)
   {
     Zobrist::init();
-    MovesLookup::init();
     MagicMoveGen::init();
 
     resetBoard(fen);

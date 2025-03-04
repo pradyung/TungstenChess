@@ -1,4 +1,4 @@
-#include "core/moves_lookup.hpp"
+#include "core/moves_lookup/lookup.hpp"
 
 namespace TungstenChess
 {
