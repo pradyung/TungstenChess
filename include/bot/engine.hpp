@@ -87,6 +87,18 @@ namespace TungstenChess
 
   private:
     /**
+     * @brief Starts the search timer thread
+     * @note This function is called automatically by the constructor
+     */
+    void startSearchTimerThread();
+
+    /**
+     * @brief Stops the search timer thread
+     * @note This function is called automatically by the destructor
+     */
+    void stopSearchTimerThread();
+
+    /**
      * @brief Gets the legal moves for a color, sorted by heuristic evaluation
      * @param moves The array to store the moves in
      * @param color The color to get the moves for

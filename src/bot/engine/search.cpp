@@ -7,6 +7,37 @@
 
 namespace TungstenChess
 {
+  void Bot::startSearchTimerThread()
+  {
+    m_searchTimerThread = std::thread(
+        [this]()
+        {
+          std::unique_lock<std::mutex> lock(m_searchTimerMutex);
+          m_searchTimerEvent.wait(lock);
+          while (!m_searchTimerTerminated)
+          {
+            m_searchTimerReset = false;
+
+            if (m_searchTimerEvent.wait_for(lock, std::chrono::milliseconds(m_maxSearchTime), [this]
+                                            { return m_searchTimerReset.load(); }))
+              continue;
+
+            m_searchCancelled = true;
+          }
+        });
+
+    m_searchTimerThread.detach();
+  }
+
+  void Bot::stopSearchTimerThread()
+  {
+    m_searchCancelled = true;
+    m_searchTimerTerminated = true;
+    m_searchTimerReset = true;
+    if (m_searchTimerThread.joinable())
+      m_searchTimerThread.join();
+  }
+
   Move Bot::generateBotMove(int maxSearchTime)
   {
     if (m_botSettings.useOpeningBook && m_openingBookLoaded.peek() && m_openingBook.updateMoveHistory(m_board.moveHistory()))
