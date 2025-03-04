@@ -2,8 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "board.hpp"
-#include "engine.hpp"
+#include "bot/engine.hpp"
 
 using namespace TungstenChess;
 

@@ -2,8 +2,12 @@
 
 #include <cstdint>
 
+#define DEBUG_MODE false
+
 namespace TungstenChess
 {
+  typedef uint32_t uint;
+
   typedef uint8_t Piece;
   typedef uint8_t PieceColor;
   typedef uint8_t PieceType;

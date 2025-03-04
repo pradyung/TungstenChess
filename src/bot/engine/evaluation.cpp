@@ -1,5 +1,7 @@
 #include "bot/engine.hpp"
 
+#include "bot/piece_eval_tables.hpp"
+
 namespace TungstenChess
 {
   enum EvaluationConstants : int

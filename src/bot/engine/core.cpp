@@ -2,7 +2,7 @@
 
 namespace TungstenChess
 {
-  Bot::Bot(Board &board, const BotSettings &settings) : m_board(board), m_openingBook(board.isDefaultStartPosition()), m_botSettings(settings)
+  Bot::Bot(Board &board, const BotSettings &settings) : m_board(board), m_openingBook(board.wasDefaultStartPosition()), m_botSettings(settings)
   {
     if (m_botSettings.maxSearchTime > 0)
     {

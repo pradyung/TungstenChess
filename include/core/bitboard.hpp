@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 #include "utils/types.hpp"
 
 namespace TungstenChess

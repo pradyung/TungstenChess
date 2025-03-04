@@ -1,26 +1,16 @@
 #pragma once
 
-#include <iostream>
-#include <chrono>
-#include <algorithm>
 #include <thread>
-#include <atomic>
-#include <condition_variable>
-#include <unordered_map>
 
+#include "bot/opening_book.hpp"
+#include "bot/transposition_table.hpp"
 #include "core/board.hpp"
 #include "utils/utils.hpp"
-#include "bot/opening_book.hpp"
-#include "bot/piece_eval_tables.hpp"
-#include "bot/transposition_table.hpp"
 
 #define POSITIVE_INFINITY 1000000
 #define NEGATIVE_INFINITY -1000000
 
-#define DEBUG_MODE false
-
 #define DEF_USE_OPENING_BOOK !DEBUG_MODE
-#define DEF_PLAYER_COLOR DEBUG_MODE ? NO_COLOR : WHITE
 
 namespace TungstenChess
 {
@@ -38,8 +28,8 @@ namespace TungstenChess
 
     struct BotSettings
     {
-      int maxSearchTime = 2000; // In milliseconds
-      int quiesceDepth = -1;    // for quiescence search, set to -1 to search indefinitely (recommended)
+      int maxSearchTime = 2000; // in milliseconds
+      int quiesceDepth = -1;    // set to -1 to quiesce indefinitely
       bool useOpeningBook = DEF_USE_OPENING_BOOK;
       bool logSearchInfo = true;
       bool logPGNMoves = true;

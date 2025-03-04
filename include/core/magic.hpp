@@ -3,9 +3,8 @@
 #include <array>
 #include <vector>
 
-#include "core/moves_lookup.hpp"
+#include "core/bitboard.hpp"
 #include "utils/types.hpp"
-#include "utils/utils.hpp"
 
 namespace TungstenChess
 {

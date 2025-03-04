@@ -1,5 +1,8 @@
 #include "core/magic.hpp"
 
+#include "utils/utils.hpp"
+#include "core/moves_lookup.hpp"
+
 namespace TungstenChess
 {
   void MagicMoveGen::init()

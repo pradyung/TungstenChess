@@ -1,11 +1,8 @@
 #pragma once
 
-#include "utils/types.hpp"
-#include "core/zobrist.hpp"
-
-#include <array>
 #include <vector>
-#include <format>
+
+#include "core/zobrist.hpp"
 
 #define MEGABYTE 1048576
 

@@ -1,5 +1,10 @@
 #include "core/board.hpp"
 
+#include <iostream>
+
+#include "core/moves_lookup.hpp"
+#include "core/magic.hpp"
+
 namespace TungstenChess
 {
   Bitboard Board::getPawnMoves(Square pieceIndex, PieceColor color, bool _) const
@@ -184,8 +189,6 @@ namespace TungstenChess
     {
       Bitboard diagonalMoves = MagicMoveGen::getBishopMoves(kingIndex, m_bitboards[ALL_PIECES]);
       Bitboard orthogonalMoves = MagicMoveGen::getRookMoves(kingIndex, m_bitboards[ALL_PIECES]);
-
-      PieceColor enemyColor = color ^ COLOR;
 
       Bitboard attackingDiagonalSliders = diagonalMoves & (enemyBitboards[BISHOP] | enemyBitboards[QUEEN]);
       Bitboard attackingOrthogonalSliders = orthogonalMoves & (enemyBitboards[ROOK] | enemyBitboards[QUEEN]);

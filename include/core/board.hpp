@@ -1,16 +1,13 @@
 #pragma once
 
+#include <array>
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <array>
-#include <iostream>
-#include <cassert>
 
 #include "core/bitboard.hpp"
-#include "core/zobrist.hpp"
-#include "core/magic.hpp"
 #include "core/move.hpp"
-#include "utils/types.hpp"
+#include "core/zobrist.hpp"
 
 #define NO_EP 8
 #define MAX_MOVE_COUNT 218
@@ -57,13 +54,12 @@ namespace TungstenChess
 
     std::vector<ZobristKey> m_positionHistory;
 
-    const bool m_isDefaultStartPosition; // Whether the board is in the default starting position (used for determining whether opening book can be used)
+    const bool m_wasDefaultStartPosition; // Whether the board started from the default starting position
     std::vector<Move> m_moveHistory;
 
   public:
     Board(std::string fen = START_FEN);
 
-    // Accessor methods
     Piece operator[](Square index) const { return m_board[index]; }
     PieceColor sideToMove() const { return m_sideToMove; }
     uint8_t castlingRights() const { return m_castlingRights; }
@@ -73,7 +69,7 @@ namespace TungstenChess
     const Bitboard &bitboard(Piece piece) const { return m_bitboards[piece]; }
     ZobristKey zobristKey() const { return m_zobristKey; }
     const std::vector<Move> &moveHistory() const { return m_moveHistory; }
-    bool isDefaultStartPosition() const { return m_isDefaultStartPosition; }
+    bool wasDefaultStartPosition() const { return m_wasDefaultStartPosition; }
     Square kingIndex(Piece piece) const { return m_kingIndices[piece]; }
     uint pieceCount(Piece piece) const { return m_pieceCounts[piece]; }
 

@@ -1,7 +1,40 @@
 #include "GUI.hpp"
 
+#include <iostream>
+
+using namespace sf;
+
 namespace TungstenChess
 {
+  ResourceManager::ResourceManager()
+  {
+    std::filesystem::path resourcePath = TUNGSTENCHESS_RESOURCES_DIR;
+
+    m_openingBookPath = resourcePath / "opening_book";
+    m_openingBookSize = std::ifstream(m_openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(uint);
+
+    m_yellowOutlineTexture.loadFromFile(resourcePath / "yellow_outline.png");
+
+    Texture atlas;
+    atlas.loadFromFile(resourcePath / "atlas.png");
+
+    m_pieceTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), IntRect(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), IntRect(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[WHITE_BISHOP].loadFromImage(atlas.copyToImage(), IntRect(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[WHITE_ROOK].loadFromImage(atlas.copyToImage(), IntRect(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[WHITE_QUEEN].loadFromImage(atlas.copyToImage(), IntRect(4 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[WHITE_KING].loadFromImage(atlas.copyToImage(), IntRect(5 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+
+    m_pieceTextures[BLACK_PAWN].loadFromImage(atlas.copyToImage(), IntRect(0 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[BLACK_KNIGHT].loadFromImage(atlas.copyToImage(), IntRect(1 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[BLACK_BISHOP].loadFromImage(atlas.copyToImage(), IntRect(2 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[BLACK_ROOK].loadFromImage(atlas.copyToImage(), IntRect(3 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), IntRect(4 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    m_pieceTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), IntRect(5 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+
+    m_icon.loadFromFile(resourcePath / "high_res_wn.png");
+  }
+
   GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
   {
     m_whiteBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
@@ -163,17 +196,17 @@ namespace TungstenChess
 
   void GUIHandler::loadSquareTextures()
   {
-    sf::Image square;
+    Image square;
 
-    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 255, 255));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, Color(255, 255, 255));
     m_squareTextures[WHITE_SQUARE].loadFromImage(square);
-    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(216, 181, 149));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, Color(216, 181, 149));
     m_squareTextures[BLACK_SQUARE].loadFromImage(square);
-    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 255, 0, 127));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, Color(255, 255, 0, 127));
     m_squareTextures[YELLOW_HIGHLIGHT].loadFromImage(square);
-    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(255, 0, 0, 200));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, Color(255, 0, 0, 200));
     m_squareTextures[RED_HIGHLIGHT].loadFromImage(square);
-    square.create(SQUARE_SIZE, SQUARE_SIZE, sf::Color(127, 127, 127, 200));
+    square.create(SQUARE_SIZE, SQUARE_SIZE, Color(127, 127, 127, 200));
     m_squareTextures[GRAY_HIGHLIGHT].loadFromImage(square);
   }
 
@@ -384,5 +417,47 @@ namespace TungstenChess
   void GUIHandler::stopThinking()
   {
     m_isThinking = false;
+  }
+
+  Square GUIHandler::getSquareIndex(int x, int y)
+  {
+    return (y / SQUARE_SIZE) * 8 + (x / SQUARE_SIZE);
+  }
+
+  Piece GUIHandler::getPromotionPiece(int x, int y)
+  {
+    Square index = getSquareIndex(x, y);
+
+    switch (index)
+    {
+    case C7:
+      return WHITE_QUEEN;
+    case D7:
+      return WHITE_ROOK;
+    case E7:
+      return WHITE_BISHOP;
+    case F7:
+      return WHITE_KNIGHT;
+    case C2:
+      return BLACK_QUEEN;
+    case D2:
+      return BLACK_ROOK;
+    case E2:
+      return BLACK_BISHOP;
+    case F2:
+      return BLACK_KNIGHT;
+    default:
+      return NO_PIECE;
+    }
+  }
+
+  Vector2f GUIHandler::getSquareCoordinates(Square index)
+  {
+    return getSquareCoordinates(index % 8, index / 8);
+  }
+
+  Vector2f GUIHandler::getSquareCoordinates(Square x, Square y)
+  {
+    return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE);
   }
 }

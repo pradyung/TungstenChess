@@ -1,9 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <fstream>
+#include <vector>
 
-#include "utils/types.hpp"
 #include "core/move.hpp"
 
 namespace TungstenChess

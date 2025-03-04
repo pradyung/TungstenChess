@@ -1,5 +1,7 @@
 #include "core/zobrist.hpp"
 
+#include <random>
+
 namespace TungstenChess
 {
   void Zobrist::init()

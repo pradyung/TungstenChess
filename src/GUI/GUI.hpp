@@ -1,21 +1,17 @@
 #pragma once
 
-#include <iostream>
 #include <fstream>
 #include <SFML/Graphics.hpp>
-#include <string>
-#include <thread>
 
 #include "bot/engine.hpp"
-#include "utils/utils.hpp"
-
-using namespace sf;
+#include "utils/types.hpp"
 
 #define SQUARE_SIZE 100
 #define SPRITE_SIZE 100.0f
 
 #define NO_SQUARE 64
 
+#define DEF_PLAYER_COLOR DEBUG_MODE ? NO_COLOR : WHITE
 #define DEF_GUI_THREADING !DEBUG_MODE
 
 namespace TungstenChess
@@ -48,44 +44,17 @@ namespace TungstenChess
     std::filesystem::path m_openingBookPath;
     uint m_openingBookSize;
 
-    Texture m_yellowOutlineTexture;
-    Texture m_pieceTextures[PIECE_NUMBER];
+    sf::Texture m_yellowOutlineTexture;
+    sf::Texture m_pieceTextures[PIECE_NUMBER];
 
-    Image m_icon;
+    sf::Image m_icon;
 
     friend class GUIHandler;
 
     /**
      * @brief Construct a new ResourceManager object
      */
-    ResourceManager()
-    {
-      std::filesystem::path resourcePath = TUNGSTENCHESS_RESOURCES_DIR;
-
-      m_openingBookPath = resourcePath / "opening_book";
-      m_openingBookSize = std::ifstream(m_openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(uint);
-
-      m_yellowOutlineTexture.loadFromFile(resourcePath / "yellow_outline.png");
-
-      sf::Texture atlas;
-      atlas.loadFromFile(resourcePath / "atlas.png");
-
-      m_pieceTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[WHITE_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[WHITE_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[WHITE_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[WHITE_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-
-      m_pieceTextures[BLACK_PAWN].loadFromImage(atlas.copyToImage(), sf::IntRect(0 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[BLACK_KNIGHT].loadFromImage(atlas.copyToImage(), sf::IntRect(1 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[BLACK_BISHOP].loadFromImage(atlas.copyToImage(), sf::IntRect(2 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[BLACK_ROOK].loadFromImage(atlas.copyToImage(), sf::IntRect(3 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), sf::IntRect(4 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-      m_pieceTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), sf::IntRect(5 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-
-      m_icon.loadFromFile(resourcePath / "high_res_wn.png");
-    }
+    ResourceManager();
   };
 
   class GUIHandler
@@ -95,7 +64,7 @@ namespace TungstenChess
      * @brief Construct a new GUIHandler object
      * @param window The window to render to
      */
-    GUIHandler(RenderWindow &window);
+    GUIHandler(sf::RenderWindow &window);
 
   private:
     ResourceManager &m_resourceManager = ResourceManager::getInstance();
@@ -106,14 +75,14 @@ namespace TungstenChess
 
     Piece m_bufferBoard[64];
 
-    RenderWindow &m_window;
+    sf::RenderWindow &m_window;
 
-    Texture m_squareTextures[5];
+    sf::Texture m_squareTextures[5];
 
-    Sprite m_boardSquares[64];
-    Sprite m_pieces[64];
+    sf::Sprite m_boardSquares[64];
+    sf::Sprite m_pieces[64];
 
-    std::array<Sprite, 64> m_pieceSprites[PIECE_NUMBER];
+    std::array<sf::Sprite, 64> m_pieceSprites[PIECE_NUMBER];
 
     Bitboard m_redHighlightsBitboard = 0;
     Bitboard m_yellowHighlightsBitboard = 0;
@@ -121,17 +90,17 @@ namespace TungstenChess
 
     Square m_yellowOutlineIndex = NO_SQUARE;
 
-    Sprite m_redHighlightsSprites[64];
-    Sprite m_yellowHighlightsSprites[64];
-    Sprite m_grayHighlightsSprites[64];
-    Sprite m_yellowOutlineSprites[64];
+    sf::Sprite m_redHighlightsSprites[64];
+    sf::Sprite m_yellowHighlightsSprites[64];
+    sf::Sprite m_grayHighlightsSprites[64];
+    sf::Sprite m_yellowOutlineSprites[64];
 
     Square m_draggingPieceIndex = NO_SQUARE;
-    Sprite m_draggingPieceSprite;
+    sf::Sprite m_draggingPieceSprite;
     bool_flag m_draggingPieceReleased;
 
-    Sprite m_whitePromotionPieces[4];
-    Sprite m_blackPromotionPieces[4];
+    sf::Sprite m_whitePromotionPieces[4];
+    sf::Sprite m_blackPromotionPieces[4];
 
     bool m_awaitingPromotion = false;
     Move m_promotionMove;
@@ -163,8 +132,8 @@ namespace TungstenChess
 
     Square getMouseSquareIndex();
 
-    bool handleLeftClick(Event &event);   // Returns true if screen needs to be redrawn
-    bool handleLeftRelease(Event &event); // Returns true if screen needs to be redrawn
+    bool handleLeftClick(sf::Event &event);   // Returns true if screen needs to be redrawn
+    bool handleLeftRelease(sf::Event &event); // Returns true if screen needs to be redrawn
 
     void render();
 
@@ -181,36 +150,11 @@ namespace TungstenChess
     void drawHighlights();
     void drawPromotionPieces();
 
-    static Square getSquareIndex(int x, int y) { return (y / SQUARE_SIZE) * 8 + (x / SQUARE_SIZE); }
+    static Square getSquareIndex(int x, int y);
 
-    static Piece getPromotionPiece(int x, int y)
-    {
-      Square index = getSquareIndex(x, y);
+    static Piece getPromotionPiece(int x, int y);
 
-      switch (index)
-      {
-      case C7:
-        return WHITE_QUEEN;
-      case D7:
-        return WHITE_ROOK;
-      case E7:
-        return WHITE_BISHOP;
-      case F7:
-        return WHITE_KNIGHT;
-      case C2:
-        return BLACK_QUEEN;
-      case D2:
-        return BLACK_ROOK;
-      case E2:
-        return BLACK_BISHOP;
-      case F2:
-        return BLACK_KNIGHT;
-      default:
-        return NO_PIECE;
-      }
-    }
-
-    static Vector2f getSquareCoordinates(Square index) { return getSquareCoordinates(index % 8, index / 8); }
-    static Vector2f getSquareCoordinates(Square x, Square y) { return Vector2f(x * SQUARE_SIZE, y * SQUARE_SIZE); }
+    static sf::Vector2f getSquareCoordinates(Square index);
+    static sf::Vector2f getSquareCoordinates(Square x, Square y);
   };
 }

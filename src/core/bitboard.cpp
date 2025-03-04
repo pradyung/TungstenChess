@@ -1,5 +1,7 @@
 #include "core/bitboard.hpp"
 
+#include <iostream>
+
 namespace TungstenChess
 {
   namespace Bitboards

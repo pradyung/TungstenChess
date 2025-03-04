@@ -1,5 +1,10 @@
 #include "bot/engine.hpp"
 
+#include <iostream>
+#include <algorithm>
+
+#include "bot/piece_eval_tables.hpp"
+
 namespace TungstenChess
 {
   Move Bot::generateBotMove(int maxSearchTime)

@@ -1,5 +1,7 @@
 #include "bot/transposition_table.hpp"
 
+#include <format>
+
 namespace TungstenChess
 {
   using Entry = TranspositionTable::Entry;
