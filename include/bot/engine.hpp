@@ -14,6 +14,22 @@
 
 namespace TungstenChess
 {
+  enum EvaluationConstants : int
+  {
+    BISHOP_PAIR_BONUS = 100,
+    CASTLED_KING_BONUS = 25,
+    CAN_CASTLE_BONUS = 25,
+    ROOK_ON_OPEN_FILE_BONUS = 50,
+    ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
+    KNIGHT_OUTPOST_BONUS = 50,
+    PASSED_PAWN_BONUS = 50,
+    DOUBLED_PAWN_PENALTY = 50,
+    ISOLATED_PAWN_PENALTY = 25,
+    BACKWARDS_PAWN_PENALTY = 50,
+    KING_SAFETY_PAWN_SHIELD_BONUS = 50,
+    CONTEMPT = 100,
+  };
+
   class Bot
   {
   private:

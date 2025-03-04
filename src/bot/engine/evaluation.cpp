@@ -4,22 +4,6 @@
 
 namespace TungstenChess
 {
-  enum EvaluationConstants : int
-  {
-    BISHOP_PAIR_BONUS = 100,
-    CASTLED_KING_BONUS = 25,
-    CAN_CASTLE_BONUS = 25,
-    ROOK_ON_OPEN_FILE_BONUS = 50,
-    ROOK_ON_SEMI_OPEN_FILE_BONUS = 25,
-    KNIGHT_OUTPOST_BONUS = 50,
-    PASSED_PAWN_BONUS = 50,
-    DOUBLED_PAWN_PENALTY = 50,
-    ISOLATED_PAWN_PENALTY = 25,
-    BACKWARDS_PAWN_PENALTY = 50,
-    KING_SAFETY_PAWN_SHIELD_BONUS = 50,
-    CONTEMPT = 100,
-  };
-
   int Bot::getStaticEvaluation()
   {
     m_previousSearchInfo.positionsEvaluated++;
@@ -242,87 +226,5 @@ namespace TungstenChess
     }
 
     return evaluationBonus;
-  }
-
-  int Bot::negamax(int depth, int alpha, int beta, bool quiesce)
-  {
-    if (m_searchCancelled)
-      return 0;
-
-    bool found;
-    const TranspositionTable::Entry &entry = m_transpositionTable.retrieve(m_board.zobristKey(), found);
-
-    if (found && entry.quiesce() == quiesce && entry.depth() >= depth)
-    {
-      if (!((entry.evaluation() == POSITIVE_INFINITY || entry.evaluation() == NEGATIVE_INFINITY) && entry.searchId() != m_currentSearchId && entry.depth() != depth))
-      {
-        m_previousSearchInfo.transpositionsUsed++;
-        return entry.evaluation();
-      }
-    }
-
-    int standPat;
-
-    if (quiesce)
-    {
-      standPat = getStaticEvaluation();
-
-      if (depth == 0)
-        return standPat;
-
-      if (standPat > alpha)
-        alpha = standPat;
-
-      if (alpha >= beta)
-        return beta;
-    }
-    else
-    {
-      if (depth == 0)
-        return negamax(m_botSettings.quiesceDepth, alpha, beta, true);
-    }
-
-    if (m_board.countRepetitions(m_board.zobristKey()) >= 3 || m_board.halfmoveClock() >= 100)
-      return -CONTEMPT;
-
-    MoveArray legalMoves;
-    int legalMovesCount = getSortedLegalMoves(legalMoves, m_board.sideToMove(), quiesce);
-
-    if (legalMovesCount == 0)
-      return (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY + (quiesce ? 10000 : 0) : -CONTEMPT);
-
-    if (legalMovesCount == 1)
-      depth++;
-
-    for (Move &move : legalMoves)
-    {
-      if (move == NULL_MOVE)
-        break;
-
-      Board::UnmoveData unmoveData = m_board.makeMove(move);
-      int evaluation = -negamax(depth - 1, -beta, -alpha, quiesce);
-      m_board.unmakeMove(move, unmoveData);
-
-      if (m_searchCancelled)
-        return 0;
-
-      if (evaluation > alpha)
-      {
-        alpha = evaluation;
-
-        if (alpha >= beta)
-          return beta;
-
-        if (!quiesce && alpha >= POSITIVE_INFINITY)
-          break;
-      }
-    }
-
-    if (!m_searchCancelled)
-    {
-      m_transpositionTable.store(m_board.zobristKey(), m_currentSearchId, alpha, depth, quiesce);
-    }
-
-    return alpha;
   }
 }
