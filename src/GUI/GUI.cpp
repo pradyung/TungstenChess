@@ -16,19 +16,15 @@ ResourceManager::ResourceManager()
   Texture atlas;
   atlas.loadFromFile(resourcePath / "atlas.png");
 
-  m_pieceTextures[WHITE_PAWN].loadFromImage(atlas.copyToImage(), IntRect(0 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[WHITE_KNIGHT].loadFromImage(atlas.copyToImage(), IntRect(1 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[WHITE_BISHOP].loadFromImage(atlas.copyToImage(), IntRect(2 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[WHITE_ROOK].loadFromImage(atlas.copyToImage(), IntRect(3 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[WHITE_QUEEN].loadFromImage(atlas.copyToImage(), IntRect(4 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[WHITE_KING].loadFromImage(atlas.copyToImage(), IntRect(5 * SPRITE_SIZE, 0, SPRITE_SIZE, SPRITE_SIZE));
+  Image atlasImage = atlas.copyToImage();
 
-  m_pieceTextures[BLACK_PAWN].loadFromImage(atlas.copyToImage(), IntRect(0 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[BLACK_KNIGHT].loadFromImage(atlas.copyToImage(), IntRect(1 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[BLACK_BISHOP].loadFromImage(atlas.copyToImage(), IntRect(2 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[BLACK_ROOK].loadFromImage(atlas.copyToImage(), IntRect(3 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[BLACK_QUEEN].loadFromImage(atlas.copyToImage(), IntRect(4 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
-  m_pieceTextures[BLACK_KING].loadFromImage(atlas.copyToImage(), IntRect(5 * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+  for (int i = 0; i < 2; i++)
+  {
+    for (int j = 0; j < 6; j++)
+    {
+      m_pieceTextures[(WHITE << i) | (PAWN + j)].loadFromImage(atlasImage, IntRect(j * SPRITE_SIZE, i * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    }
+  }
 
   m_icon.loadFromFile(resourcePath / "high_res_wn.png");
 }

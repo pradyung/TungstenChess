@@ -39,14 +39,13 @@ namespace TungstenChess
     QUEEN_PROMOTION = QUEEN << 12
   };
 
-  class Moves
+  namespace Moves
   {
-  public:
     /**
      * @brief Returns a UCI string representation of the move
      * @param move The move to convert
      */
-    static std::string getUCI(Move move);
+    std::string getUCI(Move move);
 
     /**
      * @brief Creates a move
@@ -55,7 +54,7 @@ namespace TungstenChess
      * @param promotionPieceType The piece type to promote to (if any)
      * @return The created move
      */
-    static Move createMove(Square from, Square to, PieceType promotionPieceType = NO_TYPE);
+    Move createMove(Square from, Square to, PieceType promotionPieceType = NO_TYPE);
 
     /**
      * Returns the move flags for a move
@@ -64,13 +63,13 @@ namespace TungstenChess
      * @param pieceType The type of the piece moving
      * @param capturedPiece The piece being captured (if any)
      */
-    static uint8_t getMoveFlags(Square from, Square to, PieceType pieceType, Piece capturedPiece);
+    uint8_t getMoveFlags(Square from, Square to, PieceType pieceType, Piece capturedPiece);
 
     /**
      * @brief Checks if a move is a promotion
      * @param to The square the piece is moving to
      * @param pieceType The type of the piece moving (only matters if it's a pawn)
      */
-    static bool isPromotion(Square to, PieceType pieceType);
+    bool isPromotion(Square to, PieceType pieceType);
   };
 }

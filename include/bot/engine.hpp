@@ -79,7 +79,7 @@ namespace TungstenChess
     std::mutex m_searchTimerMutex;
     std::atomic<bool> m_searchTimerTerminated = false;
 
-    once<false> m_openingBookLoaded;
+    once<false> m_onceOpeningBookLoaded;
 
   public:
     Bot(Board &board, const BotSettings &settings);
@@ -120,7 +120,7 @@ namespace TungstenChess
      * @param color The color to get the moves for
      * @param onlyCaptures Whether to only get captures
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
-     * @return The number of legal moves
+     * @return The number of legal moves generated
      */
     int getSortedLegalMoves(MoveArray &moves, PieceColor color, bool onlyCaptures = false, Move bestMove = NULL_MOVE);
 

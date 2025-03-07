@@ -8,7 +8,6 @@ namespace TungstenChess
 
     m_openingBook.resize(openingBookSize);
 
-    // read the file 4 bytes at a time into the book array
     for (size_t i = 0; i < openingBookSize; i++)
     {
       file.read((char *)&m_openingBook[i], sizeof(uint));

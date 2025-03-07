@@ -52,7 +52,7 @@ namespace TungstenChess
   };
 
   template <typename T, size_t R, size_t C, typename Allocator = std::allocator<T>>
-  struct array2d // 2d array implemented as flat std::array
+  struct array2d // 2d array implemented using flat std::array
   {
     array2d() : m_data(R * C) {}
 

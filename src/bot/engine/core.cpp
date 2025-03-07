@@ -14,7 +14,7 @@ namespace TungstenChess
 
   void Bot::loadOpeningBook(const std::filesystem::path path, uint openingBookSize)
   {
-    if (!m_openingBookLoaded)
+    if (!m_onceOpeningBookLoaded)
       m_openingBook.loadOpeningBook(path, openingBookSize);
   }
 }

@@ -40,7 +40,7 @@ namespace TungstenChess
 
   Move Bot::generateBotMove(int maxSearchTime)
   {
-    if (m_botSettings.useOpeningBook && m_openingBookLoaded.peek() && m_openingBook.updateMoveHistory(m_board.moveHistory()))
+    if (m_botSettings.useOpeningBook && m_onceOpeningBookLoaded.peek() && m_openingBook.updateMoveHistory(m_board.moveHistory()))
     {
       Move moveInt = m_openingBook.getNextMove();
 

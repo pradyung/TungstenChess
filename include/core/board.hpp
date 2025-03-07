@@ -54,7 +54,7 @@ namespace TungstenChess
 
     std::vector<ZobristKey> m_positionHistory;
 
-    const bool m_wasDefaultStartPosition; // Whether the board started from the default starting position
+    const bool m_wasDefaultStartPosition;
     std::vector<Move> m_moveHistory;
 
   public:
