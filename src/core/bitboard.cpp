@@ -21,7 +21,7 @@ namespace TungstenChess
     Square popBit(Bitboard &bitboard)
     {
       Square index = __builtin_ctzll(bitboard);
-      removeBit(bitboard, index);
+      bitboard &= bitboard - 1;
       return index;
     }
 
