@@ -335,7 +335,7 @@ namespace TungstenChess
     return isInCheck(color) ? LOSE : STALEMATE;
   }
 
-  uint Board::countGames(uint8_t depth, bool verbose)
+  uint64_t Board::countGames(uint8_t depth, bool verbose)
   {
     if (depth == 0)
       return 1;
@@ -359,7 +359,7 @@ namespace TungstenChess
 
       UnmoveData unmoveData = makeMove(legalMoves[i]);
 
-      uint newGames = countGames(depth - 1, false);
+      uint64_t newGames = countGames(depth - 1, false);
 
       if (verbose)
         std::cout << Moves::getUCI(legalMoves[i]) << ": " << newGames << std::endl;

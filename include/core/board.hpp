@@ -155,7 +155,7 @@ namespace TungstenChess
      * @param depth The depth to search to
      * @param verbose Whether to print the number of games found after each 1-deep move
      */
-    uint countGames(uint8_t depth, bool verbose = true);
+    uint64_t countGames(uint8_t depth, bool verbose = true);
 
     /**
      * @brief Gets the legal moves for a color
