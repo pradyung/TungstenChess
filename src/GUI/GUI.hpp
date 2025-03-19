@@ -3,6 +3,10 @@
 #include <fstream>
 #include <SFML/Graphics.hpp>
 
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 #include "bot/engine.hpp"
 #include "utils/types.hpp"
 
@@ -55,6 +59,12 @@ private:
    * @brief Construct a new ResourceManager object
    */
   ResourceManager();
+
+  /**
+   * @brief Gets the resource path for the current platform
+   * @return std::filesystem::path
+   */
+  static std::filesystem::path getResourcePath();
 };
 
 class GUIHandler

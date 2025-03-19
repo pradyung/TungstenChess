@@ -4,9 +4,26 @@
 
 using namespace sf;
 
+std::filesystem::path ResourceManager::getResourcePath()
+{
+#ifdef __APPLE__
+  CFBundleRef mainBundle = CFBundleGetMainBundle();
+  CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+  char path[PATH_MAX];
+  if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+  {
+    return "";
+  }
+  CFRelease(resourcesURL);
+  return path;
+#else
+  return TUNGSTENCHESS_RESOURCES_DIR;
+#endif
+}
+
 ResourceManager::ResourceManager()
 {
-  std::filesystem::path resourcePath = TUNGSTENCHESS_RESOURCES_DIR;
+  std::filesystem::path resourcePath = getResourcePath();
 
   m_openingBookPath = resourcePath / "opening_book";
   m_openingBookSize = std::ifstream(m_openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(uint);
