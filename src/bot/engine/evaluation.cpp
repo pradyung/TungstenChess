@@ -223,6 +223,25 @@ namespace TungstenChess
           evaluationBonus -= KNIGHT_OUTPOST_BONUS;
         continue;
       }
+
+      if (rank == 0 && m_board[i] == WHITE_KING)
+      {
+        evaluationBonus += KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i - 8] == WHITE_PAWN);
+        if (file > 0)
+          evaluationBonus += KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i - 9] == WHITE_PAWN);
+        if (file < 7)
+          evaluationBonus += KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i - 7] == WHITE_PAWN);
+        continue;
+      }
+      if (rank == 7 && m_board[i] == BLACK_KING)
+      {
+        evaluationBonus -= KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i + 8] == BLACK_PAWN);
+        if (file > 0)
+          evaluationBonus -= KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i + 7] == BLACK_PAWN);
+        if (file < 7)
+          evaluationBonus -= KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i + 9] == BLACK_PAWN);
+        continue;
+      }
     }
 
     return evaluationBonus;

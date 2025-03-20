@@ -37,14 +37,13 @@ namespace TungstenChess
       bool isSameKey(ZobristKey key) const { return m_key == key; }
     };
 
-    static constexpr int TABLE_SIZE = 64 * MEGABYTE / sizeof(Entry);
-
   private:
+    const int TABLE_SIZE;
     std::vector<Entry> m_transpositionTable;
     int m_occupied = 0;
 
   public:
-    TranspositionTable() : m_transpositionTable(TABLE_SIZE) {}
+    TranspositionTable(int sizeMB) : TABLE_SIZE(sizeMB * MEGABYTE / sizeof(Entry)), m_transpositionTable(TABLE_SIZE) {}
 
     std::string occupancy() const;
 

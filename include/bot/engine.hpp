@@ -26,7 +26,7 @@ namespace TungstenChess
     DOUBLED_PAWN_PENALTY = 50,
     ISOLATED_PAWN_PENALTY = 25,
     BACKWARDS_PAWN_PENALTY = 50,
-    KING_SAFETY_PAWN_SHIELD_BONUS = 50,
+    KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS = 20,
     CONTEMPT = 100,
   };
 
@@ -36,12 +36,6 @@ namespace TungstenChess
     Board &m_board;
     OpeningBook m_openingBook;
 
-    TranspositionTable m_transpositionTable;
-
-    static constexpr inline int CASTLING_BONUS_MULTIPLIERS[16] = {0, 1, 1, 2, 0, -1, 1, 0, 0, 1, -1, 0, 0, -1, -1, -2};
-
-    static const int MATERIAL_DIMINISH_SHIFT = 14;
-
     struct BotSettings
     {
       int maxSearchTime = 2000; // in milliseconds
@@ -49,7 +43,16 @@ namespace TungstenChess
       bool useOpeningBook = DEF_USE_OPENING_BOOK;
       bool logSearchInfo = true;
       bool logPGNMoves = true;
+      int transpositionTableSizeMB = 128;
     };
+
+    const BotSettings m_botSettings;
+
+    TranspositionTable m_transpositionTable;
+
+    static constexpr inline int CASTLING_BONUS_MULTIPLIERS[16] = {0, 1, 1, 2, 0, -1, 1, 0, 0, 1, -1, 0, 0, -1, -1, -2};
+
+    static const int MATERIAL_DIMINISH_SHIFT = 14;
 
     struct SearchInfo
     {
@@ -65,8 +68,6 @@ namespace TungstenChess
       int mateIn = 0;
       bool lossFound = false;
     };
-
-    const BotSettings m_botSettings;
 
     SearchInfo m_previousSearchInfo;
     uint m_currentSearchId = 0;
