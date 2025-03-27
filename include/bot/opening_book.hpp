@@ -7,10 +7,26 @@
 
 namespace TungstenChess
 {
+  typedef uint32_t OpeningBookMove;
+
+  enum OpeningBookConstants : OpeningBookMove
+  {
+    MOVE_MASK = 0xFFF,
+    MOVE_FREQUENCY_MASK = 0xFFFF,
+    MOVE_DEPTH_MASK = 0xF,
+    MOVE_SHIFT = 0,
+    MOVE_FREQUENCY_SHIFT = 12,
+    MOVE_DEPTH_SHIFT = 28
+  };
+
+  static inline uint getMove(OpeningBookMove move) { return move >> MOVE_SHIFT & MOVE_MASK; }
+  static inline uint getMoveFrequency(OpeningBookMove move) { return move >> MOVE_FREQUENCY_SHIFT & MOVE_FREQUENCY_MASK; }
+  static inline uint getMoveDepth(OpeningBookMove move) { return move >> MOVE_DEPTH_SHIFT & MOVE_DEPTH_MASK; }
+
   class OpeningBook
   {
   private:
-    std::vector<uint> m_openingBook;
+    std::vector<OpeningBookMove> m_openingBook;
     std::vector<Move> m_moves;
 
     bool m_inOpeningBook = true;

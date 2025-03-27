@@ -25,8 +25,8 @@ ResourceManager::ResourceManager()
 {
   std::filesystem::path resourcePath = getResourcePath();
 
-  m_openingBookPath = resourcePath / "opening_book";
-  m_openingBookSize = std::ifstream(m_openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(uint);
+  m_openingBookPath = resourcePath / "opening_book.dat";
+  m_openingBookSize = std::ifstream(m_openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(OpeningBookMove);
 
   m_yellowOutlineTexture.loadFromFile(resourcePath / "yellow_outline.png");
 

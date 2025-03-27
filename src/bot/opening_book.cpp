@@ -10,7 +10,7 @@ namespace TungstenChess
 
     for (size_t i = 0; i < openingBookSize; i++)
     {
-      file.read((char *)&m_openingBook[i], sizeof(uint));
+      file.read((char *)&m_openingBook[i], sizeof(OpeningBookMove));
     }
 
     file.close();
@@ -31,11 +31,13 @@ namespace TungstenChess
   {
     for (int i = m_lastMoveIndex + 1;; i++)
     {
-      if (m_openingBook[i] >> 25 == m_moves.size() - 1)
+      uint moveDepth = getMoveDepth(m_openingBook[i]);
+
+      if (moveDepth == m_moves.size() - 1)
       {
         return false;
       }
-      if ((m_openingBook[i] & 0xFFF) == move && m_openingBook[i] >> 25 == m_moves.size())
+      if (getMove(m_openingBook[i]) == move && moveDepth == m_moves.size())
       {
         m_lastMoveIndex = i;
         break;
@@ -56,9 +58,11 @@ namespace TungstenChess
   {
     for (size_t i = m_lastMoveIndex + 1; i < m_openingBook.size(); i++)
     {
-      if (m_openingBook[i] >> 25 == m_moves.size())
-        childrenMoves.push_back(m_openingBook[i] & 0xFFF);
-      else if (m_openingBook[i] >> 25 == m_moves.size() - 1)
+      uint moveDepth = getMoveDepth(m_openingBook[i]);
+
+      if (moveDepth == m_moves.size())
+        childrenMoves.push_back(getMove(m_openingBook[i]));
+      else if (moveDepth == m_moves.size() - 1)
         break;
     }
   }
@@ -75,7 +79,7 @@ namespace TungstenChess
 
     for (size_t i = 0; i < childrenMoves.size(); i++)
     {
-      totalWeight += m_openingBook[m_lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
+      totalWeight += getMoveFrequency(m_openingBook[m_lastMoveIndex + 1 + i]);
     }
 
     int randomWeight = rand() % totalWeight;
@@ -84,7 +88,7 @@ namespace TungstenChess
 
     for (size_t i = 0; i < childrenMoves.size(); i++)
     {
-      currentWeight += m_openingBook[m_lastMoveIndex + 1 + i] >> 12 & 0x1FFF;
+      currentWeight += getMoveFrequency(m_openingBook[m_lastMoveIndex + 1 + i]);
 
       if (currentWeight > randomWeight)
       {
