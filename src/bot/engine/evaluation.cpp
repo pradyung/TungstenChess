@@ -1,6 +1,7 @@
 #include "bot/engine.hpp"
 
 #include "bot/piece_eval_tables.hpp"
+#include "core/moves_lookup/magic.hpp"
 
 namespace TungstenChess
 {
@@ -123,7 +124,17 @@ namespace TungstenChess
       if (pieceType <= PAWN || pieceType == KING)
         continue;
 
-      mobilityEvaluation += Bitboards::countBits(m_board.getPseudoLegalPieceMovesBitboard(i)) * (m_board[i] & WHITE ? 1 : -1);
+      int mobility = Bitboards::countBits(m_board.getPseudoLegalPieceMovesBitboard(i));
+
+      Bitboard pawns = m_board.bitboard(((piece & COLOR) ^ COLOR) | PAWN) | m_board.bitboard((piece & COLOR) | PAWN);
+      Bitboard invertedFriendlyPiecesMask = ~m_board.bitboard(piece & COLOR);
+
+      if (pieceType & 1) // odd piece types - bishops and queens (diagonal sliders)
+        mobility += Bitboards::countBits(MagicMoveGen::getBishopMoves(i, pawns) & invertedFriendlyPiecesMask) / 2;
+      if (pieceType >= ROOK) // rooks and queens (orthogonal sliders)
+        mobility += Bitboards::countBits(MagicMoveGen::getRookMoves(i, pawns) & invertedFriendlyPiecesMask) / 2;
+
+      mobilityEvaluation += mobility * (m_board[i] & WHITE ? 1 : -1);
     }
 
     return mobilityEvaluation;
