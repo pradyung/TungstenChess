@@ -48,6 +48,12 @@ namespace TungstenChess
 
   bool OpeningBook::addMove(Move move)
   {
+    uint64_t nextMove = getMoveNextMove(m_openingBook[m_lastMoveIndex]);
+    if (nextMove == m_moveNoNextMove || nextMove == m_lastMoveIndex + 1)
+    {
+      return false;
+    }
+
     for (uint64_t i = m_lastMoveIndex + 1; i != m_moveNoNextMove; i = getMoveNextMove(m_openingBook[i]))
     {
       if (getMove(m_openingBook[i]) == move)
@@ -82,6 +88,9 @@ namespace TungstenChess
 
     if (childrenMoves.size() == 0)
       return NULL_MOVE;
+
+    if (childrenMoves.size() == 1)
+      return getMove(m_openingBook[childrenMoves[0]]);
 
     int totalWeight = 0;
     for (size_t i : childrenMoves)
