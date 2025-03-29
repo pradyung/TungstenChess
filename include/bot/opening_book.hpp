@@ -47,18 +47,20 @@ namespace TungstenChess
     Move getNextMove() const;
 
   private:
-    uint8_t m_moveFrequencyShift, m_moveDepthShift;
-    uint64_t m_moveMask, m_moveFrequencyMask;
+    uint8_t m_moveFrequencyShift, m_moveDepthShift, m_moveNextMoveShift;
+    uint64_t m_moveMask, m_moveFrequencyMask, m_moveDepthMask;
+    uint64_t m_moveNoNextMove;
 
     uint getMove(OpeningBookMove move) const { return move & m_moveMask; }
     uint getMoveFrequency(OpeningBookMove move) const { return move >> m_moveFrequencyShift & m_moveFrequencyMask; }
-    uint getMoveDepth(OpeningBookMove move) const { return move >> m_moveDepthShift; }
+    uint getMoveDepth(OpeningBookMove move) const { return move >> m_moveDepthShift & m_moveDepthMask; }
+    uint getMoveNextMove(OpeningBookMove move) const { return move >> m_moveNextMoveShift; }
 
     /**
-     * @brief Gets the next possible "children" moves from the opening book
-     * @param childrenMoves The vector to store the moves in
+     * @brief Gets the next possible "children" moves (as indices) from the opening book
+     * @param childrenMoves The vector to store the move indices in
      */
-    void getChildrenMoves(std::vector<Move> &childrenMoves) const;
+    void getChildrenMoves(std::vector<size_t> &childrenMoves) const;
 
     /**
      * @brief Gets a random next move, weighted by the frequency of the children moves

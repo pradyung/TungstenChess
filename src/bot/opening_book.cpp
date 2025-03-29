@@ -17,8 +17,12 @@ namespace TungstenChess
     file.read((char *)&m_moveDepthShift, 1);
     m_moveDepthShift += m_moveFrequencyShift;
 
+    m_moveNextMoveShift = m_moveDepthShift + 4;
+
     m_moveMask = (1 << m_moveFrequencyShift) - 1;
     m_moveFrequencyMask = (1 << (m_moveDepthShift - m_moveFrequencyShift)) - 1;
+    m_moveDepthMask = 0x7;
+    m_moveNoNextMove = (1ULL << (64 - m_moveNextMoveShift)) - 1;
 
     m_openingBook.resize(openingBookSize);
 
@@ -44,24 +48,18 @@ namespace TungstenChess
 
   bool OpeningBook::addMove(Move move)
   {
-    for (int i = m_lastMoveIndex + 1;; i++)
+    for (uint64_t i = m_lastMoveIndex + 1; i != m_moveNoNextMove; i = getMoveNextMove(m_openingBook[i]))
     {
-      uint moveDepth = getMoveDepth(m_openingBook[i]);
-
-      if (moveDepth == m_moves.size() - 1)
-      {
-        return false;
-      }
-      if (getMove(m_openingBook[i]) == move && moveDepth == m_moves.size())
+      if (getMove(m_openingBook[i]) == move)
       {
         m_lastMoveIndex = i;
-        break;
+
+        m_moves.push_back(move);
+        return true;
       }
     }
 
-    m_moves.push_back(move);
-
-    return true;
+    return false;
   }
 
   Move OpeningBook::getNextMove() const
@@ -69,45 +67,39 @@ namespace TungstenChess
     return getWeightedRandomMove();
   }
 
-  void OpeningBook::getChildrenMoves(std::vector<Move> &childrenMoves) const
+  void OpeningBook::getChildrenMoves(std::vector<size_t> &childrenMoves) const
   {
-    for (size_t i = m_lastMoveIndex + 1; i < m_openingBook.size(); i++)
+    for (uint64_t i = m_lastMoveIndex + 1; i != m_moveNoNextMove; i = getMoveNextMove(m_openingBook[i]))
     {
-      uint moveDepth = getMoveDepth(m_openingBook[i]);
-
-      if (moveDepth == m_moves.size())
-        childrenMoves.push_back(getMove(m_openingBook[i]));
-      else if (moveDepth == m_moves.size() - 1)
-        break;
+      childrenMoves.push_back(i);
     }
   }
 
   Move OpeningBook::getWeightedRandomMove() const
   {
-    std::vector<Move> childrenMoves;
+    std::vector<size_t> childrenMoves;
     getChildrenMoves(childrenMoves);
 
     if (childrenMoves.size() == 0)
       return NULL_MOVE;
 
     int totalWeight = 0;
-
-    for (size_t i = 0; i < childrenMoves.size(); i++)
+    for (size_t i : childrenMoves)
     {
-      totalWeight += getMoveFrequency(m_openingBook[m_lastMoveIndex + 1 + i]);
+      totalWeight += getMoveFrequency(m_openingBook[i]);
     }
 
     int randomWeight = rand() % totalWeight;
 
     int currentWeight = 0;
 
-    for (size_t i = 0; i < childrenMoves.size(); i++)
+    for (size_t i : childrenMoves)
     {
-      currentWeight += getMoveFrequency(m_openingBook[m_lastMoveIndex + 1 + i]);
+      currentWeight += getMoveFrequency(m_openingBook[i]);
 
       if (currentWeight > randomWeight)
       {
-        return childrenMoves[i];
+        return getMove(m_openingBook[i]);
       }
     }
 
