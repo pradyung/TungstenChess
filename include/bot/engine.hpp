@@ -92,9 +92,8 @@ namespace TungstenChess
     /**
      * @brief Loads the opening book from a file
      * @param path The path to the opening book file
-     * @param openingBookSize The number of entries in the opening book (i.e. the size of the file in bytes divided by 4)
      */
-    void loadOpeningBook(const std::filesystem::path path, uint openingBookSize);
+    void loadOpeningBook(const std::filesystem::path path);
 
     /**
      * @brief Generates the best move for the bot

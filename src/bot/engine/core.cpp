@@ -12,9 +12,9 @@ namespace TungstenChess
     stopSearchTimerThread();
   }
 
-  void Bot::loadOpeningBook(const std::filesystem::path path, uint openingBookSize)
+  void Bot::loadOpeningBook(const std::filesystem::path path)
   {
     if (!m_onceOpeningBookLoaded)
-      m_openingBook.loadOpeningBook(path, openingBookSize);
+      m_openingBook.loadOpeningBook(path);
   }
 }

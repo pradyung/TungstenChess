@@ -7,21 +7,7 @@
 
 namespace TungstenChess
 {
-  typedef uint32_t OpeningBookMove;
-
-  enum OpeningBookConstants : OpeningBookMove
-  {
-    MOVE_MASK = 0xFFF,
-    MOVE_FREQUENCY_MASK = 0xFFFF,
-    MOVE_DEPTH_MASK = 0xF,
-    MOVE_SHIFT = 0,
-    MOVE_FREQUENCY_SHIFT = 12,
-    MOVE_DEPTH_SHIFT = 28
-  };
-
-  static inline uint getMove(OpeningBookMove move) { return move >> MOVE_SHIFT & MOVE_MASK; }
-  static inline uint getMoveFrequency(OpeningBookMove move) { return move >> MOVE_FREQUENCY_SHIFT & MOVE_FREQUENCY_MASK; }
-  static inline uint getMoveDepth(OpeningBookMove move) { return move >> MOVE_DEPTH_SHIFT & MOVE_DEPTH_MASK; }
+  typedef uint64_t OpeningBookMove;
 
   class OpeningBook
   {
@@ -38,9 +24,8 @@ namespace TungstenChess
     /**
      * @brief Loads the opening book from a file
      * @param path The path to the opening book file
-     * @param openingBookSize The number of entries in the opening book (i.e. the size of the file in bytes divided by 4)
      */
-    void loadOpeningBook(const std::filesystem::path &path, uint openingBookSize);
+    void loadOpeningBook(const std::filesystem::path &path);
 
     /**
      * @brief Updates move history to synchronize with given vector
@@ -62,6 +47,13 @@ namespace TungstenChess
     Move getNextMove() const;
 
   private:
+    uint8_t m_moveFrequencyShift, m_moveDepthShift;
+    uint64_t m_moveMask, m_moveFrequencyMask;
+
+    uint getMove(OpeningBookMove move) const { return move & m_moveMask; }
+    uint getMoveFrequency(OpeningBookMove move) const { return move >> m_moveFrequencyShift & m_moveFrequencyMask; }
+    uint getMoveDepth(OpeningBookMove move) const { return move >> m_moveDepthShift; }
+
     /**
      * @brief Gets the next possible "children" moves from the opening book
      * @param childrenMoves The vector to store the moves in

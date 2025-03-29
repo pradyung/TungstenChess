@@ -2,15 +2,30 @@
 
 namespace TungstenChess
 {
-  void OpeningBook::loadOpeningBook(const std::filesystem::path &path, uint openingBookSize)
+  void OpeningBook::loadOpeningBook(const std::filesystem::path &path)
   {
     std::ifstream file(path);
+
+    uint openingBookSize;
+    file.read((char *)&openingBookSize, 4);
+
+    uint8_t numBytesPerMove;
+    file.read((char *)&numBytesPerMove, 1);
+
+    file.read((char *)&m_moveFrequencyShift, 1);
+
+    file.read((char *)&m_moveDepthShift, 1);
+    m_moveDepthShift += m_moveFrequencyShift;
+
+    m_moveMask = (1 << m_moveFrequencyShift) - 1;
+    m_moveFrequencyMask = (1 << (m_moveDepthShift - m_moveFrequencyShift)) - 1;
 
     m_openingBook.resize(openingBookSize);
 
     for (size_t i = 0; i < openingBookSize; i++)
     {
-      file.read((char *)&m_openingBook[i], sizeof(OpeningBookMove));
+      m_openingBook[i] = 0;
+      file.read((char *)&m_openingBook[i], numBytesPerMove);
     }
 
     file.close();

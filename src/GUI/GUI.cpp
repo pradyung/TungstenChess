@@ -26,7 +26,6 @@ ResourceManager::ResourceManager()
   std::filesystem::path resourcePath = getResourcePath();
 
   m_openingBookPath = resourcePath / "opening_book.dat";
-  m_openingBookSize = std::ifstream(m_openingBookPath, std::ios::binary | std::ios::ate).tellg() / sizeof(OpeningBookMove);
 
   m_yellowOutlineTexture.loadFromFile(resourcePath / "yellow_outline.png");
 
@@ -48,8 +47,8 @@ ResourceManager::ResourceManager()
 
 GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
 {
-  m_whiteBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
-  m_blackBot.loadOpeningBook(m_resourceManager.m_openingBookPath, m_resourceManager.m_openingBookSize);
+  m_whiteBot.loadOpeningBook(m_resourceManager.m_openingBookPath);
+  m_blackBot.loadOpeningBook(m_resourceManager.m_openingBookPath);
 
   loadSquareTextures();
   loadBoardSquares();

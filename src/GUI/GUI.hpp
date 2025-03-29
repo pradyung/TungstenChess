@@ -46,7 +46,6 @@ private:
   }
 
   std::filesystem::path m_openingBookPath;
-  uint m_openingBookSize;
 
   sf::Texture m_yellowOutlineTexture;
   sf::Texture m_pieceTextures[PIECE_NUMBER];
