@@ -22,7 +22,7 @@ namespace TungstenChess
     m_moveMask = (1 << m_moveFrequencyShift) - 1;
     m_moveFrequencyMask = (1 << (m_moveDepthShift - m_moveFrequencyShift)) - 1;
     m_moveDepthMask = 0x7;
-    m_moveNoNextMove = (1ULL << (64 - m_moveNextMoveShift)) - 1;
+    m_moveNoNextMove = (1ULL << (numBytesPerMove * 8 - m_moveNextMoveShift)) - 1;
 
     m_openingBook.resize(openingBookSize);
 
