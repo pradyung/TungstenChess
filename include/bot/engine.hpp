@@ -142,7 +142,7 @@ namespace TungstenChess
      * @brief Uses iterative deepening to find the best move in a constant amount of time
      * @param time The time in milliseconds to search for
      */
-    Move iterativeDeepening(int time);
+    Move iterativeDeepeningSearch(int time);
 
     /**
      * @brief Gets the static evaluation of the current position, from the perspective of the side to move (positive if favorable, negative if unfavorable)

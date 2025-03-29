@@ -59,7 +59,7 @@ namespace TungstenChess
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    Move bestMove = iterativeDeepening(maxSearchTime == -1 ? m_botSettings.maxSearchTime : maxSearchTime);
+    Move bestMove = iterativeDeepeningSearch(maxSearchTime == -1 ? m_botSettings.maxSearchTime : maxSearchTime);
 
     if (m_botSettings.logSearchInfo)
     {
@@ -227,7 +227,7 @@ namespace TungstenChess
     return bestMove;
   }
 
-  Move Bot::iterativeDeepening(int time)
+  Move Bot::iterativeDeepeningSearch(int time)
   {
     m_searchCancelled = false;
 
