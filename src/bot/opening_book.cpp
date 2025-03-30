@@ -49,11 +49,11 @@ namespace TungstenChess
   bool OpeningBook::addMove(Move move)
   {
     if (m_lastMoveIndex != -1)
-      return false;
-
-    uint64_t nextMove = getMoveNextMove(m_openingBook[m_lastMoveIndex]);
-    if (nextMove == m_moveNoNextMove || nextMove == m_lastMoveIndex + 1)
-      return false;
+    {
+      uint64_t nextMove = getMoveNextMove(m_openingBook[m_lastMoveIndex]);
+      if (nextMove == m_moveNoNextMove || nextMove == m_lastMoveIndex + 1)
+        return false;
+    }
 
     for (uint64_t i = m_lastMoveIndex + 1; i != m_moveNoNextMove; i = getMoveNextMove(m_openingBook[i]))
     {
