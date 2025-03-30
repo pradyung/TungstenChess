@@ -12,7 +12,7 @@ namespace TungstenChess
     uint8_t numBytesPerMove;
     file.read((char *)&numBytesPerMove, 1);
 
-    file.read((char *)&m_moveFrequencyShift, 1);
+    m_moveFrequencyShift = 12;
 
     file.read((char *)&m_moveDepthShift, 1);
     m_moveDepthShift += m_moveFrequencyShift;
@@ -48,10 +48,13 @@ namespace TungstenChess
 
   bool OpeningBook::addMove(Move move)
   {
-    uint64_t nextMove = getMoveNextMove(m_openingBook[m_lastMoveIndex]);
-    if (nextMove == m_moveNoNextMove || nextMove == m_lastMoveIndex + 1)
+    if (m_lastMoveIndex != -1)
     {
-      return false;
+      uint64_t nextMove = getMoveNextMove(m_openingBook[m_lastMoveIndex]);
+      if (nextMove == m_moveNoNextMove || nextMove == m_lastMoveIndex + 1)
+      {
+        return false;
+      }
     }
 
     for (uint64_t i = m_lastMoveIndex + 1; i != m_moveNoNextMove; i = getMoveNextMove(m_openingBook[i]))
