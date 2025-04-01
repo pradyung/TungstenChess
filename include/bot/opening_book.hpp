@@ -35,13 +35,6 @@ namespace TungstenChess
     bool updateMoveHistory(const std::vector<Move> &newMoves);
 
     /**
-     * @brief Adds a move to the move history
-     * @param move The move to add
-     * @return Whether the move was added successfully - if false, the move is not in the opening book
-     */
-    bool addMove(Move move);
-
-    /**
      * @brief Gets the next move from the opening book, randomly selected weighted by the frequency of the moves
      */
     Move getNextMove() const;
@@ -55,6 +48,13 @@ namespace TungstenChess
     uint getMoveFrequency(OpeningBookMove move) const { return move >> m_moveFrequencyShift & m_moveFrequencyMask; }
     uint getMoveDepth(OpeningBookMove move) const { return move >> m_moveDepthShift & m_moveDepthMask; }
     uint getMoveNextMove(OpeningBookMove move) const { return move >> m_moveNextMoveShift; }
+
+    /**
+     * @brief Adds a move to the move history
+     * @param move The move to add
+     * @return Whether the move was added successfully - if false, the move is not in the opening book
+     */
+    bool addMove(Move move);
 
     /**
      * @brief Gets the next possible "children" moves (as indices) from the opening book
