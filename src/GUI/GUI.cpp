@@ -118,7 +118,13 @@ bool GUIHandler::handleLeftClick(Event &event)
     Piece promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
     if (promotionPiece == NO_PIECE || !(promotionPiece & m_board.sideToMove()))
-      return false;
+    {
+      m_awaitingPromotion = false;
+      m_draggingPieceIndex = NO_SQUARE;
+      m_draggingPieceReleased.set_flag();
+      clearHighlights(GRAY_HIGHLIGHT);
+      return true;
+    }
 
     m_promotionMove |= (promotionPiece & TYPE) << 12;
 

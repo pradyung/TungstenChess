@@ -31,7 +31,7 @@ namespace TungstenChess
       {
         if (i % 8 == 0)
           std::cout << std::endl;
-        std::cout << (hasBit(bitboard, i) ? "1" : "0") << " ";
+        std::cout << (hasBit(bitboard, i) ? '1' : '0') << ' ';
       }
       std::cout << std::endl;
     }
