@@ -2,6 +2,18 @@
 
 #include <vector>
 #include <mutex>
+#include <chrono>
+#include <iostream>
+
+#define TIME_TEST(n, x)                                                                                          \
+  {                                                                                                              \
+    auto start = std::chrono::high_resolution_clock::now();                                                      \
+    for (int i = 0; i < n; i++)                                                                                  \
+      x;                                                                                                         \
+    auto end = std::chrono::high_resolution_clock::now();                                                        \
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);                           \
+    std::cout << (duration.count() / n) << " ns elapsed on average across " << #n << " iterations" << std::endl; \
+  }
 
 namespace TungstenChess
 {
@@ -79,5 +91,83 @@ namespace TungstenChess
     std::vector<T, Allocator> m_data;
     const size_t m_rows = R;
     const size_t m_cols = C;
+  };
+
+  template <typename T_Element>
+  class auxiliary_stack
+  {
+  private:
+    T_Element *m_data;
+    size_t m_top = 0;
+
+    void push(T_Element value)
+    {
+      m_data[m_top++] = value;
+    }
+
+  public:
+    auxiliary_stack(size_t size) : m_data(new T_Element[size]) {}
+    ~auxiliary_stack() { delete[] m_data; }
+
+    class dynamic_allocation
+    {
+    private:
+      size_t m_base;
+      auxiliary_stack &m_stack;
+
+    public:
+      using value_type = T_Element;
+      using pointer = T_Element *;
+      using reference = T_Element &;
+      using difference_type = std::ptrdiff_t;
+      using iterator_category = std::random_access_iterator_tag;
+
+      dynamic_allocation(auxiliary_stack &stack) : m_stack(stack), m_base(stack.m_top) {}
+
+      ~dynamic_allocation()
+      {
+        m_stack.m_top = m_base;
+      }
+
+      T_Element operator[](size_t index) const
+      {
+        return m_stack.m_data[m_base + index];
+      }
+
+      void push(T_Element value)
+      {
+        m_stack.push(value);
+      }
+
+      T_Element &top() const
+      {
+        return m_stack.m_data[m_stack.m_top - 1];
+      }
+
+      size_t size() const
+      {
+        return m_stack.m_top - m_base;
+      }
+
+      T_Element *begin()
+      {
+        return &m_stack.m_data[m_base];
+      }
+
+      T_Element *end()
+      {
+        return &m_stack.m_data[m_stack.m_top];
+      }
+
+      const T_Element *begin() const
+      {
+        return &m_stack.m_data[m_base];
+      }
+
+      const T_Element *end() const
+      {
+        return &m_stack.m_data[m_stack.m_top];
+      }
+    };
   };
 }

@@ -127,8 +127,8 @@ namespace TungstenChess
     if (m_board.countRepetitions(m_board.zobristKey()) >= 3 || m_board.halfmoveClock() >= 100)
       return -CONTEMPT;
 
-    MoveArray legalMoves;
-    int legalMovesCount = getSortedLegalMoves(legalMoves, m_board.sideToMove(), quiesce);
+    MoveAllocation legalMoves(m_moveStack);
+    int legalMovesCount = getSortedLegalMoves(legalMoves, quiesce);
 
     if (legalMovesCount == 0)
       return (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY + (quiesce ? 10000 : 0) : -CONTEMPT);
@@ -138,9 +138,6 @@ namespace TungstenChess
 
     for (Move &move : legalMoves)
     {
-      if (move == NULL_MOVE)
-        break;
-
       Board::UnmoveData unmoveData = m_board.makeMove(move);
       int evaluation = -negamax(depth - 1, -beta, -alpha, quiesce);
       m_board.unmakeMove(move, unmoveData);
@@ -170,8 +167,8 @@ namespace TungstenChess
 
   Move Bot::generateBestMove(int depth, Move bestMoveSoFar)
   {
-    MoveArray legalMoves;
-    int legalMovesCount = getSortedLegalMoves(legalMoves, m_board.sideToMove(), false, bestMoveSoFar);
+    MoveAllocation legalMoves(m_moveStack);
+    int legalMovesCount = getSortedLegalMoves(legalMoves, false, bestMoveSoFar);
 
     if (legalMovesCount == 0)
       return NULL_MOVE;
@@ -186,9 +183,6 @@ namespace TungstenChess
 
     for (Move &move : legalMoves)
     {
-      if (move == NULL_MOVE)
-        break;
-
       Board::UnmoveData unmoveData = m_board.makeMove(move);
       int evaluation = -negamax(depth - 1, NEGATIVE_INFINITY, -alpha, false);
       m_board.unmakeMove(move, unmoveData);
@@ -269,7 +263,7 @@ namespace TungstenChess
     return bestMove;
   }
 
-  void Bot::heuristicSortMoves(MoveArray &moves, int movesCount, Move bestMove)
+  void Bot::heuristicSortMoves(MoveAllocation &moves, int movesCount, Move bestMove)
   {
     std::sort(moves.begin(), moves.begin() + movesCount,
               [this, bestMove](Move a, Move b)
@@ -295,9 +289,9 @@ namespace TungstenChess
     return evaluation;
   }
 
-  int Bot::getSortedLegalMoves(MoveArray &moves, PieceColor color, bool onlyCaptures, Move bestMove)
+  int Bot::getSortedLegalMoves(MoveAllocation &moves, bool onlyCaptures, Move bestMove)
   {
-    int legalMovesCount = m_board.getLegalMoves(moves, color, onlyCaptures);
+    int legalMovesCount = m_board.getLegalMoves(moves, onlyCaptures);
     heuristicSortMoves(moves, legalMovesCount, bestMove);
     return legalMovesCount;
   }

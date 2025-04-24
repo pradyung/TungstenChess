@@ -10,6 +10,8 @@
 #define POSITIVE_INFINITY 1000000
 #define NEGATIVE_INFINITY -1000000
 
+#define AUXILIARY_MOVE_STACK_SIZE 16384
+
 #define DEF_USE_OPENING_BOOK !DEBUG_MODE
 
 namespace TungstenChess
@@ -35,6 +37,8 @@ namespace TungstenChess
   private:
     Board &m_board;
     OpeningBook m_openingBook;
+
+    auxiliary_stack<Move> m_moveStack;
 
     struct BotSettings
     {
@@ -117,12 +121,11 @@ namespace TungstenChess
     /**
      * @brief Gets the legal moves for a color, sorted by heuristic evaluation
      * @param moves The array to store the moves in
-     * @param color The color to get the moves for
      * @param onlyCaptures Whether to only get captures
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      * @return The number of legal moves generated
      */
-    int getSortedLegalMoves(MoveArray &moves, PieceColor color, bool onlyCaptures = false, Move bestMove = NULL_MOVE);
+    int getSortedLegalMoves(MoveAllocation &moves, bool onlyCaptures = false, Move bestMove = NULL_MOVE);
 
     /**
      * @brief Gets the positional evaluation of a single piece
@@ -192,6 +195,6 @@ namespace TungstenChess
      * @param movesCount The number of moves in the array
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      */
-    void heuristicSortMoves(MoveArray &moves, int movesCount, Move bestMove = NULL_MOVE);
+    void heuristicSortMoves(MoveAllocation &moves, int movesCount, Move bestMove = NULL_MOVE);
   };
 }

@@ -20,7 +20,8 @@
 
 namespace TungstenChess
 {
-  typedef std::array<Move, MAX_MOVE_COUNT> MoveArray;
+  typedef auxiliary_stack<Move> MoveStack;
+  typedef MoveStack::dynamic_allocation MoveAllocation;
 
   enum CastlingRights : uint8_t
   {
@@ -92,6 +93,14 @@ namespace TungstenChess
     Bitboard getLegalPieceMovesBitboard(Square pieceIndex);
 
     /**
+     * @brief Gets the legal moves for a color
+     * @param legalMoves The array to store the moves in
+     * @param onlyCaptures Whether to only include capture moves
+     * @return The number of legal moves
+     */
+    int getLegalMoves(MoveAllocation &legalMoves, bool onlyCaptures = false);
+
+    /**
      * @brief Returns the bitboard of the squares a piece can move to, not excluding moves that leave the king in check
      * @param pieceIndex The index of the piece
      */
@@ -156,15 +165,6 @@ namespace TungstenChess
      * @param verbose Whether to print the number of games found after each 1-deep move
      */
     uint64_t countGames(uint8_t depth, bool verbose = true);
-
-    /**
-     * @brief Gets the legal moves for a color
-     * @param legalMoves The array to store the moves in (entry after last generated move will be NULL_MOVE)
-     * @param color The color to get the moves for
-     * @param onlyCaptures Whether to only include capture moves
-     * @return The number of legal moves
-     */
-    int getLegalMoves(MoveArray &legalMoves, PieceColor color, bool onlyCaptures = false);
 
     /**
      * @brief Counts the number of times a position has been repeated
@@ -258,6 +258,22 @@ namespace TungstenChess
      */
     void switchSideToMove();
 
+    Bitboard getPawnMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getKnightMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getBishopMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getRookMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getQueenMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
+    Bitboard getKingMoves(Square pieceIndex, PieceColor color, bool includeCastling = true) const;
+
+    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(Square, PieceColor, bool) const = {
+        nullptr,
+        &TungstenChess::Board::getPawnMoves,
+        &TungstenChess::Board::getKnightMoves,
+        &TungstenChess::Board::getBishopMoves,
+        &TungstenChess::Board::getRookMoves,
+        &TungstenChess::Board::getQueenMoves,
+        &TungstenChess::Board::getKingMoves};
+
     /**
      * @brief Gets a bitboard of pseudo-legal moves for a piece (does not check for pins or checks)
      * @param pieceIndex The index of the piece
@@ -280,21 +296,14 @@ namespace TungstenChess
      */
     Bitboard getAttackingPiecesBitboard(Square targetSquare, Piece targetPiece, PieceColor color) const;
 
-    Bitboard getPawnMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getKnightMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getBishopMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getRookMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getQueenMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getKingMoves(Square pieceIndex, PieceColor color, bool includeCastling = true) const;
-
-    Bitboard (TungstenChess::Board::*getPieceMoves[PIECE_TYPE_NUMBER])(Square, PieceColor, bool) const = {
-        nullptr,
-        &TungstenChess::Board::getPawnMoves,
-        &TungstenChess::Board::getKnightMoves,
-        &TungstenChess::Board::getBishopMoves,
-        &TungstenChess::Board::getRookMoves,
-        &TungstenChess::Board::getQueenMoves,
-        &TungstenChess::Board::getKingMoves};
+    /**
+     * @brief Gets the legal moves for a color
+     * @param legalMoves The array to store the moves in (entry after last generated move will be NULL_MOVE)
+     * @param color The color to get the moves for
+     * @param onlyCaptures Whether to only include capture moves
+     * @return The number of legal moves
+     */
+    int getLegalMoves(MoveAllocation &legalMoves, PieceColor color, bool onlyCaptures = false);
 
     /**
      * @brief Checks if a square is attacked by a color
@@ -302,5 +311,13 @@ namespace TungstenChess
      * @param color The color to check
      */
     bool isAttacked(Square square, PieceColor color) const;
+
+    /**
+     * @brief Counts the number of games that can be played from the current position to a given depth
+     * @param moveStack The auxiliary move stack to use for storing generated moves
+     * @param depth The depth to search to
+     * @param verbose Whether to print the number of games found after each 1-deep move
+     */
+    uint64_t countGames(MoveStack &moveStack, uint8_t depth, bool verbose);
   };
 }
