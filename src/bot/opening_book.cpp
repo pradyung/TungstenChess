@@ -6,6 +6,36 @@ namespace TungstenChess
   {
     std::ifstream file(path);
 
+    Zobrist::init();
+
+    ZobristKey key = 0;
+    for (int i = 0; i < 64; i++)
+    {
+      uint8_t rawPiece;
+      file.read((char *)&rawPiece, 1);
+
+      if (rawPiece == 0)
+        continue;
+
+      Piece piece = (rawPiece & TYPE) | (WHITE << (rawPiece >> 3));
+      key ^= Zobrist::pieceKeys[piece, i];
+    }
+
+    uint8_t castlingRights;
+    file.read((char *)&castlingRights, 1);
+    key ^= Zobrist::castlingKeys[castlingRights];
+
+    uint8_t enPassantFile;
+    file.read((char *)&enPassantFile, 1);
+    key ^= Zobrist::enPassantKeys[enPassantFile];
+
+    uint8_t sideToMove;
+    file.read((char *)&sideToMove, 1);
+    if (sideToMove == 0)
+      key ^= Zobrist::sideKey;
+
+    m_inOpeningBook = (key == m_startingZobristKey);
+
     uint openingBookSize;
     file.read((char *)&openingBookSize, 4);
 

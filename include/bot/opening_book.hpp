@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/move.hpp"
+#include "core/zobrist.hpp"
 
 namespace TungstenChess
 {
@@ -15,11 +16,13 @@ namespace TungstenChess
     std::vector<OpeningBookMove> m_openingBook;
     std::vector<Move> m_moves;
 
+    ZobristKey m_startingZobristKey;
+
     bool m_inOpeningBook = true;
     int m_lastMoveIndex = -1;
 
   public:
-    OpeningBook(bool inOpeningBook) : m_inOpeningBook(inOpeningBook) {}
+    OpeningBook(ZobristKey startingZobristKey) : m_startingZobristKey(startingZobristKey) {}
 
     /**
      * @brief Loads the opening book from a file

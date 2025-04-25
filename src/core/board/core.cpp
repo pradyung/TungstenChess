@@ -4,7 +4,7 @@
 
 namespace TungstenChess
 {
-  Board::Board(std::string fen) : m_wasDefaultStartPosition(fen == DEFAULT_START_FEN)
+  Board::Board(std::string fen)
   {
     Zobrist::init();
     MagicMoveGen::init();

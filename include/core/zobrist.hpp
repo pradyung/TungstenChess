@@ -32,5 +32,6 @@ namespace TungstenChess
     static inline std::array<ZobristKey, 64 * 32 * 32> precomputedPieceCombinationKeys = {};
 
     friend class Board;
+    friend class OpeningBook;
   };
 }

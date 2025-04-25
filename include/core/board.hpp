@@ -12,11 +12,7 @@
 #define NO_EP 8
 #define MAX_MOVE_COUNT 218
 
-#define DEFAULT_START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
-#ifndef START_FEN
-#define START_FEN DEFAULT_START_FEN
-#endif
+#define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 namespace TungstenChess
 {
@@ -55,7 +51,6 @@ namespace TungstenChess
 
     std::vector<ZobristKey> m_positionHistory;
 
-    const bool m_wasDefaultStartPosition;
     std::vector<Move> m_moveHistory;
 
   public:
@@ -70,7 +65,6 @@ namespace TungstenChess
     const Bitboard &bitboard(Piece piece) const { return m_bitboards[piece]; }
     ZobristKey zobristKey() const { return m_zobristKey; }
     const std::vector<Move> &moveHistory() const { return m_moveHistory; }
-    bool wasDefaultStartPosition() const { return m_wasDefaultStartPosition; }
     Square kingIndex(Piece piece) const { return m_kingIndices[piece]; }
     uint pieceCount(Piece piece) const { return m_pieceCounts[piece]; }
 
