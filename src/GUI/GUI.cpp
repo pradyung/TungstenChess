@@ -38,11 +38,12 @@ ResourceManager::ResourceManager()
   {
     for (int j = 0; j < 6; j++)
     {
-      m_pieceTextures[(WHITE << i) | (PAWN + j)].loadFromImage(atlasImage, IntRect(j * SPRITE_SIZE, i * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+      IntRect pieceTextureRect = IntRect(j * SPRITE_SIZE, i * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+      m_pieceTextures[(WHITE << i) | (PAWN + j)].loadFromImage(atlasImage, pieceTextureRect);
     }
   }
 
-  m_icon.loadFromFile(resourcePath / "high_res_wn.png");
+  m_windowIcon.loadFromFile(resourcePath / "high_res_wn.png");
 }
 
 GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
@@ -56,7 +57,9 @@ GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
   loadPieces();
   loadPromotionPieces();
 
-  m_window.setIcon(m_resourceManager.m_icon.getSize().x, m_resourceManager.m_icon.getSize().y, m_resourceManager.m_icon.getPixelsPtr());
+  m_window.setIcon(m_resourceManager.m_windowIcon.getSize().x,
+                   m_resourceManager.m_windowIcon.getSize().y,
+                   m_resourceManager.m_windowIcon.getPixelsPtr());
 }
 
 void GUIHandler::runMainLoop()
@@ -73,11 +76,8 @@ void GUIHandler::runMainLoop()
       needsRefresh = false;
     }
 
-    if (!(m_board.sideToMove() & PLAYER_COLOR) && !m_gameOver)
-    {
-      if (!m_isThinking)
-        startThinking();
-    }
+    if (!m_isThinking && !m_gameOver && m_board.sideToMove() == BOT_COLOR)
+      startThinking();
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
@@ -94,7 +94,7 @@ void GUIHandler::runMainLoop()
 
     if (!m_isThinking && event.mouseButton.button == Mouse::Left)
     {
-      if (event.type == Event::MouseButtonPressed && !m_gameOver)
+      if (!m_gameOver && event.type == Event::MouseButtonPressed)
         needsRefresh = handleLeftClick(event);
 
       else if (event.type == Event::MouseButtonReleased)
@@ -110,7 +110,7 @@ bool GUIHandler::handleLeftClick(Event &event)
 {
   Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-  if (!(m_board.sideToMove() & m_board[index]) && !m_awaitingPromotion)
+  if (!m_awaitingPromotion && !(m_board[index] & m_board.sideToMove()))
     return false;
 
   if (m_awaitingPromotion)
@@ -126,21 +126,18 @@ bool GUIHandler::handleLeftClick(Event &event)
       return true;
     }
 
-    m_promotionMove |= (promotionPiece & TYPE) << 12;
-
-    m_draggingPieceIndex = NO_SQUARE;
-
     m_awaitingPromotion = false;
+    m_draggingPieceIndex = NO_SQUARE;
+    m_promotionMove |= (promotionPiece & TYPE) << 12;
 
     makeMove(m_promotionMove);
   }
   else
   {
-    if (!(m_board.sideToMove() & m_board[index]))
+    if (!(m_board[index] & m_board.sideToMove()))
       return false;
 
-    m_grayHighlightsBitboard = m_board.getLegalPieceMovesBitboard(index);
-
+    m_highlightsBitboards[GRAY_HIGHLIGHT] = m_board.getLegalPieceMovesBitboard(index);
     m_draggingPieceIndex = index;
   }
 
@@ -152,7 +149,8 @@ bool GUIHandler::handleLeftRelease(Event &event)
   if (m_draggingPieceIndex == NO_SQUARE)
     return false;
 
-  if (!Bitboards::hasBit(m_grayHighlightsBitboard, GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y)))
+  Square releasedSquareIndex = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
+  if (!Bitboards::hasBit(m_highlightsBitboards[GRAY_HIGHLIGHT], releasedSquareIndex))
   {
     m_draggingPieceIndex = NO_SQUARE;
     m_draggingPieceReleased.set_flag();
@@ -163,7 +161,6 @@ bool GUIHandler::handleLeftRelease(Event &event)
   Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
   Move move = Moves::createMove(m_draggingPieceIndex, index);
-
   if (!Moves::isPromotion(index, m_board[m_draggingPieceIndex] & TYPE))
   {
     makeMove(move);
@@ -215,15 +212,16 @@ void GUIHandler::loadSquareTextures()
   Image square;
 
   square.create(SQUARE_SIZE, SQUARE_SIZE, Color(255, 255, 255));
-  m_squareTextures[WHITE_SQUARE].loadFromImage(square);
+  m_boardSquareTextures[WHITE_SQUARE].loadFromImage(square);
   square.create(SQUARE_SIZE, SQUARE_SIZE, Color(216, 181, 149));
-  m_squareTextures[BLACK_SQUARE].loadFromImage(square);
+  m_boardSquareTextures[BLACK_SQUARE].loadFromImage(square);
+
   square.create(SQUARE_SIZE, SQUARE_SIZE, Color(255, 255, 0, 127));
-  m_squareTextures[YELLOW_HIGHLIGHT].loadFromImage(square);
+  m_highlightTextures[YELLOW_HIGHLIGHT].loadFromImage(square);
   square.create(SQUARE_SIZE, SQUARE_SIZE, Color(255, 0, 0, 200));
-  m_squareTextures[RED_HIGHLIGHT].loadFromImage(square);
+  m_highlightTextures[RED_HIGHLIGHT].loadFromImage(square);
   square.create(SQUARE_SIZE, SQUARE_SIZE, Color(127, 127, 127, 200));
-  m_squareTextures[GRAY_HIGHLIGHT].loadFromImage(square);
+  m_highlightTextures[GRAY_HIGHLIGHT].loadFromImage(square);
 }
 
 void GUIHandler::loadBoardSquares()
@@ -233,17 +231,17 @@ void GUIHandler::loadBoardSquares()
   {
     for (int j = 0; j < 8; j++)
     {
-      m_boardSquares[squareIndex].setTexture(m_squareTextures[(i + j) % 2]);
-      m_redHighlightsSprites[squareIndex].setTexture(m_squareTextures[RED_HIGHLIGHT]);
-      m_yellowHighlightsSprites[squareIndex].setTexture(m_squareTextures[YELLOW_HIGHLIGHT]);
-      m_grayHighlightsSprites[squareIndex].setTexture(m_squareTextures[GRAY_HIGHLIGHT]);
+      m_boardSquares[squareIndex].setTexture(m_boardSquareTextures[(i + j) % 2]);
       m_yellowOutlineSprites[squareIndex].setTexture(m_resourceManager.m_yellowOutlineTexture);
 
-      m_boardSquares[squareIndex].setPosition(getSquareCoordinates(j, i));
-      m_redHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
-      m_yellowHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
-      m_grayHighlightsSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
-      m_yellowOutlineSprites[squareIndex].setPosition(getSquareCoordinates(j, i));
+      for (int highlight = YELLOW_HIGHLIGHT; highlight <= GRAY_HIGHLIGHT; highlight++)
+        m_highlightSprites[highlight][squareIndex].setTexture(m_highlightTextures[highlight]);
+
+      Vector2f squareCoordinates = getSquareCoordinates(j, i);
+      m_boardSquares[squareIndex].setPosition(squareCoordinates);
+      m_yellowOutlineSprites[squareIndex].setPosition(squareCoordinates);
+      for (int highlight = YELLOW_HIGHLIGHT; highlight <= GRAY_HIGHLIGHT; highlight++)
+        m_highlightSprites[highlight][squareIndex].setPosition(squareCoordinates);
 
       squareIndex++;
     }
@@ -258,10 +256,11 @@ void GUIHandler::loadPieces()
     {
       m_pieceSprites[j][i].setTexture(m_resourceManager.m_pieceTextures[j]);
       m_pieceSprites[j][i].setPosition(getSquareCoordinates(i));
-      m_pieceSprites[j][i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
+      m_pieceSprites[j][i].setScale(SPRITE_SCALE, SPRITE_SCALE);
     }
 
-    m_draggingPieceSprite.setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
+    m_draggingPieceSprite.setScale(SPRITE_SCALE, SPRITE_SCALE);
+    m_draggingPieceSprite.setOrigin(SPRITE_SIZE / 2, SPRITE_SIZE / 2);
   }
 }
 
@@ -269,14 +268,14 @@ void GUIHandler::loadPromotionPieces()
 {
   for (int i = 0; i < 4; i++)
   {
-    m_whitePromotionPieces[i].setTexture(m_resourceManager.m_pieceTextures[WHITE_QUEEN - i]);
-    m_blackPromotionPieces[i].setTexture(m_resourceManager.m_pieceTextures[BLACK_QUEEN - i]);
+    m_promotionPieceSprites[WHITE][i].setTexture(m_resourceManager.m_pieceTextures[WHITE_QUEEN - i]);
+    m_promotionPieceSprites[BLACK][i].setTexture(m_resourceManager.m_pieceTextures[BLACK_QUEEN - i]);
 
-    m_whitePromotionPieces[i].setPosition(getSquareCoordinates(10 + i));
-    m_blackPromotionPieces[i].setPosition(getSquareCoordinates(50 + i));
+    m_promotionPieceSprites[WHITE][i].setPosition(getSquareCoordinates(C7 + i));
+    m_promotionPieceSprites[BLACK][i].setPosition(getSquareCoordinates(C2 + i));
 
-    m_whitePromotionPieces[i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
-    m_blackPromotionPieces[i].setScale(SQUARE_SIZE / SPRITE_SIZE, SQUARE_SIZE / SPRITE_SIZE);
+    m_promotionPieceSprites[WHITE][i].setScale(SPRITE_SCALE, SPRITE_SCALE);
+    m_promotionPieceSprites[BLACK][i].setScale(SPRITE_SCALE, SPRITE_SCALE);
   }
 }
 
@@ -292,7 +291,7 @@ void GUIHandler::drawPieces()
 {
   for (Square i = 0; i < 64; i++)
   {
-    if (m_draggingPieceIndex == i || (m_awaitingPromotion && (m_promotionMove & FROM) == i))
+    if (m_draggingPieceIndex == i)
       continue;
 
     if (!m_isThinking)
@@ -309,7 +308,7 @@ void GUIHandler::drawPieces()
     m_draggingPieceSprite.setTexture(m_resourceManager.m_pieceTextures[m_board[m_draggingPieceIndex]]);
 
     auto [mouseX, mouseY] = Mouse::getPosition(m_window);
-    m_draggingPieceSprite.setPosition(mouseX - SQUARE_SIZE / 2, mouseY - SQUARE_SIZE / 2);
+    m_draggingPieceSprite.setPosition(mouseX, mouseY);
     m_window.draw(m_draggingPieceSprite);
   }
 }
@@ -318,12 +317,11 @@ void GUIHandler::drawHighlights()
 {
   for (Square i = 0; i < 64; i++)
   {
-    if (Bitboards::hasBit(m_redHighlightsBitboard, i))
-      m_window.draw(m_redHighlightsSprites[i]);
-    else if (Bitboards::hasBit(m_grayHighlightsBitboard, i))
-      m_window.draw(m_grayHighlightsSprites[i]);
-    else if (Bitboards::hasBit(m_yellowHighlightsBitboard, i) || m_draggingPieceIndex == i)
-      m_window.draw(m_yellowHighlightsSprites[i]);
+    for (int highlight = YELLOW_HIGHLIGHT; highlight <= GRAY_HIGHLIGHT; highlight++)
+    {
+      if (Bitboards::hasBit(m_highlightsBitboards[highlight], i))
+        m_window.draw(m_highlightSprites[highlight][i]);
+    }
 
     if (m_yellowOutlineIndex == i)
       m_window.draw(m_yellowOutlineSprites[i]);
@@ -333,33 +331,18 @@ void GUIHandler::drawHighlights()
 void GUIHandler::drawPromotionPieces()
 {
   for (int i = 0; i < 4; i++)
-  {
-    if (m_board.sideToMove() == WHITE)
-    {
-      m_window.draw(m_whitePromotionPieces[i]);
-    }
-    else
-    {
-      m_window.draw(m_blackPromotionPieces[i]);
-    }
-  }
+    m_window.draw(m_promotionPieceSprites[m_board.sideToMove()][i]);
 }
 
 void GUIHandler::clearHighlights()
 {
-  m_redHighlightsBitboard = 0;
-  m_yellowHighlightsBitboard = 0;
-  m_grayHighlightsBitboard = 0;
+  for (int highlight = YELLOW_HIGHLIGHT; highlight <= GRAY_HIGHLIGHT; highlight++)
+    m_highlightsBitboards[highlight] = 0;
 }
 
 void GUIHandler::clearHighlights(Highlight highlight)
 {
-  if (highlight == RED_HIGHLIGHT)
-    m_redHighlightsBitboard = 0;
-  else if (highlight == YELLOW_HIGHLIGHT)
-    m_yellowHighlightsBitboard = 0;
-  else if (highlight == GRAY_HIGHLIGHT)
-    m_grayHighlightsBitboard = 0;
+  m_highlightsBitboards[highlight] = 0;
 }
 
 void GUIHandler::makeMove(Move move)
@@ -375,7 +358,7 @@ void GUIHandler::makeMove(Move move)
   clearHighlights();
 
   if (m_board.isInCheck(m_board.sideToMove()))
-    Bitboards::addBit(m_redHighlightsBitboard, m_board.kingIndex(m_board.sideToMove() | KING));
+    Bitboards::addBit(m_highlightsBitboards[RED_HIGHLIGHT], m_board.kingIndex(m_board.sideToMove() | KING));
 
   Board::GameStatus gameStatus = m_board.getGameStatus(m_board.sideToMove());
 
@@ -389,17 +372,18 @@ void GUIHandler::makeMove(Move move)
       std::cout << "Stalemate" << std::endl;
   }
 
-  Bitboards::addBit(m_yellowHighlightsBitboard, from);
-  Bitboards::addBit(m_yellowHighlightsBitboard, to);
+  Bitboards::addBit(m_highlightsBitboards[YELLOW_HIGHLIGHT], from);
+  Bitboards::addBit(m_highlightsBitboards[YELLOW_HIGHLIGHT], to);
 
   m_boardUpdated.set_flag();
 }
 
 void GUIHandler::makeBotMove()
 {
-  Move move = (m_board.sideToMove() == WHITE) ? m_whiteBot.generateBotMove() : m_blackBot.generateBotMove();
-
-  makeMove(move);
+  if (m_board.sideToMove() == WHITE)
+    makeMove(m_whiteBot.generateBotMove());
+  else
+    makeMove(m_blackBot.generateBotMove());
 
   stopThinking();
 }
@@ -447,21 +431,15 @@ Piece GUIHandler::getPromotionPiece(int x, int y)
   switch (index)
   {
   case C7:
-    return WHITE_QUEEN;
   case D7:
-    return WHITE_ROOK;
   case E7:
-    return WHITE_BISHOP;
   case F7:
-    return WHITE_KNIGHT;
+    return WHITE_QUEEN - (index - C7);
   case C2:
-    return BLACK_QUEEN;
   case D2:
-    return BLACK_ROOK;
   case E2:
-    return BLACK_BISHOP;
   case F2:
-    return BLACK_KNIGHT;
+    return BLACK_QUEEN - (index - C2);
   default:
     return NO_PIECE;
   }

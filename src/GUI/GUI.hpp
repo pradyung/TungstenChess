@@ -11,25 +11,30 @@
 #include "utils/types.hpp"
 
 #define SQUARE_SIZE 100
-#define SPRITE_SIZE 100.0f
+#define SPRITE_SIZE 100
+#define SPRITE_SCALE float(SQUARE_SIZE) / SPRITE_SIZE
 
 #define NO_SQUARE 64
 
-#define DEF_PLAYER_COLOR DEBUG_MODE ? NO_COLOR : WHITE
+#define DEF_BOT_COLOR DEBUG_MODE ? BOTH : BLACK
 #define DEF_GUI_THREADING !DEBUG_MODE
 
 using namespace TungstenChess;
 
-const PieceColor PLAYER_COLOR = DEF_PLAYER_COLOR;
+const PieceColor BOT_COLOR = DEF_BOT_COLOR;
 const bool THREADING = DEF_GUI_THREADING;
 
-enum Highlight
+enum BoardSquareColor
 {
   WHITE_SQUARE = 0,
   BLACK_SQUARE = 1,
-  YELLOW_HIGHLIGHT = 2,
-  RED_HIGHLIGHT = 3,
-  GRAY_HIGHLIGHT = 4,
+};
+
+enum Highlight
+{
+  YELLOW_HIGHLIGHT = 0,
+  RED_HIGHLIGHT = 1,
+  GRAY_HIGHLIGHT = 2,
 };
 
 class ResourceManager
@@ -50,7 +55,7 @@ private:
   sf::Texture m_yellowOutlineTexture;
   sf::Texture m_pieceTextures[PIECE_NUMBER];
 
-  sf::Image m_icon;
+  sf::Image m_windowIcon;
 
   friend class GUIHandler;
 
@@ -86,30 +91,25 @@ private:
 
   sf::RenderWindow &m_window;
 
-  sf::Texture m_squareTextures[5];
+  sf::Texture m_boardSquareTextures[2];
+  sf::Texture m_highlightTextures[3];
 
   sf::Sprite m_boardSquares[64];
   sf::Sprite m_pieces[64];
 
   std::array<sf::Sprite, 64> m_pieceSprites[PIECE_NUMBER];
 
-  Bitboard m_redHighlightsBitboard = 0;
-  Bitboard m_yellowHighlightsBitboard = 0;
-  Bitboard m_grayHighlightsBitboard = 0;
+  Bitboard m_highlightsBitboards[3] = {0};
+  sf::Sprite m_highlightSprites[3][64];
 
   Square m_yellowOutlineIndex = NO_SQUARE;
-
-  sf::Sprite m_redHighlightsSprites[64];
-  sf::Sprite m_yellowHighlightsSprites[64];
-  sf::Sprite m_grayHighlightsSprites[64];
   sf::Sprite m_yellowOutlineSprites[64];
 
   Square m_draggingPieceIndex = NO_SQUARE;
   sf::Sprite m_draggingPieceSprite;
   bool_flag m_draggingPieceReleased;
 
-  sf::Sprite m_whitePromotionPieces[4];
-  sf::Sprite m_blackPromotionPieces[4];
+  sf::Sprite m_promotionPieceSprites[BLACK + 1][4];
 
   bool m_awaitingPromotion = false;
   Move m_promotionMove;
