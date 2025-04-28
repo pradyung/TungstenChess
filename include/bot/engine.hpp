@@ -7,8 +7,7 @@
 #include "core/board.hpp"
 #include "utils/utils.hpp"
 
-#define POSITIVE_INFINITY 1000000
-#define NEGATIVE_INFINITY -1000000
+#define INF_EVAL 1000000
 
 #define AUXILIARY_MOVE_STACK_SIZE 16384
 
@@ -181,7 +180,7 @@ namespace TungstenChess
      * @param quiesce Whether the search is in quiescence mode (captures only)
      * @return The evaluation of the current position, from the perspective of the side to move (positive if favorable, negative if unfavorable)
      */
-    int negamax(int depth, int alpha = NEGATIVE_INFINITY, int beta = POSITIVE_INFINITY, bool quiesce = false);
+    int negamax(int depth, int alpha = -INF_EVAL, int beta = INF_EVAL, bool quiesce = false);
 
     /**
      * @brief Heuristic evaluation of a move, used for move ordering to improve alpha-beta pruning

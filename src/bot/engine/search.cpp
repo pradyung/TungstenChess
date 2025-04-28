@@ -98,7 +98,7 @@ namespace TungstenChess
 
     if (found && entry.quiesce() == quiesce && entry.depth() >= depth)
     {
-      bool isTerminal = entry.evaluation() == POSITIVE_INFINITY || entry.evaluation() == NEGATIVE_INFINITY;
+      bool isTerminal = abs(entry.evaluation()) == INF_EVAL;
 
       // Ignore transposition table entry if it is a terminal position evaluated in a previous search
       // to avoid premature mate detection
@@ -137,7 +137,7 @@ namespace TungstenChess
     int legalMovesCount = getSortedLegalMoves(legalMoves, quiesce);
 
     if (legalMovesCount == 0)
-      return (m_board.isInCheck(m_board.sideToMove()) ? NEGATIVE_INFINITY + (quiesce ? 10000 : 0) : -CONTEMPT);
+      return (m_board.isInCheck(m_board.sideToMove()) ? -INF_EVAL + (quiesce ? 10000 : 0) : -CONTEMPT);
 
     if (legalMovesCount == 1)
       depth++;
@@ -158,7 +158,7 @@ namespace TungstenChess
         if (alpha >= beta)
           return beta;
 
-        if (!quiesce && alpha >= POSITIVE_INFINITY)
+        if (!quiesce && alpha >= INF_EVAL)
           break;
       }
     }
@@ -181,7 +181,7 @@ namespace TungstenChess
 
     Move bestMove = legalMoves[0];
 
-    int alpha = NEGATIVE_INFINITY;
+    int alpha = -INF_EVAL;
     int numMovesSearched = 0;
 
     m_previousSearchInfo.nextDepthNumMovesSearched = 0;
@@ -190,7 +190,7 @@ namespace TungstenChess
     for (Move &move : legalMoves)
     {
       Board::UnmoveData unmoveData = m_board.makeMove(move);
-      int evaluation = -negamax(depth - 1, NEGATIVE_INFINITY, -alpha, false);
+      int evaluation = -negamax(depth - 1, -INF_EVAL, -alpha, false);
       m_board.unmakeMove(move, unmoveData);
 
       if (m_searchCancelled)
@@ -208,7 +208,7 @@ namespace TungstenChess
         alpha = evaluation;
         bestMove = move;
 
-        if (alpha >= POSITIVE_INFINITY)
+        if (alpha >= INF_EVAL)
         {
           m_previousSearchInfo.mateFound = true;
           break;
@@ -258,7 +258,7 @@ namespace TungstenChess
         break;
       }
 
-      if (m_previousSearchInfo.evaluation <= NEGATIVE_INFINITY)
+      if (m_previousSearchInfo.evaluation <= -INF_EVAL)
       {
         m_previousSearchInfo.lossFound = true;
         m_previousSearchInfo.mateIn = (depth - 1) / 2;
@@ -279,7 +279,7 @@ namespace TungstenChess
   int Bot::heuristicEvaluation(Move move, Move bestMove)
   {
     if (move == bestMove)
-      return POSITIVE_INFINITY;
+      return INF_EVAL;
 
     int evaluation = 0;
 

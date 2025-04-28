@@ -14,7 +14,7 @@ namespace TungstenChess
     if (gameStatus != Board::NO_MATE)
     {
       if (gameStatus == Board::LOSE)
-        return NEGATIVE_INFINITY;
+        return -INF_EVAL;
       else
         return -CONTEMPT;
     }
