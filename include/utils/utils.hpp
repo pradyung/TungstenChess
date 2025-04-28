@@ -65,7 +65,7 @@ namespace TungstenChess
       bool value;
     };
 
-    template <typename T, size_t R, size_t C, typename Allocator = std::allocator<T>>
+    template <typename T, size_t R, size_t C>
     struct array2d // 2d array implemented using flat std::array
     {
       array2d() : m_data(R * C) {}
@@ -90,7 +90,7 @@ namespace TungstenChess
       }
 
     private:
-      std::vector<T, Allocator> m_data;
+      std::vector<T> m_data;
       const size_t m_rows = R;
       const size_t m_cols = C;
     };
