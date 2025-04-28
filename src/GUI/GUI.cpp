@@ -123,6 +123,9 @@ bool GUIHandler::handleLeftClick(Event &event)
 
   bool shouldRefresh = false;
 
+  if (m_selectedSquareIndex == index)
+    m_selectedSquareReClicked.set_flag();
+
   if (m_selectedSquareIndex != NO_SQUARE)
   {
     if (m_highlightsBitboards[GRAY_HIGHLIGHT] & (1ULL << index))
@@ -187,6 +190,14 @@ bool GUIHandler::handleLeftRelease(Event &event)
   {
     m_draggingPieceIndex = NO_SQUARE;
     m_draggingPieceReleased.set_flag();
+
+    if (m_selectedSquareReClicked.pop_flag())
+    {
+      m_selectedSquareIndex = NO_SQUARE;
+      clearHighlights(GRAY_HIGHLIGHT);
+      return true;
+    }
+
     return false;
   }
 
@@ -204,6 +215,7 @@ bool GUIHandler::handleLeftRelease(Event &event)
   }
 
   m_draggingPieceIndex = NO_SQUARE;
+  m_selectedSquareIndex = NO_SQUARE;
 
   return true;
 }

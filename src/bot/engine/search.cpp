@@ -137,7 +137,13 @@ namespace TungstenChess
     int legalMovesCount = getSortedLegalMoves(legalMoves, quiesce);
 
     if (legalMovesCount == 0)
-      return (m_board.isInCheck(m_board.sideToMove()) ? -INF_EVAL + (quiesce ? 10000 : 0) : -CONTEMPT);
+    {
+      bool isStalemate = !m_board.isInCheck(m_board.sideToMove());
+      if (isStalemate)
+        return -CONTEMPT;
+      else
+        return -INF_EVAL + (quiesce ? (INF_EVAL / 10) : 0);
+    }
 
     if (legalMovesCount == 1)
       depth++;

@@ -107,6 +107,8 @@ private:
   sf::Sprite m_yellowOutlineSprites[64];
 
   Square m_selectedSquareIndex = NO_SQUARE;
+  utils::bool_flag m_selectedSquareReClicked;
+
   Square m_draggingPieceIndex = NO_SQUARE;
   sf::Sprite m_draggingPieceSprite;
   utils::bool_flag m_draggingPieceReleased;

@@ -62,7 +62,7 @@ namespace TungstenChess
       }
 
     private:
-      bool value;
+      bool value = false;
     };
 
     template <typename T, size_t R, size_t C>
