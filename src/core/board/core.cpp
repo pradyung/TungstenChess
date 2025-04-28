@@ -74,14 +74,21 @@ namespace TungstenChess
     {
       for (size_t i = 0; i < fenParts[FEN_CASTLING_RIGHTS].length(); i++)
       {
-        if (fenParts[FEN_CASTLING_RIGHTS][i] == 'K')
+        switch (fenParts[FEN_CASTLING_RIGHTS][i])
+        {
+        case 'K':
           m_castlingRights |= WHITE_KINGSIDE;
-        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'Q')
+          break;
+        case 'Q':
           m_castlingRights |= WHITE_QUEENSIDE;
-        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'k')
+          break;
+        case 'k':
           m_castlingRights |= BLACK_KINGSIDE;
-        else if (fenParts[FEN_CASTLING_RIGHTS][i] == 'q')
+          break;
+        case 'q':
           m_castlingRights |= BLACK_QUEENSIDE;
+          break;
+        }
       }
     }
 

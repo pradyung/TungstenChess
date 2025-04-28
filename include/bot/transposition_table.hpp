@@ -43,7 +43,9 @@ namespace TungstenChess
     int m_occupied = 0;
 
   public:
-    TranspositionTable(int sizeMB) : TABLE_SIZE(sizeMB * MEGABYTE / sizeof(Entry)), m_transpositionTable(TABLE_SIZE) {}
+    TranspositionTable(int sizeMB)
+        : TABLE_SIZE(sizeMB * MEGABYTE / sizeof(Entry)),
+          m_transpositionTable(TABLE_SIZE) {}
 
     std::string occupancy() const;
 

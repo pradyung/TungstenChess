@@ -45,7 +45,10 @@ namespace TungstenChess
       m_occupied++;
 
     // Prefer newer, deeper, non-quiesce entries
-    if (!entry.isOccupied() || searchId - entry.searchId() >= 3 || depth > entry.depth() || (!quiesce && entry.quiesce()))
+    if (!entry.isOccupied() ||
+        searchId - entry.searchId() >= 3 ||
+        depth > entry.depth() ||
+        (!quiesce && entry.quiesce()))
       entry.overwrite(key, searchId, evaluation, depth, quiesce);
   }
 }

@@ -54,7 +54,8 @@ namespace TungstenChess
 
     TranspositionTable m_transpositionTable;
 
-    static constexpr inline int CASTLING_BONUS_MULTIPLIERS[16] = {0, 1, 1, 2, 0, -1, 1, 0, 0, 1, -1, 0, 0, -1, -1, -2};
+    static constexpr inline int CASTLING_BONUS_MULTIPLIERS[16] =
+        {0, 1, 1, 2, 0, -1, 1, 0, 0, 1, -1, 0, 0, -1, -1, -2};
 
     static const int MATERIAL_DIMINISH_SHIFT = 14;
 

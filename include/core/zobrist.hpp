@@ -17,7 +17,8 @@ namespace TungstenChess
 
   private:
     /**
-     * @brief Get the combined Zobrist key for two pieces on the same square (used for updating the hash for a single square)
+     * @brief Get the combined Zobrist key for two pieces on the same square
+     *        (used for updating the hash for a single square)
      * @param square The square to get the key for
      * @param before The piece that was on the square before
      * @param after The piece that is on the square now

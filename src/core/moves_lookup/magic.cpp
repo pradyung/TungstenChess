@@ -19,12 +19,14 @@ namespace TungstenChess
 
   Bitboard MagicMoveGen::getBishopMoves(Square square, Bitboard allPieces)
   {
-    return BISHOP_LOOKUP_TABLES[square][((BISHOP_MAGICS[square] * (allPieces & MovesLookup::BISHOP_MASKS[square])) >> BISHOP_SHIFTS[square])];
+    Bitboard maskedPieces = allPieces & MovesLookup::BISHOP_MASKS[square];
+    return BISHOP_LOOKUP_TABLES[square][(BISHOP_MAGICS[square] * (maskedPieces)) >> BISHOP_SHIFTS[square]];
   }
 
   Bitboard MagicMoveGen::getRookMoves(Square square, Bitboard allPieces)
   {
-    return ROOK_LOOKUP_TABLES[square][((ROOK_MAGICS[square] * (allPieces & MovesLookup::ROOK_MASKS[square])) >> ROOK_SHIFTS[square])];
+    Bitboard maskedPieces = allPieces & MovesLookup::ROOK_MASKS[square];
+    return ROOK_LOOKUP_TABLES[square][(ROOK_MAGICS[square] * maskedPieces) >> ROOK_SHIFTS[square]];
   }
 
   void MagicMoveGen::getAllBlockers(std::vector<Bitboard> &blockers, Square square, Bitboard mask)

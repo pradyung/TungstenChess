@@ -19,7 +19,10 @@ namespace TungstenChess
         return -CONTEMPT;
     }
 
-    int staticEvaluation = getMaterialEvaluation() + getPositionalEvaluation() + getMobilityEvaluation() + getEvaluationBonus();
+    int staticEvaluation = getMaterialEvaluation() +
+                           getPositionalEvaluation() +
+                           getMobilityEvaluation() +
+                           getEvaluationBonus();
 
     return m_board.sideToMove() == WHITE ? staticEvaluation : -staticEvaluation;
   }
@@ -57,14 +60,24 @@ namespace TungstenChess
   {
     int positionalEvaluation = 0;
 
-    Bitboard whitePieces = m_board.bitboard(WHITE_KNIGHT) | m_board.bitboard(WHITE_BISHOP) | m_board.bitboard(WHITE_ROOK) | m_board.bitboard(WHITE_QUEEN);
-    Bitboard blackPieces = m_board.bitboard(BLACK_KNIGHT) | m_board.bitboard(BLACK_BISHOP) | m_board.bitboard(BLACK_ROOK) | m_board.bitboard(BLACK_QUEEN);
+    Bitboard whitePieces = m_board.bitboard(WHITE_KNIGHT) |
+                           m_board.bitboard(WHITE_BISHOP) |
+                           m_board.bitboard(WHITE_ROOK) |
+                           m_board.bitboard(WHITE_QUEEN);
 
-    Bitboard allPieces = whitePieces | m_board.bitboard(WHITE_PAWN) | blackPieces | m_board.bitboard(BLACK_PAWN);
+    Bitboard blackPieces = m_board.bitboard(BLACK_KNIGHT) |
+                           m_board.bitboard(BLACK_BISHOP) |
+                           m_board.bitboard(BLACK_ROOK) |
+                           m_board.bitboard(BLACK_QUEEN);
+
+    Bitboard allPieces = m_board.bitboard(ALL_PIECES);
 
     while (allPieces)
     {
       Square pieceIndex = Bitboards::popBit(allPieces);
+
+      if ((m_board[pieceIndex] & TYPE) == KING)
+        continue;
 
       positionalEvaluation += getPiecePositionalEvaluation(pieceIndex);
     }
@@ -83,7 +96,8 @@ namespace TungstenChess
 
       if (Bitboards::countBits(friendlyPieces) <= 3 && Bitboards::countBits(friendlyPieces) >= 1)
       {
-        int kingsDistance = abs(whiteKingIndex % 8 - m_board.kingIndex(BLACK_KING) % 8) + abs(whiteKingIndex / 8 - m_board.kingIndex(BLACK_KING) / 8);
+        int kingsDistance = abs(whiteKingIndex % 8 - m_board.kingIndex(BLACK_KING) % 8) +
+                            abs(whiteKingIndex / 8 - m_board.kingIndex(BLACK_KING) / 8);
 
         positionalEvaluation += KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
       }
@@ -103,7 +117,8 @@ namespace TungstenChess
 
       if (Bitboards::countBits(friendlyPieces) <= 3 && Bitboards::countBits(friendlyPieces) >= 1)
       {
-        int kingsDistance = abs(blackKingIndex % 8 - m_board.kingIndex(WHITE_KING) % 8) + abs(blackKingIndex / 8 - m_board.kingIndex(WHITE_KING) / 8);
+        int kingsDistance = abs(blackKingIndex % 8 - m_board.kingIndex(WHITE_KING) % 8) +
+                            abs(blackKingIndex / 8 - m_board.kingIndex(WHITE_KING) / 8);
 
         positionalEvaluation -= KINGS_DISTANCE_EVAL_TABLE[kingsDistance];
       }
@@ -126,7 +141,8 @@ namespace TungstenChess
 
       int mobility = Bitboards::countBits(m_board.getPseudoLegalPieceMovesBitboard(i));
 
-      Bitboard pawns = m_board.bitboard(((piece & COLOR) ^ COLOR) | PAWN) | m_board.bitboard((piece & COLOR) | PAWN);
+      Piece friendlyPawn = (piece & COLOR) | PAWN;
+      Bitboard pawns = m_board.bitboard(friendlyPawn) | m_board.bitboard(friendlyPawn ^ COLOR);
       Bitboard invertedFriendlyPiecesMask = ~m_board.bitboard(piece & COLOR);
 
       if (pieceType & 1) // odd piece types - bishops and queens (diagonal sliders)

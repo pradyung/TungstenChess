@@ -40,7 +40,9 @@ namespace TungstenChess
 
   Move Bot::generateBotMove(int maxSearchTime)
   {
-    if (m_botSettings.useOpeningBook && m_onceOpeningBookLoaded.peek() && m_openingBook.updateMoveHistory(m_board.moveHistory()))
+    if (m_botSettings.useOpeningBook &&
+        m_onceOpeningBookLoaded.peek() &&
+        m_openingBook.updateMoveHistory(m_board.moveHistory()))
     {
       Move moveInt = m_openingBook.getNextMove();
 
@@ -96,7 +98,11 @@ namespace TungstenChess
 
     if (found && entry.quiesce() == quiesce && entry.depth() >= depth)
     {
-      if (!((entry.evaluation() == POSITIVE_INFINITY || entry.evaluation() == NEGATIVE_INFINITY) && entry.searchId() != m_currentSearchId && entry.depth() != depth))
+      bool isTerminal = entry.evaluation() == POSITIVE_INFINITY || entry.evaluation() == NEGATIVE_INFINITY;
+
+      // Ignore transposition table entry if it is a terminal position evaluated in a previous search
+      // to avoid premature mate detection
+      if (!(isTerminal && entry.searchId() < m_currentSearchId && entry.depth() > depth))
       {
         m_previousSearchInfo.transpositionsUsed++;
         return entry.evaluation();

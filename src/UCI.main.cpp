@@ -28,7 +28,8 @@ int main()
   Board board(START_FEN);
 
   Bot bot(board, 2000);
-  bot.loadOpeningBook("../resources/opening_book", std::ifstream("../resources/opening_book", std::ios::binary | std::ios::ate).tellg() / sizeof(uint));
+
+  bot.loadOpeningBook("../resources/opening_book");
 
   std::cout << "TungstenChess v1.0\n";
 

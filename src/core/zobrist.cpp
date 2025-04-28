@@ -26,9 +26,9 @@ namespace TungstenChess
 
     sideKey = dis(gen);
 
-    for (Piece piece1 : validPieces)
-      for (Piece piece2 : validPieces)
-        for (Square square = 0; square < 64; square++)
+    for (Square square = 0; square < 64; square++)
+      for (Piece piece1 : validPieces)
+        for (Piece piece2 : validPieces)
           precomputedPieceCombinationKeys[square | (piece1 << 6) | (piece2 << 11)] = pieceKeys[piece1, square] ^ pieceKeys[piece2, square];
   }
 

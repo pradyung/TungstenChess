@@ -48,8 +48,8 @@ namespace TungstenChess
     uint64_t m_moveNoNextMove;
 
     uint getMove(OpeningBookMove move) const { return move & m_moveMask; }
-    uint getMoveFrequency(OpeningBookMove move) const { return move >> m_moveFrequencyShift & m_moveFrequencyMask; }
-    uint getMoveDepth(OpeningBookMove move) const { return move >> m_moveDepthShift & m_moveDepthMask; }
+    uint getMoveFrequency(OpeningBookMove move) const { return (move >> m_moveFrequencyShift) & m_moveFrequencyMask; }
+    uint getMoveDepth(OpeningBookMove move) const { return (move >> m_moveDepthShift) & m_moveDepthMask; }
     uint getMoveNextMove(OpeningBookMove move) const { return move >> m_moveNextMoveShift; }
 
     /**
