@@ -103,6 +103,14 @@ void GUIHandler::runMainLoop()
 
     if (event.type == Event::MouseMoved)
       needsRefresh = (m_draggingPieceIndex != NO_SQUARE) || (getMouseSquareIndex() != m_yellowOutlineIndex);
+
+    if (event.type == Event::MouseLeft)
+    {
+      m_yellowOutlineIndex = NO_SQUARE;
+      m_draggingPieceIndex = NO_SQUARE;
+      m_draggingPieceReleased.set_flag();
+      needsRefresh = true;
+    }
   }
 }
 
@@ -110,10 +118,40 @@ bool GUIHandler::handleLeftClick(Event &event)
 {
   Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
-  if (!m_awaitingPromotion && !(m_board[index] & m_board.sideToMove()))
-    return false;
+  bool shouldRefresh = false;
 
-  if (m_awaitingPromotion)
+  if (m_selectedSquareIndex != NO_SQUARE)
+  {
+    if (m_highlightsBitboards[GRAY_HIGHLIGHT] & (1ULL << index))
+    {
+      Move move = Moves::createMove(m_selectedSquareIndex, index);
+      if (!Moves::isPromotion(index, m_board[m_selectedSquareIndex] & TYPE))
+      {
+        makeMove(move);
+      }
+      else
+      {
+        m_awaitingPromotion = true;
+        m_promotionMove = move;
+      }
+    }
+
+    m_selectedSquareIndex = NO_SQUARE;
+    clearHighlights(GRAY_HIGHLIGHT);
+
+    shouldRefresh = true;
+  }
+
+  if (!m_awaitingPromotion)
+  {
+    if (!(m_board[index] & m_board.sideToMove()))
+      return shouldRefresh;
+
+    m_highlightsBitboards[GRAY_HIGHLIGHT] = m_board.getLegalPieceMovesBitboard(index);
+    m_draggingPieceIndex = index;
+    m_selectedSquareIndex = m_draggingPieceIndex;
+  }
+  else
   {
     Piece promotionPiece = getPromotionPiece(event.mouseButton.x, event.mouseButton.y);
 
@@ -132,14 +170,6 @@ bool GUIHandler::handleLeftClick(Event &event)
 
     makeMove(m_promotionMove);
   }
-  else
-  {
-    if (!(m_board[index] & m_board.sideToMove()))
-      return false;
-
-    m_highlightsBitboards[GRAY_HIGHLIGHT] = m_board.getLegalPieceMovesBitboard(index);
-    m_draggingPieceIndex = index;
-  }
 
   return true;
 }
@@ -154,7 +184,6 @@ bool GUIHandler::handleLeftRelease(Event &event)
   {
     m_draggingPieceIndex = NO_SQUARE;
     m_draggingPieceReleased.set_flag();
-    clearHighlights(GRAY_HIGHLIGHT);
     return false;
   }
 
@@ -319,9 +348,18 @@ void GUIHandler::drawHighlights()
   {
     for (int highlight = YELLOW_HIGHLIGHT; highlight <= GRAY_HIGHLIGHT; highlight++)
     {
+      if (highlight == GRAY_HIGHLIGHT && !HIGHLIGHT_LEGAL_MOVES)
+        continue;
+
+      if (m_selectedSquareIndex == i)
+        continue;
+
       if (Bitboards::hasBit(m_highlightsBitboards[highlight], i))
         m_window.draw(m_highlightSprites[highlight][i]);
     }
+
+    if (m_selectedSquareIndex == i)
+      m_window.draw(m_highlightSprites[YELLOW_HIGHLIGHT][i]);
 
     if (m_yellowOutlineIndex == i)
       m_window.draw(m_yellowOutlineSprites[i]);

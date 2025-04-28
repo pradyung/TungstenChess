@@ -23,6 +23,7 @@ using namespace TungstenChess;
 
 const PieceColor BOT_COLOR = DEF_BOT_COLOR;
 const bool THREADING = DEF_GUI_THREADING;
+const bool HIGHLIGHT_LEGAL_MOVES = true;
 
 enum BoardSquareColor
 {
@@ -105,6 +106,7 @@ private:
   Square m_yellowOutlineIndex = NO_SQUARE;
   sf::Sprite m_yellowOutlineSprites[64];
 
+  Square m_selectedSquareIndex = NO_SQUARE;
   Square m_draggingPieceIndex = NO_SQUARE;
   sf::Sprite m_draggingPieceSprite;
   bool_flag m_draggingPieceReleased;
