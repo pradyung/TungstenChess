@@ -64,8 +64,6 @@ GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
 
 void GUIHandler::runMainLoop()
 {
-  Event event;
-
   bool needsRefresh = true;
 
   while (m_window.isOpen())
@@ -84,6 +82,7 @@ void GUIHandler::runMainLoop()
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
+    Event event;
     if (m_isThinking || m_boardUpdated)
       m_window.pollEvent(event);
     else
@@ -134,12 +133,15 @@ bool GUIHandler::handleLeftClick(Event &event)
       if (!Moves::isPromotion(index, m_board[m_selectedSquareIndex] & TYPE))
       {
         makeMove(move);
+        m_selectedSquareIndex = NO_SQUARE;
       }
       else
       {
         m_awaitingPromotion = true;
         m_promotionMove = move;
       }
+
+      return true;
     }
 
     m_selectedSquareIndex = NO_SQUARE;
