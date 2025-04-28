@@ -17,127 +17,130 @@
 
 namespace TungstenChess
 {
-  template <bool B>
-  struct once
+  namespace utils
   {
-    operator bool()
+    template <bool B>
+    struct once
     {
-      std::lock_guard<std::mutex> lock(mtx);
-      if (value == B)
+      operator bool()
       {
-        value = !B;
-        return B;
+        std::lock_guard<std::mutex> lock(mtx);
+        if (value == B)
+        {
+          value = !B;
+          return B;
+        }
+        return !B;
       }
-      return !B;
-    }
 
-    void trigger()
+      void trigger()
+      {
+        std::lock_guard<std::mutex> lock(mtx);
+        value = !B;
+      }
+
+      bool peek()
+      {
+        std::lock_guard<std::mutex> lock(mtx);
+        return value;
+      }
+
+    private:
+      bool value = B;
+      std::mutex mtx;
+    };
+
+    struct bool_flag
     {
-      std::lock_guard<std::mutex> lock(mtx);
-      value = !B;
-    }
+      operator bool() const { return value; }
+      void set_flag() { value = true; }
+      bool pop_flag()
+      {
+        bool temp = value;
+        value = false;
+        return temp;
+      }
 
-    bool peek()
+    private:
+      bool value;
+    };
+
+    template <typename T, size_t R, size_t C, typename Allocator = std::allocator<T>>
+    struct array2d // 2d array implemented using flat std::array
     {
-      std::lock_guard<std::mutex> lock(mtx);
-      return value;
-    }
+      array2d() : m_data(R * C) {}
 
-  private:
-    bool value = B;
-    std::mutex mtx;
-  };
+      T &operator[](size_t r, size_t c) { return m_data[r * C + c]; }
+      const T &operator[](size_t r, size_t c) const { return m_data[r * C + c]; }
 
-  struct bool_flag
-  {
-    operator bool() const { return value; }
-    void set_flag() { value = true; }
-    bool pop_flag()
-    {
-      bool temp = value;
-      value = false;
-      return temp;
-    }
+      void copyRow(const array2d &other, size_t src, size_t dst)
+      {
+        if (src == dst)
+          return;
 
-  private:
-    bool value;
-  };
+        if (src > other.m_rows || dst > R || other.m_cols != C)
+          return;
 
-  template <typename T, size_t R, size_t C, typename Allocator = std::allocator<T>>
-  struct array2d // 2d array implemented using flat std::array
-  {
-    array2d() : m_data(R * C) {}
+        std::copy(&other.m_data[src * C], &other.m_data[src * C + C], &m_data[dst * C]);
+      }
 
-    T &operator[](size_t r, size_t c) { return m_data[r * C + c]; }
-    const T &operator[](size_t r, size_t c) const { return m_data[r * C + c]; }
+      void copyRow(size_t src, size_t dst)
+      {
+        copyRow(*this, src, dst);
+      }
 
-    void copyRow(const array2d &other, size_t src, size_t dst)
-    {
-      if (src == dst)
-        return;
+    private:
+      std::vector<T, Allocator> m_data;
+      const size_t m_rows = R;
+      const size_t m_cols = C;
+    };
 
-      if (src > other.m_rows || dst > R || other.m_cols != C)
-        return;
-
-      std::copy(&other.m_data[src * C], &other.m_data[src * C + C], &m_data[dst * C]);
-    }
-
-    void copyRow(size_t src, size_t dst)
-    {
-      copyRow(*this, src, dst);
-    }
-
-  private:
-    std::vector<T, Allocator> m_data;
-    const size_t m_rows = R;
-    const size_t m_cols = C;
-  };
-
-  template <typename T_Element>
-  class auxiliary_stack
-  {
-  private:
-    T_Element *m_data;
-    size_t m_top = 0;
-
-    void push(T_Element value)
-    {
-      m_data[m_top++] = value;
-    }
-
-  public:
-    auxiliary_stack(size_t size) : m_data(new T_Element[size]) {}
-    ~auxiliary_stack() { delete[] m_data; }
-
-    class dynamic_allocation
+    template <typename T_Element>
+    class auxiliary_stack
     {
     private:
-      size_t m_base;
-      auxiliary_stack &m_stack;
+      T_Element *m_data;
+      size_t m_top = 0;
 
     public:
-      using value_type = T_Element;
-      using pointer = T_Element *;
-      using reference = T_Element &;
-      using difference_type = std::ptrdiff_t;
-      using iterator_category = std::random_access_iterator_tag;
+      auxiliary_stack(size_t size) : m_data(new T_Element[size]) {}
+      ~auxiliary_stack() { delete[] m_data; }
 
-      dynamic_allocation(auxiliary_stack &stack) : m_stack(stack), m_base(stack.m_top) {}
+      void push(T_Element value) { m_data[m_top++] = value; }
+      T_Element pop() { return m_data[--m_top]; }
 
-      ~dynamic_allocation() { m_stack.m_top = m_base; }
+      class dynamic_top_allocation
+      {
+      private:
+        size_t m_base;
+        auxiliary_stack &m_stack;
 
-      void push(T_Element value) { m_stack.push(value); }
+      public:
+        using value_type = T_Element;
+        using pointer = T_Element *;
+        using reference = T_Element &;
+        using difference_type = std::ptrdiff_t;
+        using iterator_category = std::random_access_iterator_tag;
 
-      T_Element operator[](size_t index) const { return m_stack.m_data[m_base + index]; }
-      T_Element &top() const { return m_stack.m_data[m_stack.m_top - 1]; }
+        dynamic_top_allocation(auxiliary_stack &stack) : m_stack(stack), m_base(stack.m_top) {}
 
-      size_t size() const { return m_stack.m_top - m_base; }
+        ~dynamic_top_allocation() { free(); }
 
-      T_Element *begin() { return &m_stack.m_data[m_base]; }
-      T_Element *end() { return &m_stack.m_data[m_stack.m_top]; }
+        void free() { m_stack.m_top = m_base; }
 
-      const T_Element *begin() const { return &m_stack.m_data[m_base]; }
-      const T_Element *end() const { return &m_stack.m_data[m_stack.m_top]; }
+        void push(T_Element value) { m_stack.push(value); }
+
+        T_Element operator[](size_t index) const { return m_stack.m_data[m_base + index]; }
+        T_Element &top() const { return m_stack.m_data[m_stack.m_top - 1]; }
+
+        size_t size() const { return m_stack.m_top - m_base; }
+
+        T_Element *begin() { return &m_stack.m_data[m_base]; }
+        T_Element *end() { return &m_stack.m_data[m_stack.m_top]; }
+
+        const T_Element *begin() const { return &m_stack.m_data[m_base]; }
+        const T_Element *end() const { return &m_stack.m_data[m_stack.m_top]; }
+      };
     };
-  };
+  }
 }

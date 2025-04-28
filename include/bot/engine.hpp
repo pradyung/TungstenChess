@@ -38,7 +38,7 @@ namespace TungstenChess
     Board &m_board;
     OpeningBook m_openingBook;
 
-    auxiliary_stack<Move> m_moveStack;
+    utils::auxiliary_stack<Move> m_moveStack;
 
     struct BotSettings
     {
@@ -84,7 +84,7 @@ namespace TungstenChess
     std::mutex m_searchTimerMutex;
     std::atomic<bool> m_searchTimerTerminated = false;
 
-    once<false> m_onceOpeningBookLoaded;
+    utils::once<false> m_onceOpeningBookLoaded;
 
   public:
     Bot(Board &board, const BotSettings &settings);

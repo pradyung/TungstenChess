@@ -16,8 +16,8 @@
 
 namespace TungstenChess
 {
-  typedef auxiliary_stack<Move> MoveStack;
-  typedef MoveStack::dynamic_allocation MoveAllocation;
+  typedef utils::auxiliary_stack<Move> MoveStack;
+  typedef MoveStack::dynamic_top_allocation MoveAllocation;
 
   enum CastlingRights : uint8_t
   {

@@ -109,14 +109,14 @@ private:
   Square m_selectedSquareIndex = NO_SQUARE;
   Square m_draggingPieceIndex = NO_SQUARE;
   sf::Sprite m_draggingPieceSprite;
-  bool_flag m_draggingPieceReleased;
+  utils::bool_flag m_draggingPieceReleased;
 
   sf::Sprite m_promotionPieceSprites[BLACK + 1][4];
 
   bool m_awaitingPromotion = false;
   Move m_promotionMove;
 
-  bool_flag m_boardUpdated;
+  utils::bool_flag m_boardUpdated;
 
   bool m_gameOver = false;
 

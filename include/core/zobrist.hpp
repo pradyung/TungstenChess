@@ -24,7 +24,7 @@ namespace TungstenChess
      */
     static ZobristKey getPieceCombinationKey(Square square, Square before, Square after);
 
-    static inline array2d<ZobristKey, PIECE_NUMBER, 64> pieceKeys = {};
+    static inline utils::array2d<ZobristKey, PIECE_NUMBER, 64> pieceKeys = {};
     static inline std::array<ZobristKey, 16> castlingKeys = {};
     static inline std::array<ZobristKey, 9> enPassantKeys = {};
     static inline ZobristKey sideKey = 0;

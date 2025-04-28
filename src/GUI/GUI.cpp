@@ -70,7 +70,10 @@ void GUIHandler::runMainLoop()
 
   while (m_window.isOpen())
   {
-    if (needsRefresh || m_boardUpdated.pop_flag() || m_draggingPieceReleased.pop_flag())
+    bool boardUpdated = m_boardUpdated.pop_flag();
+    bool draggingPieceReleased = m_draggingPieceReleased.pop_flag();
+
+    if (needsRefresh || boardUpdated || draggingPieceReleased)
     {
       render();
       needsRefresh = false;

@@ -7,7 +7,7 @@ namespace TungstenChess
 {
   void MagicMoveGen::init()
   {
-    static once<false> initialized;
+    static utils::once<false> initialized;
     if (initialized)
       return;
 

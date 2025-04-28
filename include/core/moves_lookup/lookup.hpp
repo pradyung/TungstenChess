@@ -21,9 +21,9 @@ namespace TungstenChess
     static inline std::array<Bitboard, 64> BISHOP_MASKS = {};
     static inline std::array<Bitboard, 64> ROOK_MASKS = {};
 
-    static inline array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_CAPTURE_MOVES = {};
-    static inline array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_REVERSE_SINGLE_MOVES = {};
-    static inline array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_REVERSE_DOUBLE_MOVES = {};
+    static inline utils::array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_CAPTURE_MOVES = {};
+    static inline utils::array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_REVERSE_SINGLE_MOVES = {};
+    static inline utils::array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_REVERSE_DOUBLE_MOVES = {};
 
     friend class Board;
     friend class MagicMoveGen;
