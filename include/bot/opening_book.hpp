@@ -31,11 +31,11 @@ namespace TungstenChess
     void loadOpeningBook(const std::filesystem::path &path);
 
     /**
-     * @brief Updates move history to synchronize with given vector
+     * @brief Updates move history to synchronize with given move list
      * @param moves The moves to update the history with
      * @return Whether the moves were added successfully - if false, the moves are not in the opening book
      */
-    bool updateMoveHistory(const std::vector<Move> &newMoves);
+    bool updateMoveHistory(const MoveStack &newMoves);
 
     /**
      * @brief Gets the next move from the opening book, randomly selected weighted by the frequency of the moves

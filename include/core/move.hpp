@@ -4,12 +4,15 @@
 #include <string>
 
 #include "utils/types.hpp"
+#include "utils/utils.hpp"
 
 #define NULL_MOVE 0
 
 namespace TungstenChess
 {
   typedef uint16_t Move;
+  typedef utils::auxiliary_stack<Move> MoveStack;
+  typedef MoveStack::dynamic_top_allocation MoveAllocation;
 
   enum MoveFlags : uint8_t
   {

@@ -10,15 +10,13 @@
 #include "core/zobrist.hpp"
 
 #define NO_EP 8
-#define MAX_MOVE_COUNT 218
+#define MAX_LEGAL_MOVE_COUNT 218
+#define MAX_GAME_LENGTH 10000
 
 #define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 namespace TungstenChess
 {
-  typedef utils::auxiliary_stack<Move> MoveStack;
-  typedef MoveStack::dynamic_top_allocation MoveAllocation;
-
   enum CastlingRights : uint8_t
   {
     WHITE_KINGSIDE = 1,
@@ -49,9 +47,9 @@ namespace TungstenChess
 
     ZobristKey m_zobristKey;
 
-    std::vector<ZobristKey> m_positionHistory;
+    ZobristKeyStack m_positionHistory;
 
-    std::vector<Move> m_moveHistory;
+    MoveStack m_moveHistory;
 
   public:
     Board(std::string fen = START_FEN);
@@ -64,7 +62,7 @@ namespace TungstenChess
     uint8_t halfmoveClock() const { return m_halfmoveClock; }
     const Bitboard &bitboard(Piece piece) const { return m_bitboards[piece]; }
     ZobristKey zobristKey() const { return m_zobristKey; }
-    const std::vector<Move> &moveHistory() const { return m_moveHistory; }
+    const MoveStack &moveHistory() const { return m_moveHistory; }
     Square kingIndex(Piece piece) const { return m_kingIndices[piece]; }
     uint pieceCount(Piece piece) const { return m_pieceCounts[piece]; }
 

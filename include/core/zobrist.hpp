@@ -6,6 +6,7 @@
 namespace TungstenChess
 {
   typedef uint64_t ZobristKey;
+  typedef utils::auxiliary_stack<ZobristKey> ZobristKeyStack;
 
   class Zobrist
   {

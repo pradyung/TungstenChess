@@ -372,7 +372,7 @@ namespace TungstenChess
 
   uint64_t Board::countGames(uint8_t depth, bool verbose)
   {
-    MoveStack moveStack(depth * MAX_MOVE_COUNT);
+    MoveStack moveStack(depth * MAX_LEGAL_MOVE_COUNT);
     return countGames(moveStack, depth, verbose);
   }
 

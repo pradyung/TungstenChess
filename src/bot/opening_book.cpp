@@ -65,7 +65,7 @@ namespace TungstenChess
     file.close();
   }
 
-  bool OpeningBook::updateMoveHistory(const std::vector<Move> &newMoves)
+  bool OpeningBook::updateMoveHistory(const MoveStack &newMoves)
   {
     if (!m_inOpeningBook)
       return false;

@@ -26,7 +26,7 @@ namespace TungstenChess
     if (m_board[to] || pieceType == PAWN)
       m_halfmoveClock = 0;
 
-    m_moveHistory.push_back(move & FROM_TO);
+    m_moveHistory.push(move & FROM_TO);
 
     movePiece(from, to, promotionPieceType | pieceColor);
 
@@ -62,7 +62,7 @@ namespace TungstenChess
         movePiece(to - 2, to + 1);
     }
 
-    m_positionHistory.push_back(m_zobristKey);
+    m_positionHistory.push(m_zobristKey);
 
     return unmoveData;
   }
@@ -74,8 +74,8 @@ namespace TungstenChess
 
   void Board::unmakeMove(Move move, UnmoveData unmoveData)
   {
-    m_positionHistory.pop_back();
-    m_moveHistory.pop_back();
+    m_positionHistory.pop();
+    m_moveHistory.pop();
 
     uint8_t from = move & FROM;
     uint8_t to = (move & TO) >> 6;

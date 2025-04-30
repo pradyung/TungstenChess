@@ -109,6 +109,22 @@ namespace TungstenChess
       void push(T_Element value) { m_data[m_top++] = value; }
       T_Element pop() { return m_data[--m_top]; }
 
+      void clear() { m_top = 0; }
+
+      T_Element &operator[](size_t index) { return m_data[index]; }
+      const T_Element &operator[](size_t index) const { return m_data[index]; }
+
+      T_Element &top() { return m_data[m_top - 1]; }
+      const T_Element &top() const { return m_data[m_top - 1]; }
+
+      size_t size() const { return m_top; }
+
+      T_Element *begin() { return m_data; }
+      T_Element *end() { return m_data + m_top; }
+
+      const T_Element *begin() const { return m_data; }
+      const T_Element *end() const { return m_data + m_top; }
+
       class dynamic_top_allocation
       {
       private:
@@ -129,17 +145,18 @@ namespace TungstenChess
         void free() { m_stack.m_top = m_base; }
 
         void push(T_Element value) { m_stack.push(value); }
+        T_Element pop() { return m_stack.pop(); }
 
-        T_Element operator[](size_t index) const { return m_stack.m_data[m_base + index]; }
-        T_Element &top() const { return m_stack.m_data[m_stack.m_top - 1]; }
+        T_Element operator[](size_t index) const { return m_stack[m_base + index]; }
+        T_Element &top() const { return m_stack.top(); }
 
-        size_t size() const { return m_stack.m_top - m_base; }
+        size_t size() const { return m_stack.size() - m_base; }
 
-        T_Element *begin() { return &m_stack.m_data[m_base]; }
-        T_Element *end() { return &m_stack.m_data[m_stack.m_top]; }
+        T_Element *begin() { return &m_stack[m_base]; }
+        T_Element *end() { return m_stack.end(); }
 
-        const T_Element *begin() const { return &m_stack.m_data[m_base]; }
-        const T_Element *end() const { return &m_stack.m_data[m_stack.m_top]; }
+        const T_Element *begin() const { return &m_stack[m_base]; }
+        const T_Element *end() const { return m_stack.end(); }
       };
     };
   }

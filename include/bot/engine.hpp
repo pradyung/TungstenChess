@@ -37,7 +37,7 @@ namespace TungstenChess
     Board &m_board;
     OpeningBook m_openingBook;
 
-    utils::auxiliary_stack<Move> m_moveStack;
+    MoveStack m_moveStack;
 
     struct BotSettings
     {

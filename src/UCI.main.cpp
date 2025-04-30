@@ -2,9 +2,30 @@
 #include <string>
 #include <vector>
 
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 #include "bot/engine.hpp"
 
 using namespace TungstenChess;
+
+std::filesystem::path getResourcePath()
+{
+#ifdef __APPLE__
+  CFBundleRef mainBundle = CFBundleGetMainBundle();
+  CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+  char path[PATH_MAX];
+  if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+  {
+    return "";
+  }
+  CFRelease(resourcesURL);
+  return path;
+#else
+  return TUNGSTENCHESS_RESOURCES_DIR;
+#endif
+}
 
 std::vector<std::string> split(std::string str, std::string delimiter)
 {
@@ -25,11 +46,13 @@ std::vector<std::string> split(std::string str, std::string delimiter)
 
 int main()
 {
-  Board board(START_FEN);
+  Board board;
 
-  Bot bot(board, 2000);
+  Bot bot(board);
 
-  bot.loadOpeningBook("../resources/opening_book");
+  std::filesystem::path openingBookPath = getResourcePath() / "opening_book.dat";
+
+  bot.loadOpeningBook(openingBookPath);
 
   std::cout << "TungstenChess v1.0\n";
 
