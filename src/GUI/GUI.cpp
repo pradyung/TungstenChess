@@ -77,7 +77,7 @@ void GUIHandler::runMainLoop()
       needsRefresh = false;
     }
 
-    if (!m_isThinking && !m_gameOver && m_board.sideToMove() == BOT_COLOR)
+    if (!m_isThinking && !m_gameOver && (m_board.sideToMove() & BOT_COLOR))
       startThinking();
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
