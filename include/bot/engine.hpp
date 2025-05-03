@@ -192,9 +192,8 @@ namespace TungstenChess
     /**
      * @brief Sorts moves by heuristic evaluation (in place) to improve alpha-beta pruning
      * @param moves The moves to sort
-     * @param movesCount The number of moves in the array
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      */
-    void heuristicSortMoves(MoveAllocation &moves, int movesCount, Move bestMove = NULL_MOVE);
+    void heuristicSortMoves(MoveAllocation &moves, Move bestMove = NULL_MOVE);
   };
 }

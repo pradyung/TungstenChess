@@ -275,9 +275,9 @@ namespace TungstenChess
     return bestMove;
   }
 
-  void Bot::heuristicSortMoves(MoveAllocation &moves, int movesCount, Move bestMove)
+  void Bot::heuristicSortMoves(MoveAllocation &moves, Move bestMove)
   {
-    std::sort(moves.begin(), moves.begin() + movesCount,
+    std::sort(moves.begin(), moves.end(),
               [this, bestMove](Move a, Move b)
               { return heuristicEvaluation(a, bestMove) > heuristicEvaluation(b, bestMove); });
   }
@@ -304,7 +304,7 @@ namespace TungstenChess
   int Bot::getSortedLegalMoves(MoveAllocation &moves, bool onlyCaptures, Move bestMove)
   {
     int legalMovesCount = m_board.getLegalMoves(moves, onlyCaptures);
-    heuristicSortMoves(moves, legalMovesCount, bestMove);
+    heuristicSortMoves(moves, bestMove);
     return legalMovesCount;
   }
 }

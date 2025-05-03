@@ -21,7 +21,7 @@ namespace TungstenChess
 
     int staticEvaluation = getMaterialEvaluation() +
                            getPositionalEvaluation() +
-                           getMobilityEvaluation() +
+                           //  getMobilityEvaluation() +
                            getEvaluationBonus();
 
     return m_board.sideToMove() == WHITE ? staticEvaluation : -staticEvaluation;
