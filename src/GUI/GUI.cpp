@@ -80,8 +80,6 @@ void GUIHandler::runMainLoop()
     if (!m_isThinking && !m_gameOver && (m_board.sideToMove() & BOT_COLOR))
       startThinking();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
     Event event;
     if (m_isThinking || m_boardUpdated)
       m_window.pollEvent(event);
@@ -193,7 +191,7 @@ bool GUIHandler::handleLeftRelease(Event &event)
     m_draggingPieceIndex = NO_SQUARE;
     m_draggingPieceReleased.set_flag();
 
-    if (m_selectedSquareReClicked.pop_flag())
+    if (m_selectedSquareReClicked.pop_flag() && m_selectedSquareIndex == releasedSquareIndex)
     {
       m_selectedSquareIndex = NO_SQUARE;
       clearHighlights(GRAY_HIGHLIGHT);
