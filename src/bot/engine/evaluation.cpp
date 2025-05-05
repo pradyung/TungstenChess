@@ -19,10 +19,11 @@ namespace TungstenChess
         return -CONTEMPT;
     }
 
-    int staticEvaluation = getMaterialEvaluation() +
-                           getPositionalEvaluation() +
-                           //  getMobilityEvaluation() +
-                           getEvaluationBonus();
+    int staticEvaluation = 0;
+    staticEvaluation += getMaterialEvaluation();
+    staticEvaluation += getPositionalEvaluation();
+    // staticEvaluation += getMobilityEvaluation();
+    staticEvaluation += getEvaluationBonus();
 
     return m_board.sideToMove() == WHITE ? staticEvaluation : -staticEvaluation;
   }
