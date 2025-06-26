@@ -60,6 +60,8 @@ GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
   m_window.setIcon(m_resourceManager.m_windowIcon.getSize().x,
                    m_resourceManager.m_windowIcon.getSize().y,
                    m_resourceManager.m_windowIcon.getPixelsPtr());
+
+  m_lastMoveTime = std::chrono::high_resolution_clock::now();
 }
 
 void GUIHandler::runMainLoop()
@@ -104,7 +106,7 @@ void GUIHandler::runMainLoop()
     if (event.type == Event::MouseMoved)
       needsRefresh = (m_draggingPieceIndex != NO_SQUARE) || (getMouseSquareIndex() != m_yellowOutlineIndex);
 
-    if (event.type == Event::MouseLeft)
+    else if (event.type == Event::MouseLeft)
     {
       m_yellowOutlineIndex = NO_SQUARE;
       m_draggingPieceIndex = NO_SQUARE;
@@ -405,6 +407,17 @@ void GUIHandler::makeMove(Move move)
 
   if (from == to)
     return;
+
+  if (m_logPlayerMoves && !(m_board.sideToMove() & BOT_COLOR))
+  {
+    std::cout << std::format(
+                     "Move: {:<9} Time: {:>6} ms",
+                     m_logPGNMoves ? m_board.getMovePGN(move) : Moves::getUCI(move),
+                     std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_lastMoveTime).count())
+              << std::endl;
+  }
+
+  m_lastMoveTime = std::chrono::high_resolution_clock::now();
 
   m_board.makeMove(move);
 

@@ -126,6 +126,11 @@ private:
 
   std::thread m_thinkingThread;
 
+  std::chrono::time_point<std::chrono::high_resolution_clock> m_lastMoveTime;
+
+  const bool m_logPlayerMoves = true;
+  const bool m_logPGNMoves = true;
+
 public:
   /**
    * @brief Runs the main loop of the GUI, including rendering, input handling, and move making
