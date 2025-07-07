@@ -1,6 +1,6 @@
 #include "core/board.hpp"
 
-#include <iostream>
+#include <print>
 
 #include "core/moves_lookup/lookup.hpp"
 #include "core/moves_lookup/magic.hpp"
@@ -393,7 +393,7 @@ namespace TungstenChess
         games++;
 
         if (verbose)
-          std::cout << Moves::getUCI(legalMoves[i]) << ": 1" << std::endl;
+          std::println("{:s}: 1", Moves::getUCI(legalMoves[i]));
 
         continue;
       }
@@ -403,7 +403,7 @@ namespace TungstenChess
       uint64_t newGames = countGames(moveStack, depth - 1, false);
 
       if (verbose)
-        std::cout << Moves::getUCI(legalMoves[i]) << ": " << newGames << std::endl;
+        std::println("{:s}: {:d}", Moves::getUCI(legalMoves[i]), newGames);
 
       games += newGames;
 

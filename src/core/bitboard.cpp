@@ -1,6 +1,6 @@
 #include "core/bitboard.hpp"
 
-#include <iostream>
+#include <print>
 
 namespace TungstenChess
 {
@@ -29,11 +29,10 @@ namespace TungstenChess
     {
       for (Square i = 0; i < 64; i++)
       {
-        if (i % 8 == 0)
-          std::cout << std::endl;
-        std::cout << (hasBit(bitboard, i) ? '1' : '0') << ' ';
+        std::print("{:d} ", hasBit(bitboard, i));
+        if (i % 8 == 7)
+          std::print("\n");
       }
-      std::cout << std::endl;
     }
   }
 }

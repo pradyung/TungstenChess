@@ -3,16 +3,16 @@
 #include <vector>
 #include <mutex>
 #include <chrono>
-#include <iostream>
+#include <print>
 
-#define TIME_TEST(n, x)                                                                                          \
-  {                                                                                                              \
-    auto start = std::chrono::high_resolution_clock::now();                                                      \
-    for (int i = 0; i < n; i++)                                                                                  \
-      x;                                                                                                         \
-    auto end = std::chrono::high_resolution_clock::now();                                                        \
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);                           \
-    std::cout << (duration.count() / n) << " ns elapsed on average across " << #n << " iterations" << std::endl; \
+#define TIME_TEST(n, x)                                                                          \
+  {                                                                                              \
+    auto start = std::chrono::high_resolution_clock::now();                                      \
+    for (int i = 0; i < n; i++)                                                                  \
+      x;                                                                                         \
+    auto end = std::chrono::high_resolution_clock::now();                                        \
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);           \
+    std::println("{:d} ns elapsed on average across {:d} iterations", duration.count() / n, #n); \
   }
 
 namespace TungstenChess

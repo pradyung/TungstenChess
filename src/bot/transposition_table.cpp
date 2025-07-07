@@ -22,7 +22,10 @@ namespace TungstenChess
 
   std::string TranspositionTable::occupancy() const
   {
-    return std::format("{:.2f}/{} MB", m_occupied / (double)MEGABYTE * sizeof(Entry), TABLE_SIZE / (double)MEGABYTE * sizeof(Entry));
+    return std::format(
+        "{:.2f}/{:f} MB",
+        m_occupied / (double)MEGABYTE * sizeof(Entry),
+        TABLE_SIZE / (double)MEGABYTE * sizeof(Entry));
   }
 
   bool TranspositionTable::hasEntry(ZobristKey key) const
