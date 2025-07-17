@@ -65,24 +65,19 @@ namespace TungstenChess
     file.close();
   }
 
-  bool OpeningBook::updateMoveHistory(const MoveStack &newMoves)
+  bool OpeningBook::addMove(Move move)
   {
     if (!m_inOpeningBook)
       return false;
 
-    for (size_t i = m_moves.size(); i < newMoves.size() && m_inOpeningBook; i++)
-      m_inOpeningBook = addMove(newMoves[i]);
-
-    return m_inOpeningBook;
-  }
-
-  bool OpeningBook::addMove(Move move)
-  {
     if (m_lastMoveIndex != -1)
     {
       uint64_t nextMove = getMoveNextMove(m_openingBook[m_lastMoveIndex]);
       if (nextMove == m_moveNoNextMove || nextMove == m_lastMoveIndex + 1)
+      {
+        m_inOpeningBook = false;
         return false;
+      }
     }
 
     for (uint64_t i = m_lastMoveIndex + 1; i != m_moveNoNextMove; i = getMoveNextMove(m_openingBook[i]))
@@ -96,6 +91,7 @@ namespace TungstenChess
       }
     }
 
+    m_inOpeningBook = false;
     return false;
   }
 

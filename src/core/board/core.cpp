@@ -5,8 +5,7 @@
 namespace TungstenChess
 {
   Board::Board(std::string fen)
-      : m_positionHistory(MAX_GAME_LENGTH),
-        m_moveHistory(MAX_GAME_LENGTH)
+      : m_positionHistory(MAX_GAME_LENGTH)
   {
     Zobrist::init();
     MagicMoveGen::init();
@@ -102,8 +101,6 @@ namespace TungstenChess
     m_zobristKey = calculateInitialZobristKey();
 
     m_positionHistory.push(m_zobristKey);
-
-    m_moveHistory.clear();
   }
 
   ZobristKey Board::calculateInitialZobristKey() const

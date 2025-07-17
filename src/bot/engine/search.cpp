@@ -38,11 +38,16 @@ namespace TungstenChess
       m_searchTimerThread.join();
   }
 
+  void Bot::addMove(Move move)
+  {
+    m_openingBook.addMove(move);
+  }
+
   Move Bot::generateBotMove(int maxSearchTime)
   {
     if (m_botSettings.useOpeningBook &&
         m_onceOpeningBookLoaded.peek() &&
-        m_openingBook.updateMoveHistory(m_board.moveHistory()))
+        m_openingBook.isInOpeningBook())
     {
       Move moveInt = m_openingBook.getNextMove();
 

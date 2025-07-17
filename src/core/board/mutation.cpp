@@ -26,8 +26,6 @@ namespace TungstenChess
     if (m_board[to] || pieceType == PAWN)
       m_halfmoveClock = 0;
 
-    m_moveHistory.push(move & FROM_TO);
-
     movePiece(from, to, promotionPieceType | pieceColor);
 
     updateEnPassantFile(flags & PAWN_DOUBLE ? to % 8 : NO_EP);
@@ -75,7 +73,6 @@ namespace TungstenChess
   void Board::unmakeMove(Move move, UnmoveData unmoveData)
   {
     m_positionHistory.pop();
-    m_moveHistory.pop();
 
     uint8_t from = move & FROM;
     uint8_t to = (move & TO) >> 6;

@@ -23,7 +23,7 @@ namespace TungstenChess
   std::string TranspositionTable::occupancy() const
   {
     return std::format(
-        "{:.2f}/{:f} MB",
+        "{:.2f}/{:.2f} MB",
         m_occupied / (double)MEGABYTE * sizeof(Entry),
         TABLE_SIZE / (double)MEGABYTE * sizeof(Entry));
   }

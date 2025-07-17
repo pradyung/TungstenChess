@@ -442,6 +442,9 @@ void GUIHandler::makeMove(Move move)
   Bitboards::addBit(m_highlightsBitboards[YELLOW_HIGHLIGHT], to);
 
   m_boardUpdated.set_flag();
+
+  m_whiteBot.addMove(move);
+  m_blackBot.addMove(move);
 }
 
 void GUIHandler::makeBotMove()

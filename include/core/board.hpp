@@ -35,7 +35,7 @@ namespace TungstenChess
   private:
     std::array<Piece, 64> m_board;
     std::array<Bitboard, ALL_PIECES + 1> m_bitboards;
-    std::array<Piece, PIECE_NUMBER> m_kingIndices; // Only indexes WHITE_KING and BLACK_KING are valid, the rest are garbage
+    std::array<Piece, PIECE_NUMBER> m_kingIndices; // Only indices WHITE_KING and BLACK_KING are valid, the rest are garbage
     std::array<uint, PIECE_NUMBER> m_pieceCounts;
 
     PieceColor m_sideToMove;
@@ -49,8 +49,6 @@ namespace TungstenChess
 
     ZobristKeyStack m_positionHistory;
 
-    MoveStack m_moveHistory;
-
   public:
     Board(std::string fen = START_FEN);
 
@@ -62,7 +60,6 @@ namespace TungstenChess
     uint8_t halfmoveClock() const { return m_halfmoveClock; }
     const Bitboard &bitboard(Piece piece) const { return m_bitboards[piece]; }
     ZobristKey zobristKey() const { return m_zobristKey; }
-    const MoveStack &moveHistory() const { return m_moveHistory; }
     Square kingIndex(Piece piece) const { return m_kingIndices[piece]; }
     uint pieceCount(Piece piece) const { return m_pieceCounts[piece]; }
 

@@ -100,6 +100,12 @@ namespace TungstenChess
     void loadOpeningBook(const std::filesystem::path path);
 
     /**
+     * @brief Adds a move to the opening book move history
+     * @param move The move to add
+     */
+    void addMove(Move move);
+
+    /**
      * @brief Generates the best move for the bot
      * @param maxSearchTime The maximum time to search for in milliseconds
      */
