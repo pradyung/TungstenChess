@@ -47,7 +47,30 @@ namespace TungstenChess
 
     ZobristKey m_zobristKey;
 
-    ZobristKeyStack m_positionHistory;
+    struct DisjointZobristKeyStack
+    {
+      DisjointZobristKeyStack(size_t size, const DisjointZobristKeyStack *prev = nullptr)
+          : stack(size), prev(prev), prevSize(prev ? prev->stack.size() : 0) {}
+
+      ZobristKeyStack stack;
+      const DisjointZobristKeyStack *prev;
+      const size_t prevSize;
+    };
+
+    DisjointZobristKeyStack m_positionHistory;
+
+    Board(const Board &other, size_t futureMoves)
+        : m_board(other.m_board),
+          m_bitboards(other.m_bitboards),
+          m_kingIndices(other.m_kingIndices),
+          m_pieceCounts(other.m_pieceCounts),
+          m_sideToMove(other.m_sideToMove),
+          m_castlingRights(other.m_castlingRights),
+          m_enPassantFile(other.m_enPassantFile),
+          m_hasCastled(other.m_hasCastled),
+          m_halfmoveClock(other.m_halfmoveClock),
+          m_zobristKey(other.m_zobristKey),
+          m_positionHistory(futureMoves, &other.m_positionHistory) {}
 
   public:
     Board(std::string fen = START_FEN);
@@ -156,10 +179,17 @@ namespace TungstenChess
     uint64_t countGames(uint8_t depth, bool verbose = true);
 
     /**
-     * @brief Counts the number of times a position has been repeated
+     * @brief Checks if a position has been repeated thrice
      * @param key The Zobrist key of the position to check
      */
-    uint8_t countRepetitions(ZobristKey key) const;
+    bool hasRepeatedThrice(ZobristKey key) const;
+
+    /**
+     * @brief Creates a copy of the board for branching search
+     * @param futureMoves The number of future moves to allocate space for in the move stack
+     * @return A new Board object with the same state as this board
+     */
+    Board createBranch(size_t futureMoves = MAX_GAME_LENGTH) const;
 
   private:
     /**

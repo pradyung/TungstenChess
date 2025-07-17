@@ -100,7 +100,7 @@ namespace TungstenChess
 
     m_zobristKey = calculateInitialZobristKey();
 
-    m_positionHistory.push(m_zobristKey);
+    m_positionHistory.stack.push(m_zobristKey);
   }
 
   ZobristKey Board::calculateInitialZobristKey() const
@@ -122,5 +122,10 @@ namespace TungstenChess
       zobristKey ^= Zobrist::sideKey;
 
     return zobristKey;
+  }
+
+  Board Board::createBranch(size_t futureMoves) const
+  {
+    return Board(*this, futureMoves);
   }
 }

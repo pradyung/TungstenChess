@@ -60,7 +60,7 @@ namespace TungstenChess
         movePiece(to - 2, to + 1);
     }
 
-    m_positionHistory.push(m_zobristKey);
+    m_positionHistory.stack.push(m_zobristKey);
 
     return unmoveData;
   }
@@ -72,7 +72,7 @@ namespace TungstenChess
 
   void Board::unmakeMove(Move move, UnmoveData unmoveData)
   {
-    m_positionHistory.pop();
+    m_positionHistory.stack.pop();
 
     uint8_t from = move & FROM;
     uint8_t to = (move & TO) >> 6;

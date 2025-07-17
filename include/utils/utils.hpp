@@ -5,14 +5,14 @@
 #include <chrono>
 #include <print>
 
-#define TIME_TEST(n, x)                                                                          \
-  {                                                                                              \
-    auto start = std::chrono::high_resolution_clock::now();                                      \
-    for (int i = 0; i < n; i++)                                                                  \
-      x;                                                                                         \
-    auto end = std::chrono::high_resolution_clock::now();                                        \
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);           \
-    std::println("{:d} ns elapsed on average across {:d} iterations", duration.count() / n, #n); \
+#define TIME_TEST(n, x)                                                                              \
+  {                                                                                                  \
+    auto start = std::chrono::high_resolution_clock::now();                                          \
+    for (int i = 0; i < n; i++)                                                                      \
+      x;                                                                                             \
+    auto end = std::chrono::high_resolution_clock::now();                                            \
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);               \
+    std::cout << (duration.count() / n) << " ns elapsed on average across " << n << " iterations\n"; \
   }
 
 namespace TungstenChess
@@ -106,10 +106,25 @@ namespace TungstenChess
       auxiliary_stack(size_t size) : m_data(new T_Element[size]) {}
       ~auxiliary_stack() { delete[] m_data; }
 
+      auxiliary_stack(const auxiliary_stack &other) : m_data(new T_Element[other.m_top]), m_top(other.m_top)
+      {
+        std::copy(other.m_data, other.m_data + other.m_top, m_data);
+      }
+
+      auxiliary_stack(auxiliary_stack &&other) noexcept
+          : m_data(other.m_data), m_top(other.m_top)
+      {
+        other.m_data = nullptr;
+        other.m_top = 0;
+      }
+
       void push(T_Element value) { m_data[m_top++] = value; }
       T_Element pop() { return m_data[--m_top]; }
 
       void clear() { m_top = 0; }
+
+      T_Element &at(size_t index) { return m_data[index]; }
+      const T_Element &at(size_t index) const { return m_data[index]; }
 
       T_Element &operator[](size_t index) { return m_data[index]; }
       const T_Element &operator[](size_t index) const { return m_data[index]; }

@@ -134,7 +134,7 @@ namespace TungstenChess
         return negamax(m_botSettings.quiesceDepth, alpha, beta, true);
     }
 
-    if (m_board.countRepetitions(m_board.zobristKey()) >= 3 || m_board.halfmoveClock() >= 100)
+    if (m_board.hasRepeatedThrice(m_board.zobristKey()) || m_board.halfmoveClock() >= 100)
       return -CONTEMPT;
 
     MoveAllocation legalMoves(m_moveStack);

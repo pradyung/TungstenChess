@@ -341,20 +341,31 @@ namespace TungstenChess
     return isAttacked(m_kingIndices[color | KING], color ^ COLOR);
   }
 
-  uint8_t Board::countRepetitions(ZobristKey key) const
+  bool Board::hasRepeatedThrice(ZobristKey key) const
   {
     uint8_t count = 0;
 
-    for (size_t i = 0; i < m_positionHistory.size(); i++)
-      if (m_positionHistory[i] == key)
-        count++;
+    const DisjointZobristKeyStack *current = &m_positionHistory;
+    size_t currentSize = current->stack.size();
 
-    return count;
+    while (current)
+    {
+      for (size_t i = currentSize - 1; i != SIZE_MAX; i--)
+      {
+        if (current->stack[i] == key && ++count == 3)
+          return true;
+      }
+
+      currentSize = current->prevSize;
+      current = current->prev;
+    }
+
+    return false;
   }
 
   Board::GameStatus Board::getGameStatus(PieceColor color)
   {
-    if (countRepetitions(m_zobristKey) >= 3)
+    if (hasRepeatedThrice(m_zobristKey))
       return STALEMATE;
 
     Bitboard friendlyPiecesBitboard = m_bitboards[color];
