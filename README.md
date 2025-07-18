@@ -1,22 +1,23 @@
 # Tungsten Chess
 
-This is a simple but powerful chess AI built using C++ and SFML. The bot uses the negamax algorithm with a minimum depth of 5 moves, and a maximum depth of 15 moves (for quiescence search).
+This is a simple but powerful chess AI built using C++ and SFML. The bot uses iterative deepening and negamax to search for moves within a given time (defaults to 2000 ms).
 
 ## Platform
 
-The bot is currently only compatible with MacOS. It is in the process of being ported to Windows.
+The bot is currently only compatible with MacOS.
 
 ## Dependencies
 
 The only dependencies you will need to compile and run this project are CMake and OpenGL. You do not need to install SFML, as the makefile will install it locally for you.
 
-If you already have SFML installed, the makefile will use the system version instead of installing a new one. (Installing SFML onto your system is recommended, as it will speed up the build process and reduce the size of the application bundle.)
+If you already have SFML installed, the makefile will use the system version instead of installing a new one.
 
 ## Compile Instructions
 
 After cloning the repository, open a terminal window and navigate into the `TungstenChess` folder. Now, run the following commands:
 
 ```zsh
+TungstenChess % mkdir build
 TungstenChess % cd build
 build % cmake ..
 ```
