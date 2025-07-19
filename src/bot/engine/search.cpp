@@ -142,11 +142,14 @@ namespace TungstenChess
 
     if (legalMovesCount == 0)
     {
+      if (quiesce)
+        return standPat;
+
       bool isStalemate = !m_board.isInCheck(m_board.sideToMove());
       if (isStalemate)
         return -CONTEMPT;
       else
-        return -INF_EVAL + (quiesce ? (INF_EVAL / 10) : 0);
+        return -INF_EVAL;
     }
 
     if (legalMovesCount == 1)
