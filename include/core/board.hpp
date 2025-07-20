@@ -59,18 +59,7 @@ namespace TungstenChess
 
     DisjointZobristKeyStack m_positionHistory;
 
-    Board(const Board &other, size_t futureMoves)
-        : m_board(other.m_board),
-          m_bitboards(other.m_bitboards),
-          m_kingIndices(other.m_kingIndices),
-          m_pieceCounts(other.m_pieceCounts),
-          m_sideToMove(other.m_sideToMove),
-          m_castlingRights(other.m_castlingRights),
-          m_enPassantFile(other.m_enPassantFile),
-          m_hasCastled(other.m_hasCastled),
-          m_halfmoveClock(other.m_halfmoveClock),
-          m_zobristKey(other.m_zobristKey),
-          m_positionHistory(futureMoves, &other.m_positionHistory) {}
+    Board(const Board &other, size_t futureMoves);
 
   public:
     Board(std::string fen = START_FEN);
