@@ -76,10 +76,9 @@ class GUIHandler
 {
 public:
   /**
-   * @brief Construct a new GUIHandler object
-   * @param window The window to render to
+   * @brief Construct a new GUIHandler object and render window
    */
-  GUIHandler(sf::RenderWindow &window);
+  GUIHandler();
 
 private:
   ResourceManager &m_resourceManager = ResourceManager::getInstance();
@@ -90,7 +89,7 @@ private:
 
   Piece m_bufferBoard[64];
 
-  sf::RenderWindow &m_window;
+  sf::RenderWindow m_window;
 
   sf::Texture m_boardSquareTextures[2];
   sf::Texture m_highlightTextures[3];

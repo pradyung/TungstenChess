@@ -47,8 +47,10 @@ ResourceManager::ResourceManager()
   m_windowIcon.loadFromFile(resourcePath / "high_res_wn.png");
 }
 
-GUIHandler::GUIHandler(RenderWindow &window) : m_window(window)
+GUIHandler::GUIHandler() : m_window(sf::VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE * 8), "TungstenChess", sf::Style::Titlebar | sf::Style::Close)
 {
+  m_window.setFramerateLimit(60);
+
   m_whiteBot.loadOpeningBook(m_resourceManager.m_openingBookPath);
   m_blackBot.loadOpeningBook(m_resourceManager.m_openingBookPath);
 
