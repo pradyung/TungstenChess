@@ -22,7 +22,7 @@ namespace TungstenChess
 
       Bitboard captureSquares = m_bitboards[BLACK];
       if (m_enPassantFile != NO_EP)
-        captureSquares |= 1ULL << (m_enPassantFile + 24);
+        captureSquares |= 1ULL << (m_enPassantFile + 16);
 
       movesBitboard |= (MovesLookup::PAWN_CAPTURE_MOVES[WHITE_PAWN, pieceIndex] & captureSquares);
     }
