@@ -107,8 +107,9 @@ void GUIHandler::runMainLoop()
     }
 
     if (event.type == Event::MouseMoved)
+    {
       needsRefresh = (m_draggingPieceIndex != NO_SQUARE) || (getMouseSquareIndex() != m_yellowOutlineIndex);
-
+    }
     else if (event.type == Event::MouseLeft)
     {
       m_yellowOutlineIndex = NO_SQUARE;
@@ -287,8 +288,10 @@ void GUIHandler::loadBoardSquares()
         m_highlightSprites[highlight][squareIndex].setTexture(m_highlightTextures[highlight]);
 
       Vector2f squareCoordinates = getSquareCoordinates(j, i);
+
       m_boardSquares[squareIndex].setPosition(squareCoordinates);
       m_yellowOutlineSprites[squareIndex].setPosition(squareCoordinates);
+
       for (int highlight = YELLOW_HIGHLIGHT; highlight <= GRAY_HIGHLIGHT; highlight++)
         m_highlightSprites[highlight][squareIndex].setPosition(squareCoordinates);
 
