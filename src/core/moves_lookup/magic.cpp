@@ -109,6 +109,13 @@ namespace TungstenChess
 
   void MagicMoveGen::initRookLookupTables()
   {
+    std::array<size_t, 64> rowSizes;
+    for (Square square = 0; square < 64; square++)
+    {
+      rowSizes[square] = 1ULL << (64 - ROOK_SHIFTS[square]);
+    }
+    ROOK_LOOKUP_TABLES.reserve(rowSizes);
+
     std::vector<Bitboard> blockers;
 
     for (Square square = 0; square < 64; square++)
@@ -125,6 +132,13 @@ namespace TungstenChess
 
   void MagicMoveGen::initBishopLookupTables()
   {
+    std::array<size_t, 64> rowSizes;
+    for (Square square = 0; square < 64; square++)
+    {
+      rowSizes[square] = 1ULL << (64 - BISHOP_SHIFTS[square]);
+    }
+    BISHOP_LOOKUP_TABLES.reserve(rowSizes);
+
     std::vector<Bitboard> blockers;
 
     for (Square square = 0; square < 64; square++)

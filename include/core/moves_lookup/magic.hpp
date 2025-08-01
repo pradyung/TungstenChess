@@ -23,8 +23,8 @@ namespace TungstenChess
     static constexpr Shift BISHOP_SHIFTS[64] = {58, 59, 59, 59, 59, 59, 59, 58, 59, 59, 59, 59, 59, 59, 60, 60, 59, 59, 57, 57, 57, 57, 59, 59, 59, 59, 57, 54, 54, 56, 59, 59, 59, 59, 56, 54, 54, 56, 59, 59, 59, 59, 56, 56, 56, 56, 59, 59, 59, 60, 59, 59, 59, 59, 59, 60, 58, 59, 59, 59, 59, 59, 59, 58};
     static constexpr size_t MAX_BISHOP_LOOKUP_SIZE = 1ULL << (64 - std::min(BISHOP_SHIFTS[0], BISHOP_SHIFTS[63]));
 
-    static inline utils::array2d<Bitboard, 64, MAX_ROOK_LOOKUP_SIZE> ROOK_LOOKUP_TABLES = {};
-    static inline utils::array2d<Bitboard, 64, MAX_BISHOP_LOOKUP_SIZE> BISHOP_LOOKUP_TABLES = {};
+    static inline utils::ragged_array2d<Bitboard, 64> ROOK_LOOKUP_TABLES = {};
+    static inline utils::ragged_array2d<Bitboard, 64> BISHOP_LOOKUP_TABLES = {};
 
   public:
     /**

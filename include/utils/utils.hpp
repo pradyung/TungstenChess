@@ -167,6 +167,45 @@ namespace TungstenChess
       const size_t m_cols = C;
     };
 
+    template <typename T, size_t R>
+    struct ragged_array2d
+    {
+    private:
+      T *m_data;
+      std::array<size_t, R> m_rowOffsets;
+      size_t m_capacity;
+
+    public:
+      ragged_array2d() {}
+
+      ragged_array2d(std::array<size_t, R> &rowSizes)
+      {
+        reserve(rowSizes);
+      }
+
+      ~ragged_array2d()
+      {
+        delete[] m_data;
+      }
+
+      void reserve(std::array<size_t, R> &rowSizes)
+      {
+        size_t totalSize = 0;
+
+        for (size_t i = 0; i < R; i++)
+        {
+          m_rowOffsets[i] = totalSize;
+          totalSize += rowSizes[i];
+        }
+
+        m_capacity = totalSize;
+        m_data = new T[m_capacity];
+      }
+
+      T &operator[](size_t r, size_t c) { return m_data[m_rowOffsets[r] + c]; }
+      const T &operator[](size_t r, size_t c) const { return m_data[m_rowOffsets[r] + c]; }
+    };
+
     /**
      * @brief This class simulates stack memory, but is allocated on the heap. It supports
      *        dynamic top allocation, which can be used to allocate memory at the top of the stack
