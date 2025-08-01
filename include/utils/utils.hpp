@@ -5,15 +5,16 @@
 #include <chrono>
 #include <print>
 
-#define TIME_TEST(n, x)                                                                              \
-  {                                                                                                  \
-    auto start = std::chrono::high_resolution_clock::now();                                          \
-    for (int i = 0; i < n; i++)                                                                      \
-      x;                                                                                             \
-    auto end = std::chrono::high_resolution_clock::now();                                            \
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);               \
-    std::cout << (duration.count() / n) << " ns elapsed on average across " << n << " iterations\n"; \
-  }
+#define TIME_TEST(n, x)                                                                         \
+  do                                                                                            \
+  {                                                                                             \
+    auto start = std::chrono::high_resolution_clock::now();                                     \
+    for (int i = 0; i < n; i++)                                                                 \
+      x;                                                                                        \
+    auto end = std::chrono::high_resolution_clock::now();                                       \
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);          \
+    std::println("{:d} ns elapsed on average across {:d} iterations", duration.count() / n, n); \
+  } while (0)
 
 namespace TungstenChess
 {
@@ -99,7 +100,7 @@ namespace TungstenChess
     };
 
     /**
-     * @brief A 2D array implementation using a flat std::vector to reduce memory fragmentation.
+     * @brief A 2D array implementation using a flat heap allocation to reduce memory fragmentation.
      *        This is useful for storing large 2D arrays in contiguous heap memory.
      * @tparam T The type of the elements in the array.
      * @tparam R The number of rows in the array.
@@ -108,7 +109,9 @@ namespace TungstenChess
     template <typename T, size_t R, size_t C>
     struct array2d
     {
-      array2d() : m_data(R * C) {}
+      array2d() : m_data(new T[R * C]) {}
+
+      ~array2d() { delete[] m_data; }
 
       /**
        * @brief Access an element in the array using row and column indices.
@@ -159,7 +162,7 @@ namespace TungstenChess
       }
 
     private:
-      std::vector<T> m_data;
+      T *m_data;
       const size_t m_rows = R;
       const size_t m_cols = C;
     };

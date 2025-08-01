@@ -20,17 +20,19 @@ namespace TungstenChess
   Bitboard MagicMoveGen::getBishopMoves(Square square, Bitboard allPieces)
   {
     Bitboard maskedPieces = allPieces & MovesLookup::BISHOP_MASKS[square];
-    return BISHOP_LOOKUP_TABLES[square][(BISHOP_MAGICS[square] * (maskedPieces)) >> BISHOP_SHIFTS[square]];
+    return BISHOP_LOOKUP_TABLES[square, (BISHOP_MAGICS[square] * (maskedPieces)) >> BISHOP_SHIFTS[square]];
   }
 
   Bitboard MagicMoveGen::getRookMoves(Square square, Bitboard allPieces)
   {
     Bitboard maskedPieces = allPieces & MovesLookup::ROOK_MASKS[square];
-    return ROOK_LOOKUP_TABLES[square][(ROOK_MAGICS[square] * maskedPieces) >> ROOK_SHIFTS[square]];
+    return ROOK_LOOKUP_TABLES[square, (ROOK_MAGICS[square] * maskedPieces) >> ROOK_SHIFTS[square]];
   }
 
   void MagicMoveGen::getAllBlockers(std::vector<Bitboard> &blockers, Square square, Bitboard mask)
   {
+    blockers.clear();
+
     std::vector<Square> setBits;
 
     for (Square i = 0; i < 64; i++)
@@ -47,12 +49,6 @@ namespace TungstenChess
 
       blockers.push_back(blocker);
     }
-  }
-
-  void MagicMoveGen::shiftBlockers(std::vector<Bitboard> &blockers, Magic magic, Shift shift, Square square)
-  {
-    for (size_t i = 0; i < blockers.size(); i++)
-      blockers[i] = (magic * blockers[i]) >> shift;
   }
 
   Bitboard MagicMoveGen::getRookMovesBitboard(Square square, Bitboard blockers)
@@ -111,49 +107,35 @@ namespace TungstenChess
     return movesBitboard & ~(1ULL << square);
   }
 
-  void MagicMoveGen::getAllMovesBitboards(std::vector<Bitboard> &moves, Square square, std::vector<Bitboard> blockers, bool rook)
-  {
-    for (size_t i = 0; i < blockers.size(); i++)
-    {
-      if (rook)
-        moves.push_back(getRookMovesBitboard(square, blockers[i]));
-      else
-        moves.push_back(getBishopMovesBitboard(square, blockers[i]));
-    }
-  }
-
-  void MagicMoveGen::getMovesLookupTable(std::vector<Bitboard> &lookupTable, Square square, bool rook)
-  {
-    Magic magic = rook ? ROOK_MAGICS[square] : BISHOP_MAGICS[square];
-    Shift shift = rook ? ROOK_SHIFTS[square] : BISHOP_SHIFTS[square];
-
-    std::vector<Bitboard> blockers;
-    getAllBlockers(blockers, square, rook ? MovesLookup::ROOK_MASKS[square] : MovesLookup::BISHOP_MASKS[square]);
-
-    std::vector<Bitboard> moves;
-    getAllMovesBitboards(moves, square, blockers, rook);
-
-    shiftBlockers(blockers, magic, shift, square);
-
-    lookupTable.resize(1 << (64 - shift), 0);
-
-    for (size_t i = 0; i < blockers.size(); i++)
-      lookupTable[blockers[i]] = moves[i];
-  }
-
   void MagicMoveGen::initRookLookupTables()
   {
-    for (Square i = 0; i < 64; i++)
+    std::vector<Bitboard> blockers;
+
+    for (Square square = 0; square < 64; square++)
     {
-      getMovesLookupTable(ROOK_LOOKUP_TABLES[i], i, true);
+      getAllBlockers(blockers, square, MovesLookup::ROOK_MASKS[square]);
+
+      for (size_t i = 0; i < blockers.size(); i++)
+      {
+        Bitboard shiftedBlockers = (blockers[i] * ROOK_MAGICS[square]) >> ROOK_SHIFTS[square];
+        ROOK_LOOKUP_TABLES[square, shiftedBlockers] = getRookMovesBitboard(square, blockers[i]);
+      }
     }
   }
 
   void MagicMoveGen::initBishopLookupTables()
   {
-    for (Square i = 0; i < 64; i++)
+    std::vector<Bitboard> blockers;
+
+    for (Square square = 0; square < 64; square++)
     {
-      getMovesLookupTable(BISHOP_LOOKUP_TABLES[i], i, false);
+      getAllBlockers(blockers, square, MovesLookup::BISHOP_MASKS[square]);
+
+      for (size_t i = 0; i < blockers.size(); i++)
+      {
+        Bitboard shiftedBlockers = (blockers[i] * BISHOP_MAGICS[square]) >> BISHOP_SHIFTS[square];
+        BISHOP_LOOKUP_TABLES[square, shiftedBlockers] = getBishopMovesBitboard(square, blockers[i]);
+      }
     }
   }
 }
