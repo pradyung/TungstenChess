@@ -104,7 +104,7 @@ namespace TungstenChess
 
   void Board::updateBitboards(Square pieceIndex, Piece oldPiece, Piece newPiece)
   {
-    Bitboard squareBitboard = 1ULL << pieceIndex;
+    Bitboard squareBitboard = Bitboards::bit(pieceIndex);
 
     if (oldPiece)
     {

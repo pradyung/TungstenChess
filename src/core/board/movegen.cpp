@@ -16,30 +16,28 @@ namespace TungstenChess
       if (!m_board[pieceIndex - 8])
       {
         Bitboards::addBit(movesBitboard, pieceIndex - 8);
-        if (pieceIndex >= A2 && pieceIndex <= H2 && !m_board[pieceIndex - 16])
+
+        if ((pieceIndex / 8 == RANK_7) && !m_board[pieceIndex - 16])
           Bitboards::addBit(movesBitboard, pieceIndex - 16);
       }
 
       Bitboard captureSquares = m_bitboards[BLACK];
-      if (m_enPassantFile != NO_EP)
-        captureSquares |= 1ULL << (m_enPassantFile + 16);
-
-      movesBitboard |= (MovesLookup::PAWN_CAPTURE_MOVES[WHITE_PAWN, pieceIndex] & captureSquares);
+      captureSquares |= (0xFFULL & Bitboards::bit(m_enPassantFile)) << 16;
+      movesBitboard |= MovesLookup::PAWN_CAPTURE_MOVES[WHITE_PAWN, pieceIndex] & captureSquares;
     }
     else if (color & BLACK)
     {
       if (!m_board[pieceIndex + 8])
       {
         Bitboards::addBit(movesBitboard, pieceIndex + 8);
-        if (pieceIndex >= A7 && pieceIndex <= H7 && !m_board[pieceIndex + 16])
+
+        if ((pieceIndex / 8 == RANK_2) && !m_board[pieceIndex + 16])
           Bitboards::addBit(movesBitboard, pieceIndex + 16);
       }
 
       Bitboard captureSquares = m_bitboards[WHITE];
-      if (m_enPassantFile != NO_EP)
-        captureSquares |= 1ULL << (m_enPassantFile + 40);
-
-      movesBitboard |= (MovesLookup::PAWN_CAPTURE_MOVES[BLACK_PAWN, pieceIndex] & captureSquares);
+      captureSquares |= (0xFFULL & Bitboards::bit(m_enPassantFile)) << 40;
+      movesBitboard |= MovesLookup::PAWN_CAPTURE_MOVES[BLACK_PAWN, pieceIndex] & captureSquares;
     }
 
     return movesBitboard;
@@ -76,14 +74,14 @@ namespace TungstenChess
     {
       if (color & WHITE)
       {
-        if (m_castlingRights & WHITE_KINGSIDE &&
+        if ((m_castlingRights & WHITE_KINGSIDE) &&
             !m_board[F1] && !m_board[G1] &&
             !isInCheck(WHITE) && !isAttacked(F1, BLACK))
         {
           Bitboards::addBit(movesBitboard, G1);
         }
 
-        if (m_castlingRights & WHITE_QUEENSIDE &&
+        if ((m_castlingRights & WHITE_QUEENSIDE) &&
             !m_board[D1] && !m_board[C1] && !m_board[B1] &&
             !isInCheck(WHITE) && !isAttacked(D1, BLACK))
         {
@@ -92,14 +90,14 @@ namespace TungstenChess
       }
       else if (color & BLACK)
       {
-        if (m_castlingRights & BLACK_KINGSIDE &&
+        if ((m_castlingRights & BLACK_KINGSIDE) &&
             !m_board[F8] && !m_board[G8] &&
             !isInCheck(BLACK) && !isAttacked(F8, WHITE))
         {
           Bitboards::addBit(movesBitboard, G8);
         }
 
-        if (m_castlingRights & BLACK_QUEENSIDE &&
+        if ((m_castlingRights & BLACK_QUEENSIDE) &&
             !m_board[D8] && !m_board[C8] && !m_board[B8] &&
             !isInCheck(BLACK) && !isAttacked(D8, WHITE))
         {
@@ -310,14 +308,12 @@ namespace TungstenChess
 
     const Bitboard *attackerBitboards = &m_bitboards[color];
 
-    if (MovesLookup::PAWN_CAPTURE_MOVES[attackedColor, square] & attackerBitboards[PAWN])
-      return true;
-
-    if (MovesLookup::KNIGHT_MOVES[square] & attackerBitboards[KNIGHT])
-      return true;
-
-    if (MovesLookup::KING_MOVES[square] & attackerBitboards[KING])
-      return true;
+    Bitboard orthogonalSliders = (attackerBitboards[ROOK] | attackerBitboards[QUEEN]);
+    if (orthogonalSliders)
+    {
+      if (getRookMoves(square, attackedColor) & orthogonalSliders)
+        return true;
+    }
 
     Bitboard diagonalSliders = (attackerBitboards[BISHOP] | attackerBitboards[QUEEN]);
     if (diagonalSliders)
@@ -326,12 +322,15 @@ namespace TungstenChess
         return true;
     }
 
-    Bitboard orthogonalSliders = (attackerBitboards[ROOK] | attackerBitboards[QUEEN]);
-    if (orthogonalSliders)
-    {
-      if (getRookMoves(square, attackedColor) & orthogonalSliders)
-        return true;
-    }
+    if (MovesLookup::KNIGHT_MOVES[square] & attackerBitboards[KNIGHT])
+      return true;
+
+    // look for pawns in the reverse direction
+    if (MovesLookup::PAWN_CAPTURE_MOVES[attackedColor, square] & attackerBitboards[PAWN])
+      return true;
+
+    if (MovesLookup::KING_MOVES[square] & attackerBitboards[KING])
+      return true;
 
     return false;
   }
@@ -480,7 +479,7 @@ namespace TungstenChess
       {
         pgn += "..NBRQK"[pieceType];
 
-        Bitboard sameTypePieces = m_bitboards[piece] & ~(1ULL << from);
+        Bitboard sameTypePieces = m_bitboards[piece] & ~Bitboards::bit(from);
         Bitboard ambiguousPieces = 0;
 
         while (sameTypePieces)

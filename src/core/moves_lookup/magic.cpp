@@ -36,7 +36,7 @@ namespace TungstenChess
     std::vector<Square> setBits;
 
     for (Square i = 0; i < 64; i++)
-      if (mask & (1ULL << i))
+      if (mask & Bitboards::bit(i))
         setBits.push_back(i);
 
     for (int i = 0; i < (1 << setBits.size()); i++)
@@ -45,7 +45,7 @@ namespace TungstenChess
 
       for (size_t j = 0; j < setBits.size(); j++)
         if (i & (1 << j))
-          blocker |= 1ULL << setBits[j];
+          blocker |= Bitboards::bit(setBits[j]);
 
       blockers.push_back(blocker);
     }
@@ -65,18 +65,18 @@ namespace TungstenChess
 
       while (true)
       {
-        movesBitboard |= 1ULL << to;
+        movesBitboard |= Bitboards::bit(to);
 
         bool isEdge = (to / 8 == rankEdges[i]) || (to % 8 == fileEdges[i]);
 
-        if (isEdge || (blockers & (1ULL << to)))
+        if (isEdge || (blockers & Bitboards::bit(to)))
           break;
 
         to += directions[i];
       }
     }
 
-    return movesBitboard & ~(1ULL << square);
+    return movesBitboard & ~Bitboards::bit(square);
   }
 
   Bitboard MagicMoveGen::getBishopMovesBitboard(Square square, Bitboard blockers)
@@ -93,18 +93,18 @@ namespace TungstenChess
 
       while (true)
       {
-        movesBitboard |= 1ULL << to;
+        movesBitboard |= Bitboards::bit(to);
 
         bool isEdge = (to / 8 == rankEdges[i]) || (to % 8 == fileEdges[i]);
 
-        if (isEdge || (blockers & (1ULL << to)))
+        if (isEdge || (blockers & Bitboards::bit(to)))
           break;
 
         to += directions[i];
       }
     }
 
-    return movesBitboard & ~(1ULL << square);
+    return movesBitboard & ~Bitboards::bit(square);
   }
 
   void MagicMoveGen::initRookLookupTables()
@@ -112,7 +112,7 @@ namespace TungstenChess
     std::array<size_t, 64> rowSizes;
     for (Square square = 0; square < 64; square++)
     {
-      rowSizes[square] = 1ULL << (64 - ROOK_SHIFTS[square]);
+      rowSizes[square] = 1U << (64 - ROOK_SHIFTS[square]);
     }
     ROOK_LOOKUP_TABLES.reserve(rowSizes);
 
@@ -135,7 +135,7 @@ namespace TungstenChess
     std::array<size_t, 64> rowSizes;
     for (Square square = 0; square < 64; square++)
     {
-      rowSizes[square] = 1ULL << (64 - BISHOP_SHIFTS[square]);
+      rowSizes[square] = 1 << (64 - BISHOP_SHIFTS[square]);
     }
     BISHOP_LOOKUP_TABLES.reserve(rowSizes);
 

@@ -8,6 +8,8 @@ namespace TungstenChess
 
   namespace Bitboards
   {
+    constexpr Bitboard bit(Square index) { return 1ULL << index; }
+
     void addBit(Bitboard &bitboard, Square index);
     void removeBit(Bitboard &bitboard, Square index);
 

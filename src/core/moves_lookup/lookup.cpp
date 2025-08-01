@@ -19,7 +19,7 @@ namespace TungstenChess
   {
     for (Square square = 0; square < 64; square++)
     {
-      Bitboard position = 1ULL << square;
+      Bitboard position = Bitboards::bit(square);
 
       KNIGHT_MOVES[square] = 0ULL;
 
@@ -62,7 +62,7 @@ namespace TungstenChess
           if (toRank < 0 || toRank > 7 || toFile < 0 || toFile > 7 || (dr == 1 && df == 1))
             continue;
 
-          KING_MOVES[square] |= 1ULL << (toRank * 8 + toFile);
+          KING_MOVES[square] |= Bitboards::bit(toRank * 8 + toFile);
         }
       }
     }
@@ -72,7 +72,7 @@ namespace TungstenChess
   {
     for (Square square = 0; square < 64; square++)
     {
-      Bitboard position = 1ULL << square;
+      Bitboard position = Bitboards::bit(square);
 
       PAWN_CAPTURE_MOVES[WHITE_PAWN, square] = 0ULL;
       PAWN_CAPTURE_MOVES[BLACK_PAWN, square] = 0ULL;
@@ -127,13 +127,13 @@ namespace TungstenChess
           if ((to / 8 == rankEdges[i]) || (to % 8 == fileEdges[i]))
             break;
 
-          BISHOP_MASKS[square] |= 1ULL << to;
+          BISHOP_MASKS[square] |= Bitboards::bit(to);
 
           to += directions[i];
         }
       }
 
-      BISHOP_MASKS[square] &= ~(1ULL << square);
+      BISHOP_MASKS[square] &= ~Bitboards::bit(square);
     }
   }
 
@@ -156,13 +156,13 @@ namespace TungstenChess
           if ((to / 8 == rankEdges[i]) || (to % 8 == fileEdges[i]))
             break;
 
-          ROOK_MASKS[square] |= 1ULL << to;
+          ROOK_MASKS[square] |= Bitboards::bit(to);
 
           to += directions[i];
         }
       }
 
-      ROOK_MASKS[square] &= ~(1ULL << square);
+      ROOK_MASKS[square] &= ~Bitboards::bit(square);
     }
   }
 }

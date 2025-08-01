@@ -6,11 +6,11 @@ namespace TungstenChess
 {
   namespace Bitboards
   {
-    void addBit(Bitboard &bitboard, Square index) { bitboard |= (1ULL << index); }
+    void addBit(Bitboard &bitboard, Square index) { bitboard |= bit(index); }
 
-    void removeBit(Bitboard &bitboard, Square index) { bitboard &= ~(1ULL << index); }
+    void removeBit(Bitboard &bitboard, Square index) { bitboard &= ~bit(index); }
 
-    bool hasBit(const Bitboard &bitboard, Square index) { return bitboard & (1ULL << index); }
+    bool hasBit(const Bitboard &bitboard, Square index) { return bitboard & bit(index); }
 
     Square countBits(const Bitboard &bitboard) { return __builtin_popcountll(bitboard); }
 
