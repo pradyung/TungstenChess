@@ -15,7 +15,7 @@ namespace TungstenChess
     {
       if (!m_board[pieceIndex - 8])
       {
-        Bitboards::addBit(movesBitboard, pieceIndex - 8);
+        movesBitboard = Bitboards::bit(pieceIndex - 8);
 
         if ((pieceIndex / 8 == RANK_7) && !m_board[pieceIndex - 16])
           Bitboards::addBit(movesBitboard, pieceIndex - 16);
@@ -29,7 +29,7 @@ namespace TungstenChess
     {
       if (!m_board[pieceIndex + 8])
       {
-        Bitboards::addBit(movesBitboard, pieceIndex + 8);
+        movesBitboard = Bitboards::bit(pieceIndex + 8);
 
         if ((pieceIndex / 8 == RANK_2) && !m_board[pieceIndex + 16])
           Bitboards::addBit(movesBitboard, pieceIndex + 16);
@@ -121,7 +121,8 @@ namespace TungstenChess
 
   Bitboard Board::getLegalPieceMovesBitboard(Square pieceIndex, PieceColor color, bool onlyCaptures)
   {
-    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, color, !onlyCaptures);
+    bool includeCastling = !onlyCaptures;
+    Bitboard pseudoLegalMovesBitboard = getPseudoLegalPieceMoves(pieceIndex, color, includeCastling);
 
     if (onlyCaptures)
       pseudoLegalMovesBitboard &= m_bitboards[color ^ COLOR];

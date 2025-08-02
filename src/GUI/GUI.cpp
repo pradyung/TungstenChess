@@ -131,7 +131,7 @@ bool GUIHandler::handleLeftClick(Event &event)
 
   if (m_selectedSquareIndex != NO_SQUARE)
   {
-    if (m_highlightsBitboards[GRAY_HIGHLIGHT] & (1ULL << index))
+    if (m_highlightsBitboards[GRAY_HIGHLIGHT] & Bitboards::bit(index))
     {
       Move move = Moves::createMove(m_selectedSquareIndex, index);
       if (!Moves::isPromotion(index, m_board[m_selectedSquareIndex] & TYPE))
