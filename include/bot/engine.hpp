@@ -61,17 +61,32 @@ namespace TungstenChess
 
     struct SearchInfo
     {
-      int positionsEvaluated = 0;
-      int transpositionsUsed = 0;
-      int depthSearched = 0;
+      int positionsEvaluated;
+      int transpositionsUsed;
+      int depthSearched;
 
-      int nextDepthNumMovesSearched = 0;
-      int nextDepthTotalMoves = 0;
+      int nextDepthNumMovesSearched;
+      int nextDepthTotalMoves;
 
-      int evaluation = 0;
-      bool mateFound = false;
-      int mateIn = 0;
-      bool lossFound = false;
+      int evaluation;
+      bool mateFound;
+      int mateIn;
+      bool lossFound;
+
+      void reset()
+      {
+        positionsEvaluated = 0;
+        transpositionsUsed = 0;
+        depthSearched = 0;
+
+        nextDepthNumMovesSearched = 0;
+        nextDepthTotalMoves = 0;
+
+        evaluation = 0;
+        mateFound = false;
+        mateIn = 0;
+        lossFound = false;
+      }
     };
 
     SearchInfo m_previousSearchInfo;

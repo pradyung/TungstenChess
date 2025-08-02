@@ -62,7 +62,7 @@ namespace TungstenChess
       }
     }
 
-    m_previousSearchInfo = SearchInfo();
+    m_previousSearchInfo.reset();
 
     auto start = std::chrono::high_resolution_clock::now();
 
