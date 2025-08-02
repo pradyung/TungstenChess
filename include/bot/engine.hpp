@@ -47,6 +47,7 @@ namespace TungstenChess
       bool logSearchInfo = true;
       bool logPGNMoves = true;
       int transpositionTableSizeMB = 128;
+      int maxHeuristicSortedMoves = 4; // Maximum number of moves to sort by heuristic evaluation (too few leads to poor pruning, too many leads to unnecessary sorting)
     };
 
     const BotSettings m_botSettings;
@@ -198,8 +199,9 @@ namespace TungstenChess
     /**
      * @brief Sorts moves by heuristic evaluation (in place) to improve alpha-beta pruning
      * @param moves The moves to sort
+     * @param numMovesToSort The number of moves to sort
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      */
-    void heuristicSortMoves(MoveAllocation &moves, Move bestMove = NULL_MOVE);
+    void heuristicSortMoves(MoveAllocation &moves, int numMovesToSort, Move bestMove = NULL_MOVE);
   };
 }

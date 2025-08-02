@@ -309,6 +309,16 @@ namespace TungstenChess
 
     const Bitboard *attackerBitboards = &m_bitboards[color];
 
+    if (MovesLookup::KNIGHT_MOVES[square] & attackerBitboards[KNIGHT])
+      return true;
+
+    // look for pawns in the reverse direction
+    if (MovesLookup::PAWN_CAPTURE_MOVES[attackedColor, square] & attackerBitboards[PAWN])
+      return true;
+
+    if (MovesLookup::KING_MOVES[square] & attackerBitboards[KING])
+      return true;
+
     Bitboard orthogonalSliders = (attackerBitboards[ROOK] | attackerBitboards[QUEEN]);
     if (orthogonalSliders)
     {
@@ -322,16 +332,6 @@ namespace TungstenChess
       if (getBishopMoves(square, attackedColor) & diagonalSliders)
         return true;
     }
-
-    if (MovesLookup::KNIGHT_MOVES[square] & attackerBitboards[KNIGHT])
-      return true;
-
-    // look for pawns in the reverse direction
-    if (MovesLookup::PAWN_CAPTURE_MOVES[attackedColor, square] & attackerBitboards[PAWN])
-      return true;
-
-    if (MovesLookup::KING_MOVES[square] & attackerBitboards[KING])
-      return true;
 
     return false;
   }
