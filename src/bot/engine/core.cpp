@@ -2,7 +2,7 @@
 
 namespace TungstenChess
 {
-  Bot::Bot(Board &board, const BotSettings &settings)
+  Bot::Bot(Board& board, const BotSettings& settings)
       : m_board(board),
         m_openingBook(board.zobristKey()),
         m_moveStack(AUXILIARY_MOVE_STACK_SIZE),

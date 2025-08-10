@@ -25,7 +25,8 @@ namespace TungstenChess
     return std::format(
         "{:.2f}/{:.2f} MB",
         m_occupied / (double)MEGABYTE * sizeof(Entry),
-        TABLE_SIZE / (double)MEGABYTE * sizeof(Entry));
+        TABLE_SIZE / (double)MEGABYTE * sizeof(Entry)
+    );
   }
 
   bool TranspositionTable::hasEntry(ZobristKey key) const
@@ -33,16 +34,16 @@ namespace TungstenChess
     return m_transpositionTable[key % TABLE_SIZE].isSameKey(key);
   }
 
-  const Entry &TranspositionTable::retrieve(ZobristKey key, bool &found)
+  const Entry& TranspositionTable::retrieve(ZobristKey key, bool& found)
   {
-    Entry &entry = m_transpositionTable[key % TABLE_SIZE];
+    Entry& entry = m_transpositionTable[key % TABLE_SIZE];
     found = entry.isSameKey(key);
     return entry;
   }
 
   void TranspositionTable::store(ZobristKey key, uint searchId, int evaluation, int depth, bool quiesce)
   {
-    Entry &entry = m_transpositionTable[key % TABLE_SIZE];
+    Entry& entry = m_transpositionTable[key % TABLE_SIZE];
 
     if (!entry.isOccupied())
       m_occupied++;

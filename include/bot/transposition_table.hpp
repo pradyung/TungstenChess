@@ -45,13 +45,14 @@ namespace TungstenChess
   public:
     TranspositionTable(int sizeMB)
         : TABLE_SIZE(sizeMB * MEGABYTE / sizeof(Entry)),
-          m_transpositionTable(TABLE_SIZE) {}
+          m_transpositionTable(TABLE_SIZE)
+    {}
 
     std::string occupancy() const;
 
     bool hasEntry(ZobristKey key) const;
 
-    const Entry &retrieve(ZobristKey key, bool &found);
+    const Entry& retrieve(ZobristKey key, bool& found);
 
     void store(ZobristKey key, uint searchId, int evaluation, int depth, bool quiesce);
   };

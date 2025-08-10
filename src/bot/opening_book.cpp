@@ -2,7 +2,7 @@
 
 namespace TungstenChess
 {
-  void OpeningBook::loadOpeningBook(const std::filesystem::path &path)
+  void OpeningBook::loadOpeningBook(const std::filesystem::path& path)
   {
     std::ifstream file(path);
 
@@ -12,7 +12,7 @@ namespace TungstenChess
     for (int i = 0; i < 64; i++)
     {
       uint8_t rawPiece;
-      file.read((char *)&rawPiece, 1);
+      file.read((char*)&rawPiece, 1);
 
       if (rawPiece == 0)
         continue;
@@ -22,29 +22,29 @@ namespace TungstenChess
     }
 
     uint8_t castlingRights;
-    file.read((char *)&castlingRights, 1);
+    file.read((char*)&castlingRights, 1);
     key ^= Zobrist::castlingKeys[castlingRights];
 
     uint8_t enPassantFile;
-    file.read((char *)&enPassantFile, 1);
+    file.read((char*)&enPassantFile, 1);
     key ^= Zobrist::enPassantKeys[enPassantFile];
 
     uint8_t sideToMove;
-    file.read((char *)&sideToMove, 1);
+    file.read((char*)&sideToMove, 1);
     if (sideToMove == 0)
       key ^= Zobrist::sideKey;
 
     m_inOpeningBook = (key == m_startingZobristKey);
 
     uint openingBookSize;
-    file.read((char *)&openingBookSize, 4);
+    file.read((char*)&openingBookSize, 4);
 
     uint8_t numBytesPerMove;
-    file.read((char *)&numBytesPerMove, 1);
+    file.read((char*)&numBytesPerMove, 1);
 
     m_moveFrequencyShift = 12;
 
-    file.read((char *)&m_moveDepthShift, 1);
+    file.read((char*)&m_moveDepthShift, 1);
     m_moveDepthShift += m_moveFrequencyShift;
 
     m_moveNextMoveShift = m_moveDepthShift + 4;
@@ -59,7 +59,7 @@ namespace TungstenChess
     for (size_t i = 0; i < openingBookSize; i++)
     {
       m_openingBook[i] = 0;
-      file.read((char *)&m_openingBook[i], numBytesPerMove);
+      file.read((char*)&m_openingBook[i], numBytesPerMove);
     }
 
     file.close();
@@ -100,7 +100,7 @@ namespace TungstenChess
     return getWeightedRandomMove();
   }
 
-  void OpeningBook::getChildrenMoves(std::vector<size_t> &childrenMoves) const
+  void OpeningBook::getChildrenMoves(std::vector<size_t>& childrenMoves) const
   {
     for (uint64_t i = m_lastMoveIndex + 1; i != m_moveNoNextMove; i = getMoveNextMove(m_openingBook[i]))
     {

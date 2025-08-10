@@ -146,7 +146,7 @@ namespace TungstenChess
       Bitboard pawns = m_board.bitboard(friendlyPawn) | m_board.bitboard(friendlyPawn ^ COLOR);
       Bitboard invertedFriendlyPiecesMask = ~m_board.bitboard(piece & COLOR);
 
-      if (pieceType & 1) // odd piece types - bishops and queens (diagonal sliders)
+      if (pieceType & 1)     // odd piece types - bishops and queens (diagonal sliders)
         mobility += Bitboards::countBits(MagicMoveGen::getBishopMoves(i, pawns) & invertedFriendlyPiecesMask) / 2;
       if (pieceType >= ROOK) // rooks and queens (orthogonal sliders)
         mobility += Bitboards::countBits(MagicMoveGen::getRookMoves(i, pawns) & invertedFriendlyPiecesMask) / 2;
@@ -167,11 +167,11 @@ namespace TungstenChess
 
     evaluationBonus += CASTLED_KING_BONUS * (bool(m_board.hasCastled() & WHITE) - bool(m_board.hasCastled() & BLACK));
 
-    std::array<uint, 8> whitePawnsOnFiles = {0};
-    std::array<uint, 8> blackPawnsOnFiles = {0};
+    std::array<uint, 8> whitePawnsOnFiles = { 0 };
+    std::array<uint, 8> blackPawnsOnFiles = { 0 };
 
-    std::array<bool, 8> whitePawnsOnNeighboringFiles = {false};
-    std::array<bool, 8> blackPawnsOnNeighboringFiles = {false};
+    std::array<bool, 8> whitePawnsOnNeighboringFiles = { false };
+    std::array<bool, 8> blackPawnsOnNeighboringFiles = { false };
 
     for (File file = 0; file < 8; file++)
     {

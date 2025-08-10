@@ -1,7 +1,7 @@
 #include "bot/engine.hpp"
 
-#include <print>
 #include <algorithm>
+#include <print>
 
 #include "bot/piece_eval_tables.hpp"
 
@@ -24,7 +24,8 @@ namespace TungstenChess
 
             m_searchCancelled = true;
           }
-        });
+        }
+    );
 
     m_searchTimerThread.detach();
   }
@@ -86,7 +87,8 @@ namespace TungstenChess
           m_previousSearchInfo.positionsEvaluated,
           m_previousSearchInfo.transpositionsUsed,
           m_transpositionTable.occupancy(),
-          evalString);
+          evalString
+      );
     }
 
     return bestMove;
@@ -98,7 +100,7 @@ namespace TungstenChess
       return 0;
 
     bool found;
-    const TranspositionTable::Entry &entry = m_transpositionTable.retrieve(m_board.zobristKey(), found);
+    const TranspositionTable::Entry& entry = m_transpositionTable.retrieve(m_board.zobristKey(), found);
 
     if (found && entry.quiesce() == quiesce && entry.depth() >= depth)
     {
@@ -155,7 +157,7 @@ namespace TungstenChess
     if (legalMovesCount == 1)
       depth++;
 
-    for (Move &move : legalMoves)
+    for (Move& move : legalMoves)
     {
       Board::UnmoveData unmoveData = m_board.makeMove(move);
       int evaluation = -negamax(depth - 1, -beta, -alpha, quiesce);
@@ -200,7 +202,7 @@ namespace TungstenChess
     m_previousSearchInfo.nextDepthNumMovesSearched = 0;
     m_previousSearchInfo.nextDepthTotalMoves = legalMovesCount;
 
-    for (Move &move : legalMoves)
+    for (Move& move : legalMoves)
     {
       Board::UnmoveData unmoveData = m_board.makeMove(move);
       int evaluation = -negamax(depth - 1, -INF_EVAL, -alpha, false);
@@ -282,11 +284,15 @@ namespace TungstenChess
     return bestMove;
   }
 
-  void Bot::heuristicSortMoves(MoveAllocation &moves, int numMovesToSort, Move bestMove)
+  void Bot::heuristicSortMoves(MoveAllocation& moves, int numMovesToSort, Move bestMove)
   {
-    std::partial_sort(moves.begin(), moves.begin() + numMovesToSort, moves.end(),
-                      [this, bestMove](Move a, Move b)
-                      { return heuristicEvaluation(a, bestMove) > heuristicEvaluation(b, bestMove); });
+    std::partial_sort(
+        moves.begin(),
+        moves.begin() + numMovesToSort,
+        moves.end(),
+        [this, bestMove](Move a, Move b)
+        { return heuristicEvaluation(a, bestMove) > heuristicEvaluation(b, bestMove); }
+    );
   }
 
   int Bot::heuristicEvaluation(Move move, Move bestMove)
@@ -308,7 +314,7 @@ namespace TungstenChess
     return evaluation;
   }
 
-  int Bot::getSortedLegalMoves(MoveAllocation &moves, bool onlyCaptures, Move bestMove)
+  int Bot::getSortedLegalMoves(MoveAllocation& moves, bool onlyCaptures, Move bestMove)
   {
     int legalMovesCount = m_board.getLegalMoves(moves, onlyCaptures);
     heuristicSortMoves(moves, std::min(legalMovesCount, m_botSettings.maxHeuristicSortedMoves), bestMove);

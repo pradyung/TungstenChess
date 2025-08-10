@@ -22,7 +22,9 @@ namespace TungstenChess
     int m_lastMoveIndex = -1;
 
   public:
-    OpeningBook(ZobristKey startingZobristKey) : m_startingZobristKey(startingZobristKey) {}
+    OpeningBook(ZobristKey startingZobristKey)
+        : m_startingZobristKey(startingZobristKey)
+    {}
 
     bool isInOpeningBook() const { return m_inOpeningBook; }
 
@@ -30,7 +32,7 @@ namespace TungstenChess
      * @brief Loads the opening book from a file
      * @param path The path to the opening book file
      */
-    void loadOpeningBook(const std::filesystem::path &path);
+    void loadOpeningBook(const std::filesystem::path& path);
 
     /**
      * @brief Adds a move to the move history
@@ -58,7 +60,7 @@ namespace TungstenChess
      * @brief Gets the next possible "children" moves (as indices) from the opening book
      * @param childrenMoves The vector to store the move indices in
      */
-    void getChildrenMoves(std::vector<size_t> &childrenMoves) const;
+    void getChildrenMoves(std::vector<size_t>& childrenMoves) const;
 
     /**
      * @brief Gets a random next move, weighted by the frequency of the children moves

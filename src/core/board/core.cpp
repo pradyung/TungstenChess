@@ -13,7 +13,7 @@ namespace TungstenChess
     resetBoard(fen);
   }
 
-  Board::Board(const Board &other, size_t futureMoves)
+  Board::Board(const Board& other, size_t futureMoves)
       : m_board(other.m_board),
         m_bitboards(other.m_bitboards),
         m_kingIndices(other.m_kingIndices),
@@ -24,7 +24,8 @@ namespace TungstenChess
         m_hasCastled(other.m_hasCastled),
         m_halfmoveClock(other.m_halfmoveClock),
         m_zobristKey(other.m_zobristKey),
-        m_positionHistory(futureMoves, &other.m_positionHistory) {}
+        m_positionHistory(futureMoves, &other.m_positionHistory)
+  {}
 
   void Board::resetBoard(std::string fen)
   {
@@ -90,18 +91,18 @@ namespace TungstenChess
       {
         switch (fenParts[FEN_CASTLING_RIGHTS][i])
         {
-        case 'K':
-          m_castlingRights |= WHITE_KINGSIDE;
-          break;
-        case 'Q':
-          m_castlingRights |= WHITE_QUEENSIDE;
-          break;
-        case 'k':
-          m_castlingRights |= BLACK_KINGSIDE;
-          break;
-        case 'q':
-          m_castlingRights |= BLACK_QUEENSIDE;
-          break;
+          case 'K':
+            m_castlingRights |= WHITE_KINGSIDE;
+            break;
+          case 'Q':
+            m_castlingRights |= WHITE_QUEENSIDE;
+            break;
+          case 'k':
+            m_castlingRights |= BLACK_KINGSIDE;
+            break;
+          case 'q':
+            m_castlingRights |= BLACK_QUEENSIDE;
+            break;
         }
       }
     }

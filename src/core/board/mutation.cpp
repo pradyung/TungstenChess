@@ -20,7 +20,7 @@ namespace TungstenChess
 
     uint8_t flags = Moves::getMoveFlags(from, to, pieceType, capturedPiece);
 
-    UnmoveData unmoveData = {piece, capturedPiece, m_castlingRights, m_enPassantFile, m_halfmoveClock, flags};
+    UnmoveData unmoveData = { piece, capturedPiece, m_castlingRights, m_enPassantFile, m_halfmoveClock, flags };
 
     m_halfmoveClock++;
     if (m_board[to] || pieceType == PAWN)

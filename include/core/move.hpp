@@ -74,5 +74,5 @@ namespace TungstenChess
      * @param pieceType The type of the piece moving (only matters if it's a pawn)
      */
     bool isPromotion(Square to, PieceType pieceType);
-  };
+  }
 }

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <vector>
-#include <mutex>
 #include <chrono>
+#include <mutex>
 #include <print>
+#include <vector>
 
 #define TIME_TEST(n, x)                                                                         \
   do                                                                                            \
@@ -14,7 +14,8 @@
     auto end = std::chrono::high_resolution_clock::now();                                       \
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);          \
     std::println("{:d} ns elapsed on average across {:d} iterations", duration.count() / n, n); \
-  } while (0)
+  }                                                                                             \
+  while (0)
 
 namespace TungstenChess
 {
@@ -78,12 +79,18 @@ namespace TungstenChess
       /**
        * @brief Casting the bool_flag to a bool will return the current value of the flag.
        */
-      operator bool() const { return value; }
+      operator bool() const
+      {
+        return value;
+      }
 
       /**
        * @brief Set the flag to true.
        */
-      void set_flag() { value = true; }
+      void set_flag()
+      {
+        value = true;
+      }
 
       /**
        * @brief Unset the flag and return its previous value.
@@ -109,9 +116,14 @@ namespace TungstenChess
     template <typename T, size_t R, size_t C>
     struct array2d
     {
-      array2d() : m_data(new T[R * C]) {}
+      array2d()
+          : m_data(new T[R * C])
+      {}
 
-      ~array2d() { delete[] m_data; }
+      ~array2d()
+      {
+        delete[] m_data;
+      }
 
       /**
        * @brief Access an element in the array using row and column indices.
@@ -119,7 +131,10 @@ namespace TungstenChess
        * @param c The column index.
        * @return A reference to the element at the specified row and column.
        */
-      T &operator[](size_t r, size_t c) { return m_data[r * C + c]; }
+      T& operator[](size_t r, size_t c)
+      {
+        return m_data[r * C + c];
+      }
 
       /**
        * @brief Access an element in the array using row and column indices.
@@ -127,7 +142,10 @@ namespace TungstenChess
        * @param c The column index.
        * @return A const reference to the element at the specified row and column.
        */
-      const T &operator[](size_t r, size_t c) const { return m_data[r * C + c]; }
+      const T& operator[](size_t r, size_t c) const
+      {
+        return m_data[r * C + c];
+      }
 
       /**
        * @brief Copy a row from another array2d to this array2d.
@@ -138,7 +156,7 @@ namespace TungstenChess
        * @note If the source or destination indices are out of bounds, no operation is performed.
        * @note If the two arrays have different column sizes, no operation is performed.
        */
-      void copyRow(const array2d &other, size_t src, size_t dst)
+      void copyRow(const array2d& other, size_t src, size_t dst)
       {
         if (this == &other && src == dst)
           return;
@@ -162,7 +180,7 @@ namespace TungstenChess
       }
 
     private:
-      T *m_data;
+      T* m_data;
       const size_t m_rows = R;
       const size_t m_cols = C;
     };
@@ -171,14 +189,14 @@ namespace TungstenChess
     struct ragged_array2d
     {
     private:
-      T *m_data;
+      T* m_data;
       std::array<size_t, R> m_rowOffsets;
       size_t m_capacity;
 
     public:
       ragged_array2d() {}
 
-      ragged_array2d(std::array<size_t, R> &rowSizes)
+      ragged_array2d(std::array<size_t, R>& rowSizes)
       {
         reserve(rowSizes);
       }
@@ -188,7 +206,7 @@ namespace TungstenChess
         delete[] m_data;
       }
 
-      void reserve(std::array<size_t, R> &rowSizes)
+      void reserve(std::array<size_t, R>& rowSizes)
       {
         size_t totalSize = 0;
 
@@ -202,8 +220,14 @@ namespace TungstenChess
         m_data = new T[m_capacity];
       }
 
-      T &operator[](size_t r, size_t c) { return m_data[m_rowOffsets[r] + c]; }
-      const T &operator[](size_t r, size_t c) const { return m_data[m_rowOffsets[r] + c]; }
+      T& operator[](size_t r, size_t c)
+      {
+        return m_data[m_rowOffsets[r] + c];
+      }
+      const T& operator[](size_t r, size_t c) const
+      {
+        return m_data[m_rowOffsets[r] + c];
+      }
     };
 
     /**
@@ -220,46 +244,97 @@ namespace TungstenChess
     class auxiliary_stack
     {
     private:
-      T_Element *m_data;
+      T_Element* m_data;
       size_t m_top = 0;
 
     public:
-      auxiliary_stack(size_t size) : m_data(new T_Element[size]) {}
-      ~auxiliary_stack() { delete[] m_data; }
+      auxiliary_stack(size_t size)
+          : m_data(new T_Element[size])
+      {}
 
-      auxiliary_stack(const auxiliary_stack &other) : m_data(new T_Element[other.m_top]), m_top(other.m_top)
+      ~auxiliary_stack()
+      {
+        delete[] m_data;
+      }
+
+      auxiliary_stack(const auxiliary_stack& other)
+          : m_data(new T_Element[other.m_top]),
+            m_top(other.m_top)
       {
         std::copy(other.m_data, other.m_data + other.m_top, m_data);
       }
 
-      auxiliary_stack(auxiliary_stack &&other) noexcept
-          : m_data(other.m_data), m_top(other.m_top)
+      auxiliary_stack(auxiliary_stack&& other) noexcept
+          : m_data(other.m_data),
+            m_top(other.m_top)
       {
         other.m_data = nullptr;
         other.m_top = 0;
       }
 
-      void push(T_Element value) { m_data[m_top++] = value; }
-      T_Element pop() { return m_data[--m_top]; }
+      void push(T_Element value)
+      {
+        m_data[m_top++] = value;
+      }
+      T_Element pop()
+      {
+        return m_data[--m_top];
+      }
 
-      void clear() { m_top = 0; }
+      void clear()
+      {
+        m_top = 0;
+      }
 
-      T_Element &at(size_t index) { return m_data[index]; }
-      const T_Element &at(size_t index) const { return m_data[index]; }
+      T_Element& at(size_t index)
+      {
+        return m_data[index];
+      }
+      const T_Element& at(size_t index) const
+      {
+        return m_data[index];
+      }
 
-      T_Element &operator[](size_t index) { return m_data[index]; }
-      const T_Element &operator[](size_t index) const { return m_data[index]; }
+      T_Element& operator[](size_t index)
+      {
+        return m_data[index];
+      }
+      const T_Element& operator[](size_t index) const
+      {
+        return m_data[index];
+      }
 
-      T_Element &top() { return m_data[m_top - 1]; }
-      const T_Element &top() const { return m_data[m_top - 1]; }
+      T_Element& top()
+      {
+        return m_data[m_top - 1];
+      }
+      const T_Element& top() const
+      {
+        return m_data[m_top - 1];
+      }
 
-      size_t size() const { return m_top; }
+      size_t size() const
+      {
+        return m_top;
+      }
 
-      T_Element *begin() { return m_data; }
-      T_Element *end() { return m_data + m_top; }
+      T_Element* begin()
+      {
+        return m_data;
+      }
+      T_Element* end()
+      {
+        return m_data + m_top;
+      }
 
-      const T_Element *begin() const { return m_data; }
-      const T_Element *end() const { return m_data + m_top; }
+      const T_Element* begin() const
+      {
+        return m_data;
+      }
+      const T_Element* end() const
+      {
+        return m_data + m_top;
+      }
 
       /**
        * @brief This class can be used to manage memory at the top of an auxiliary_stack.
@@ -274,34 +349,70 @@ namespace TungstenChess
       {
       private:
         size_t m_base;
-        auxiliary_stack &m_stack;
+        auxiliary_stack& m_stack;
 
       public:
         using value_type = T_Element;
-        using pointer = T_Element *;
-        using reference = T_Element &;
+        using pointer = T_Element*;
+        using reference = T_Element&;
         using difference_type = std::ptrdiff_t;
         using iterator_category = std::random_access_iterator_tag;
 
-        dynamic_top_allocation(auxiliary_stack &stack) : m_stack(stack), m_base(stack.m_top) {}
+        dynamic_top_allocation(auxiliary_stack& stack)
+            : m_stack(stack),
+              m_base(stack.m_top)
+        {}
 
-        ~dynamic_top_allocation() { free(); }
+        ~dynamic_top_allocation()
+        {
+          free();
+        }
 
-        void free() { m_stack.m_top = m_base; }
+        void free()
+        {
+          m_stack.m_top = m_base;
+        }
 
-        void push(T_Element value) { m_stack.push(value); }
-        T_Element pop() { return m_stack.pop(); }
+        void push(T_Element value)
+        {
+          m_stack.push(value);
+        }
+        T_Element pop()
+        {
+          return m_stack.pop();
+        }
 
-        T_Element operator[](size_t index) const { return m_stack[m_base + index]; }
-        T_Element &top() const { return m_stack.top(); }
+        T_Element operator[](size_t index) const
+        {
+          return m_stack[m_base + index];
+        }
+        T_Element& top() const
+        {
+          return m_stack.top();
+        }
 
-        size_t size() const { return m_stack.size() - m_base; }
+        size_t size() const
+        {
+          return m_stack.size() - m_base;
+        }
 
-        T_Element *begin() { return &m_stack[m_base]; }
-        T_Element *end() { return m_stack.end(); }
+        T_Element* begin()
+        {
+          return &m_stack[m_base];
+        }
+        T_Element* end()
+        {
+          return m_stack.end();
+        }
 
-        const T_Element *begin() const { return &m_stack[m_base]; }
-        const T_Element *end() const { return m_stack.end(); }
+        const T_Element* begin() const
+        {
+          return &m_stack[m_base];
+        }
+        const T_Element* end() const
+        {
+          return m_stack.end();
+        }
       };
     };
   }

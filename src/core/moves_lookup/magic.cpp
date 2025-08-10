@@ -1,7 +1,7 @@
 #include "core/moves_lookup/magic.hpp"
 
-#include "utils/utils.hpp"
 #include "core/moves_lookup/lookup.hpp"
+#include "utils/utils.hpp"
 
 namespace TungstenChess
 {
@@ -29,7 +29,7 @@ namespace TungstenChess
     return ROOK_LOOKUP_TABLES[square, (ROOK_MAGICS[square] * maskedPieces) >> ROOK_SHIFTS[square]];
   }
 
-  void MagicMoveGen::getAllBlockers(std::vector<Bitboard> &blockers, Square square, Bitboard mask)
+  void MagicMoveGen::getAllBlockers(std::vector<Bitboard>& blockers, Square square, Bitboard mask)
   {
     blockers.clear();
 
@@ -55,9 +55,9 @@ namespace TungstenChess
   {
     Bitboard movesBitboard = 0;
 
-    int directions[4] = {-8, -1, 1, 8};
-    int rankEdges[4] = {0, -1, -1, 7};
-    int fileEdges[4] = {-1, 0, 7, -1};
+    int directions[4] = { -8, -1, 1, 8 };
+    int rankEdges[4] = { 0, -1, -1, 7 };
+    int fileEdges[4] = { -1, 0, 7, -1 };
 
     for (int i = 0; i < 4; i++)
     {
@@ -83,9 +83,9 @@ namespace TungstenChess
   {
     Bitboard movesBitboard = 0;
 
-    int directions[4] = {-9, -7, 7, 9};
-    int rankEdges[4] = {0, 0, 7, 7};
-    int fileEdges[4] = {0, 7, 0, 7};
+    int directions[4] = { -9, -7, 7, 9 };
+    int rankEdges[4] = { 0, 0, 7, 7 };
+    int fileEdges[4] = { 0, 7, 0, 7 };
 
     for (int i = 0; i < 4; i++)
     {

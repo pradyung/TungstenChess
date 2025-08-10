@@ -153,7 +153,7 @@ namespace TungstenChess
   {
     Bitboard attackingPiecesBitboard = 0;
 
-    const Bitboard *friendlyBitboards = &m_bitboards[color];
+    const Bitboard* friendlyBitboards = &m_bitboards[color];
 
     if (targetPiece)
     {
@@ -191,18 +191,18 @@ namespace TungstenChess
     return attackingPiecesBitboard;
   }
 
-  int Board::getLegalMoves(MoveAllocation &legalMoves, bool onlyCaptures)
+  int Board::getLegalMoves(MoveAllocation& legalMoves, bool onlyCaptures)
   {
     return getLegalMoves(legalMoves, m_sideToMove, onlyCaptures);
   }
 
-  int Board::getLegalMoves(MoveAllocation &legalMoves, PieceColor color, bool onlyCaptures)
+  int Board::getLegalMoves(MoveAllocation& legalMoves, PieceColor color, bool onlyCaptures)
   {
     Bitboard movablePiecesBitboard = 0;
     Bitboard targetSquaresBitboard = 0;
 
-    const Bitboard *friendlyBitboards = &m_bitboards[color];
-    const Bitboard *enemyBitboards = &m_bitboards[color ^ COLOR];
+    const Bitboard* friendlyBitboards = &m_bitboards[color];
+    const Bitboard* enemyBitboards = &m_bitboards[color ^ COLOR];
 
     int kingIndex = m_kingIndices[color | KING];
 
@@ -252,7 +252,7 @@ namespace TungstenChess
 
         legalMoves.push(Moves::createMove(pieceIndex, toIndex));
 
-        Move &move = legalMoves.top();
+        Move& move = legalMoves.top();
 
         if (Moves::isPromotion(toIndex, m_board[pieceIndex] & TYPE))
         {
@@ -285,7 +285,7 @@ namespace TungstenChess
         {
           legalMoves.push(Moves::createMove(attackerIndex, targetSquare));
 
-          Move &move = legalMoves.top();
+          Move& move = legalMoves.top();
 
           if (flag & PROMOTION)
           {
@@ -307,7 +307,7 @@ namespace TungstenChess
   {
     PieceColor attackedColor = color ^ COLOR;
 
-    const Bitboard *attackerBitboards = &m_bitboards[color];
+    const Bitboard* attackerBitboards = &m_bitboards[color];
 
     if (MovesLookup::KNIGHT_MOVES[square] & attackerBitboards[KNIGHT])
       return true;
@@ -345,7 +345,7 @@ namespace TungstenChess
   {
     uint8_t count = 0;
 
-    const DisjointZobristKeyStack *current = &m_positionHistory;
+    const DisjointZobristKeyStack* current = &m_positionHistory;
     size_t currentSize = current->stack.size();
 
     while (current)
@@ -387,7 +387,7 @@ namespace TungstenChess
     return countGames(moveStack, depth, verbose);
   }
 
-  uint64_t Board::countGames(MoveStack &moveStack, uint8_t depth, bool verbose)
+  uint64_t Board::countGames(MoveStack& moveStack, uint8_t depth, bool verbose)
   {
     if (depth == 0)
       return 1;
@@ -435,18 +435,18 @@ namespace TungstenChess
     {
       switch (uci[4])
       {
-      case 'q':
-        promotionPieceType = QUEEN;
-        break;
-      case 'r':
-        promotionPieceType = ROOK;
-        break;
-      case 'b':
-        promotionPieceType = BISHOP;
-        break;
-      case 'n':
-        promotionPieceType = KNIGHT;
-        break;
+        case 'q':
+          promotionPieceType = QUEEN;
+          break;
+        case 'r':
+          promotionPieceType = ROOK;
+          break;
+        case 'b':
+          promotionPieceType = BISHOP;
+          break;
+        case 'n':
+          promotionPieceType = KNIGHT;
+          break;
       }
     }
 

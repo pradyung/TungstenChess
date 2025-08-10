@@ -11,7 +11,7 @@ std::filesystem::path ResourceManager::getResourcePath()
   CFBundleRef mainBundle = CFBundleGetMainBundle();
   CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
   char path[PATH_MAX];
-  if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
+  if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8*)path, PATH_MAX))
   {
     return "";
   }
@@ -47,7 +47,8 @@ ResourceManager::ResourceManager()
   m_windowIcon.loadFromFile(resourcePath / "high_res_wn.png");
 }
 
-GUIHandler::GUIHandler() : m_window(sf::VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE * 8), "TungstenChess", sf::Style::Titlebar | sf::Style::Close)
+GUIHandler::GUIHandler()
+    : m_window(sf::VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE * 8), "TungstenChess", sf::Style::Titlebar | sf::Style::Close)
 {
   m_window.setFramerateLimit(60);
 
@@ -60,9 +61,7 @@ GUIHandler::GUIHandler() : m_window(sf::VideoMode(SQUARE_SIZE * 8, SQUARE_SIZE *
   loadPieces();
   loadPromotionPieces();
 
-  m_window.setIcon(m_resourceManager.m_windowIcon.getSize().x,
-                   m_resourceManager.m_windowIcon.getSize().y,
-                   m_resourceManager.m_windowIcon.getPixelsPtr());
+  m_window.setIcon(m_resourceManager.m_windowIcon.getSize().x, m_resourceManager.m_windowIcon.getSize().y, m_resourceManager.m_windowIcon.getPixelsPtr());
 
   m_lastMoveTime = std::chrono::high_resolution_clock::now();
 }
@@ -120,7 +119,7 @@ void GUIHandler::runMainLoop()
   }
 }
 
-bool GUIHandler::handleLeftClick(Event &event)
+bool GUIHandler::handleLeftClick(Event& event)
 {
   Square index = GUIHandler::getSquareIndex(event.mouseButton.x, event.mouseButton.y);
 
@@ -186,7 +185,7 @@ bool GUIHandler::handleLeftClick(Event &event)
   return true;
 }
 
-bool GUIHandler::handleLeftRelease(Event &event)
+bool GUIHandler::handleLeftRelease(Event& event)
 {
   if (m_draggingPieceIndex == NO_SQUARE)
     return false;
@@ -419,7 +418,8 @@ void GUIHandler::makeMove(Move move)
     std::println(
         "Move: {:<9s} Time: {:>6d} ms",
         m_logPGNMoves ? m_board.getMovePGN(move) : Moves::getUCI(move),
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_lastMoveTime).count());
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_lastMoveTime).count()
+    );
   }
 
   m_lastMoveTime = std::chrono::high_resolution_clock::now();
@@ -504,18 +504,18 @@ Piece GUIHandler::getPromotionPiece(int x, int y)
 
   switch (index)
   {
-  case C7:
-  case D7:
-  case E7:
-  case F7:
-    return WHITE_QUEEN - (index - C7);
-  case C2:
-  case D2:
-  case E2:
-  case F2:
-    return BLACK_QUEEN - (index - C2);
-  default:
-    return NO_PIECE;
+    case C7:
+    case D7:
+    case E7:
+    case F7:
+      return WHITE_QUEEN - (index - C7);
+    case C2:
+    case D2:
+    case E2:
+    case F2:
+      return BLACK_QUEEN - (index - C2);
+    default:
+      return NO_PIECE;
   }
 }
 

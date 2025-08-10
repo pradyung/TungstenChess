@@ -48,7 +48,7 @@ namespace TungstenChess
     {
       KING_MOVES[square] = 0ULL;
 
-      int offsets[8] = {-1, 0, 1};
+      int offsets[8] = { -1, 0, 1 };
       Rank rank = square / 8;
       File file = square % 8;
 
@@ -114,9 +114,9 @@ namespace TungstenChess
     {
       BISHOP_MASKS[square] = 0;
 
-      int directions[4] = {-9, -7, 7, 9};
-      int rankEdges[4] = {0, 0, 7, 7};
-      int fileEdges[4] = {0, 7, 0, 7};
+      int directions[4] = { -9, -7, 7, 9 };
+      int rankEdges[4] = { 0, 0, 7, 7 };
+      int fileEdges[4] = { 0, 7, 0, 7 };
 
       for (int i = 0; i < 4; i++)
       {
@@ -147,9 +147,9 @@ namespace TungstenChess
       {
         Square to = square;
 
-        int directions[4] = {-8, -1, 1, 8};
-        int rankEdges[4] = {0, -1, -1, 7};
-        int fileEdges[4] = {-1, 0, 7, -1};
+        int directions[4] = { -8, -1, 1, 8 };
+        int rankEdges[4] = { 0, -1, -1, 7 };
+        int fileEdges[4] = { -1, 0, 7, -1 };
 
         while (true)
         {

@@ -34,7 +34,7 @@ namespace TungstenChess
   class Bot
   {
   private:
-    Board &m_board;
+    Board& m_board;
     OpeningBook m_openingBook;
 
     MoveStack m_moveStack;
@@ -54,8 +54,7 @@ namespace TungstenChess
 
     TranspositionTable m_transpositionTable;
 
-    static constexpr inline int CASTLING_BONUS_MULTIPLIERS[16] =
-        {0, 1, 1, 2, 0, -1, 1, 0, 0, 1, -1, 0, 0, -1, -1, -2};
+    static constexpr inline int CASTLING_BONUS_MULTIPLIERS[16] = { 0, 1, 1, 2, 0, -1, 1, 0, 0, 1, -1, 0, 0, -1, -1, -2 };
 
     static const int MATERIAL_DIMINISH_SHIFT = 14;
 
@@ -103,9 +102,15 @@ namespace TungstenChess
     utils::once<false> m_onceOpeningBookLoaded;
 
   public:
-    Bot(Board &board, const BotSettings &settings);
-    Bot(Board &board) : Bot(board, BotSettings()) {}
-    Bot(Board &board, int maxSearchTime) : Bot(board, BotSettings{maxSearchTime}) {}
+    Bot(Board& board, const BotSettings& settings);
+
+    Bot(Board& board)
+        : Bot(board, BotSettings())
+    {}
+
+    Bot(Board& board, int maxSearchTime)
+        : Bot(board, BotSettings{ maxSearchTime })
+    {}
 
     ~Bot();
 
@@ -147,7 +152,7 @@ namespace TungstenChess
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      * @return The number of legal moves generated
      */
-    int getSortedLegalMoves(MoveAllocation &moves, bool onlyCaptures = false, Move bestMove = NULL_MOVE);
+    int getSortedLegalMoves(MoveAllocation& moves, bool onlyCaptures = false, Move bestMove = NULL_MOVE);
 
     /**
      * @brief Gets the positional evaluation of a single piece
@@ -217,6 +222,6 @@ namespace TungstenChess
      * @param numMovesToSort The number of moves to sort
      * @param bestMove The best move found so far, used when iterative deepening has already found a good move
      */
-    void heuristicSortMoves(MoveAllocation &moves, int numMovesToSort, Move bestMove = NULL_MOVE);
+    void heuristicSortMoves(MoveAllocation& moves, int numMovesToSort, Move bestMove = NULL_MOVE);
   };
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <fstream>
 #include <SFML/Graphics.hpp>
+#include <fstream>
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -45,7 +45,7 @@ private:
    * @brief Get the singleton instance of the ResourceManager
    * @return ResourceManager&
    */
-  static ResourceManager &getInstance()
+  static ResourceManager& getInstance()
   {
     static ResourceManager instance;
     return instance;
@@ -81,7 +81,7 @@ public:
   GUIHandler();
 
 private:
-  ResourceManager &m_resourceManager = ResourceManager::getInstance();
+  ResourceManager& m_resourceManager = ResourceManager::getInstance();
 
   Board m_board;
   Bot m_whiteBot = Bot(m_board);
@@ -99,7 +99,7 @@ private:
 
   std::array<sf::Sprite, 64> m_pieceSprites[PIECE_NUMBER];
 
-  Bitboard m_highlightsBitboards[3] = {0};
+  Bitboard m_highlightsBitboards[3] = { 0 };
   sf::Sprite m_highlightSprites[3][64];
 
   Square m_yellowOutlineIndex = NO_SQUARE;
@@ -149,8 +149,8 @@ private:
 
   Square getMouseSquareIndex();
 
-  bool handleLeftClick(sf::Event &event);   // Returns true if screen needs to be redrawn
-  bool handleLeftRelease(sf::Event &event); // Returns true if screen needs to be redrawn
+  bool handleLeftClick(sf::Event& event);   // Returns true if screen needs to be redrawn
+  bool handleLeftRelease(sf::Event& event); // Returns true if screen needs to be redrawn
 
   void render();
 
