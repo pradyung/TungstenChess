@@ -1,3 +1,7 @@
+// UCI functionality is not currently supported/up to date.
+// Disregard this file for now.
+// This file is a placeholder for future UCI support.
+
 #include <iostream>
 #include <string>
 #include <vector>
