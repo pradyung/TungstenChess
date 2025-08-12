@@ -185,6 +185,12 @@ namespace TungstenChess
       const size_t m_cols = C;
     };
 
+    /**
+     * @brief A 2D ragged array implementation using a flat heap allocation to reduce memory fragmentation.
+    *         This is useful for storing 2D arrays with different row sizes in contiguous heap memory.
+     * @tparam T The type of the elements in the array.
+     * @tparam R The number of rows in the array.
+     */
     template <typename T, size_t R>
     struct ragged_array2d
     {
