@@ -26,6 +26,7 @@ namespace TungstenChess
     static inline utils::array2d<Bitboard, BLACK_PAWN + 1, 64> PAWN_REVERSE_DOUBLE_MOVES = {};
 
     friend class Board;
+    friend class Bot;
     friend class MagicMoveGen;
 
     /**

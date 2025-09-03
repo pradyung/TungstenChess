@@ -1,6 +1,7 @@
 #include "bot/engine.hpp"
 
 #include "bot/piece_eval_tables.hpp"
+#include "core/moves_lookup/lookup.hpp"
 #include "core/moves_lookup/magic.hpp"
 
 namespace TungstenChess
@@ -254,20 +255,18 @@ namespace TungstenChess
 
       if (rank == 0 && m_board[i] == WHITE_KING)
       {
-        evaluationBonus += KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i - 8] == WHITE_PAWN);
-        if (file > 0)
-          evaluationBonus += KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i - 9] == WHITE_PAWN);
-        if (file < 7)
-          evaluationBonus += KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i - 7] == WHITE_PAWN);
+        int pawnShieldWeight = (m_board[i - 8] == WHITE_PAWN) +
+                               Bitboards::countBits(MovesLookup::PAWN_CAPTURE_MOVES[WHITE_PAWN, i] & m_board.bitboard(WHITE_PAWN));
+
+        evaluationBonus += KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * pawnShieldWeight;
         continue;
       }
       if (rank == 7 && m_board[i] == BLACK_KING)
       {
-        evaluationBonus -= KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i + 8] == BLACK_PAWN);
-        if (file > 0)
-          evaluationBonus -= KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i + 7] == BLACK_PAWN);
-        if (file < 7)
-          evaluationBonus -= KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * (m_board[i + 9] == BLACK_PAWN);
+        int pawnShieldWeight = (m_board[i + 8] == BLACK_PAWN) +
+                               Bitboards::countBits(MovesLookup::PAWN_CAPTURE_MOVES[BLACK_PAWN, i] & m_board.bitboard(BLACK_PAWN));
+
+        evaluationBonus -= KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * pawnShieldWeight;
         continue;
       }
     }
