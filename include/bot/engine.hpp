@@ -28,7 +28,7 @@ namespace TungstenChess
     ISOLATED_PAWN_PENALTY = 25,
     BACKWARDS_PAWN_PENALTY = 50,
     KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS = 20,
-    CONTEMPT = 100,
+    CONTEMPT = 0,
   };
 
   class Bot
