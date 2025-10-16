@@ -138,7 +138,7 @@ namespace TungstenChess
       Piece piece = m_board[i];
       PieceType pieceType = piece & TYPE;
 
-      if (pieceType == EMPTY || pieceType == KING)
+      if (pieceType == NO_TYPE || pieceType == KING)
         continue;
 
       int mobility = Bitboards::countBits(m_board.getPseudoLegalPieceMovesBitboard(i));
