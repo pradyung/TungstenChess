@@ -226,14 +226,8 @@ namespace TungstenChess
         m_data = new T[m_capacity];
       }
 
-      T& operator[](size_t r, size_t c)
-      {
-        return m_data[m_rowOffsets[r] + c];
-      }
-      const T& operator[](size_t r, size_t c) const
-      {
-        return m_data[m_rowOffsets[r] + c];
-      }
+      T& operator[](size_t r, size_t c) { return m_data[m_rowOffsets[r] + c]; }
+      const T& operator[](size_t r, size_t c) const { return m_data[m_rowOffsets[r] + c]; }
     };
 
     /**
@@ -258,10 +252,7 @@ namespace TungstenChess
           : m_data(new T_Element[size])
       {}
 
-      ~auxiliary_stack()
-      {
-        delete[] m_data;
-      }
+      ~auxiliary_stack() { delete[] m_data; }
 
       auxiliary_stack(const auxiliary_stack& other)
           : m_data(new T_Element[other.m_top]),
@@ -278,69 +269,27 @@ namespace TungstenChess
         other.m_top = 0;
       }
 
-      void push(T_Element value)
-      {
-        m_data[m_top++] = value;
-      }
-      T_Element pop()
-      {
-        return m_data[--m_top];
-      }
+      void push(T_Element value) { m_data[m_top++] = value; }
+      T_Element pop() { return m_data[--m_top]; }
 
-      void clear()
-      {
-        m_top = 0;
-      }
+      void clear() { m_top = 0; }
 
-      T_Element& at(size_t index)
-      {
-        return m_data[index];
-      }
-      const T_Element& at(size_t index) const
-      {
-        return m_data[index];
-      }
+      T_Element& at(size_t index) { return m_data[index]; }
+      const T_Element& at(size_t index) const { return m_data[index]; }
 
-      T_Element& operator[](size_t index)
-      {
-        return m_data[index];
-      }
-      const T_Element& operator[](size_t index) const
-      {
-        return m_data[index];
-      }
+      T_Element& operator[](size_t index) { return m_data[index]; }
+      const T_Element& operator[](size_t index) const { return m_data[index]; }
 
-      T_Element& top()
-      {
-        return m_data[m_top - 1];
-      }
-      const T_Element& top() const
-      {
-        return m_data[m_top - 1];
-      }
+      T_Element& top() { return m_data[m_top - 1]; }
+      const T_Element& top() const { return m_data[m_top - 1]; }
 
-      size_t size() const
-      {
-        return m_top;
-      }
+      size_t size() const { return m_top; }
 
-      T_Element* begin()
-      {
-        return m_data;
-      }
-      T_Element* end()
-      {
-        return m_data + m_top;
-      }
+      T_Element* begin() { return m_data; }
+      T_Element* end() { return m_data + m_top; }
 
-      const T_Element* begin() const
-      {
-        return m_data;
-      }
-      const T_Element* end() const
-      {
-        return m_data + m_top;
-      }
+      const T_Element* begin() const { return m_data; }
+      const T_Element* end() const { return m_data + m_top; }
 
       /**
        * @brief This class can be used to manage memory at the top of an auxiliary_stack.
@@ -369,56 +318,23 @@ namespace TungstenChess
               m_base(stack.m_top)
         {}
 
-        ~dynamic_top_allocation()
-        {
-          free();
-        }
+        ~dynamic_top_allocation() { free(); }
 
-        void free()
-        {
-          m_stack.m_top = m_base;
-        }
+        void free() { m_stack.m_top = m_base; }
 
-        void push(T_Element value)
-        {
-          m_stack.push(value);
-        }
-        T_Element pop()
-        {
-          return m_stack.pop();
-        }
+        void push(T_Element value) { m_stack.push(value); }
+        T_Element pop() { return m_stack.pop(); }
 
-        T_Element operator[](size_t index) const
-        {
-          return m_stack[m_base + index];
-        }
-        T_Element& top() const
-        {
-          return m_stack.top();
-        }
+        T_Element operator[](size_t index) const { return m_stack[m_base + index]; }
+        T_Element& top() const { return m_stack.top(); }
 
-        size_t size() const
-        {
-          return m_stack.size() - m_base;
-        }
+        size_t size() const { return m_stack.size() - m_base; }
 
-        T_Element* begin()
-        {
-          return &m_stack[m_base];
-        }
-        T_Element* end()
-        {
-          return m_stack.end();
-        }
+        T_Element* begin() { return &m_stack[m_base]; }
+        T_Element* end() { return m_stack.end(); }
 
-        const T_Element* begin() const
-        {
-          return &m_stack[m_base];
-        }
-        const T_Element* end() const
-        {
-          return m_stack.end();
-        }
+        const T_Element* begin() const { return &m_stack[m_base]; }
+        const T_Element* end() const { return m_stack.end(); }
       };
     };
   }
