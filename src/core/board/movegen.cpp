@@ -5,9 +5,11 @@
 #include "core/moves_lookup/lookup.hpp"
 #include "core/moves_lookup/magic.hpp"
 
+#define INCLUDE_CASTLING_TAG_BIT 0b100000
+
 namespace TungstenChess
 {
-  Bitboard Board::getPawnMoves(Square pieceIndex, PieceColor color, bool _) const
+  Bitboard Board::getPawnMoves(Square pieceIndex, PieceColor color) const
   {
     Bitboard movesBitboard = 0;
 
@@ -43,22 +45,22 @@ namespace TungstenChess
     return movesBitboard;
   }
 
-  Bitboard Board::getKnightMoves(Square pieceIndex, PieceColor color, bool _) const
+  Bitboard Board::getKnightMoves(Square pieceIndex, PieceColor color) const
   {
     return MovesLookup::KNIGHT_MOVES[pieceIndex] & ~m_bitboards[color];
   }
 
-  Bitboard Board::getBishopMoves(Square pieceIndex, PieceColor color, bool _) const
+  Bitboard Board::getBishopMoves(Square pieceIndex, PieceColor color) const
   {
     return MagicMoveGen::getBishopMoves(pieceIndex, m_bitboards[ALL_PIECES]) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getRookMoves(Square pieceIndex, PieceColor color, bool _) const
+  Bitboard Board::getRookMoves(Square pieceIndex, PieceColor color) const
   {
     return MagicMoveGen::getRookMoves(pieceIndex, m_bitboards[ALL_PIECES]) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getQueenMoves(Square pieceIndex, PieceColor color, bool _) const
+  Bitboard Board::getQueenMoves(Square pieceIndex, PieceColor color) const
   {
     Bitboard bishopMoves = MagicMoveGen::getBishopMoves(pieceIndex, m_bitboards[ALL_PIECES]);
     Bitboard rookMoves = MagicMoveGen::getRookMoves(pieceIndex, m_bitboards[ALL_PIECES]);
@@ -66,8 +68,12 @@ namespace TungstenChess
     return (bishopMoves | rookMoves) & ~m_bitboards[color];
   }
 
-  Bitboard Board::getKingMoves(Square pieceIndex, PieceColor color, bool includeCastling) const
+  Bitboard Board::getKingMoves(Square pieceIndex, PieceColor color) const
   {
+    bool includeCastling = color & INCLUDE_CASTLING_TAG_BIT;
+
+    color &= ~INCLUDE_CASTLING_TAG_BIT;
+
     Bitboard movesBitboard = MovesLookup::KING_MOVES[pieceIndex] & ~m_bitboards[color];
 
     if (includeCastling && m_castlingRights)
@@ -111,7 +117,12 @@ namespace TungstenChess
 
   Bitboard Board::getPseudoLegalPieceMoves(Square pieceIndex, PieceColor color, bool includeCastling) const
   {
-    return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color, includeCastling);
+    PieceType pieceType = m_board[pieceIndex] & TYPE;
+
+    if (pieceType == KING && includeCastling)
+      color |= INCLUDE_CASTLING_TAG_BIT;
+
+    return (this->*getPieceMoves[m_board[pieceIndex] & TYPE])(pieceIndex, color);
   }
 
   Bitboard Board::getPseudoLegalPieceMovesBitboard(Square pieceIndex) const

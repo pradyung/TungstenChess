@@ -207,7 +207,8 @@ namespace TungstenChess
     MoveFlags quickMakeMove(Square from, Square to);
 
     /**
-     * @brief Quickly unmakes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array or Zobrist key
+     * @brief Quickly unmakes a move, only updating bitboards and king indices (used for illegal move detection), does not update board array, Zobrist key or piece counts.
+     * @note Relies on m_board array being consistent since before last quickMakeMove call to know what piece was moved/captured
      * @param from The index of the piece to move
      * @param to The index to move the piece to
      * @param flag The flag returned by quickMakeMove
@@ -269,14 +270,14 @@ namespace TungstenChess
      */
     void switchSideToMove();
 
-    Bitboard getPawnMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getKnightMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getBishopMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getRookMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getQueenMoves(Square pieceIndex, PieceColor color, bool _ = false) const;
-    Bitboard getKingMoves(Square pieceIndex, PieceColor color, bool includeCastling = true) const;
+    Bitboard getPawnMoves(Square pieceIndex, PieceColor color) const;
+    Bitboard getKnightMoves(Square pieceIndex, PieceColor color) const;
+    Bitboard getBishopMoves(Square pieceIndex, PieceColor color) const;
+    Bitboard getRookMoves(Square pieceIndex, PieceColor color) const;
+    Bitboard getQueenMoves(Square pieceIndex, PieceColor color) const;
+    Bitboard getKingMoves(Square pieceIndex, PieceColor taggedColor) const;
 
-    Bitboard (TungstenChess::Board::* getPieceMoves[PIECE_TYPE_NUMBER])(Square, PieceColor, bool) const = {
+    Bitboard (TungstenChess::Board::* getPieceMoves[PIECE_TYPE_NUMBER])(Square, PieceColor) const = {
       nullptr,
       &TungstenChess::Board::getPawnMoves,
       &TungstenChess::Board::getKnightMoves,

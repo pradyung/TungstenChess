@@ -80,7 +80,7 @@ namespace TungstenChess
         evalString = std::to_string(m_previousSearchInfo.evaluation * (m_board.sideToMove() == WHITE ? 1 : -1));
 
       std::println(
-          "Move: {:<9s} Time: {:>6d} ms    Depth: {:<12s} Positions evaluated: {:>9d}   Transpositions used: {:>7d}   Occupied: {:>12s}   Evaluation: {:s}",
+          "Move: {:<9s} Time: {:>6d} ms    Depth: {:<12s} Positions evaluated: {:>9d}   Transpositions used: {:>7d}   Occupied: {:>16s}   Evaluation: {:s}",
           m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove),
           std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count(),
           std::format("{:d} + {:d}/{:d}", m_previousSearchInfo.depthSearched, m_previousSearchInfo.nextDepthNumMovesSearched, m_previousSearchInfo.nextDepthTotalMoves),
