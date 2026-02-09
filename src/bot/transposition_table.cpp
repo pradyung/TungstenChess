@@ -1,6 +1,7 @@
 #include "bot/transposition_table.hpp"
 
-#include <format>
+#include <iomanip>
+#include <sstream>
 
 namespace TungstenChess
 {
@@ -22,11 +23,13 @@ namespace TungstenChess
 
   std::string TranspositionTable::occupancy() const
   {
-    return std::format(
-        "{:.2f}/{:.2f} MB",
-        m_occupied / (double)MEGABYTE * sizeof(Entry),
-        TABLE_SIZE / (double)MEGABYTE * sizeof(Entry)
-    );
+    std::ostringstream ss;
+    ss << std::fixed << std::setprecision(2)
+       << (m_occupied * sizeof(Entry) / (double)MEGABYTE)
+       << " MB / "
+       << (TABLE_SIZE * sizeof(Entry) / (double)MEGABYTE)
+       << " MB";
+    return ss.str();
   }
 
   bool TranspositionTable::hasEntry(ZobristKey key) const

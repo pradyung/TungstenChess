@@ -256,7 +256,7 @@ namespace TungstenChess
       if (rank == 0 && m_board[i] == WHITE_KING)
       {
         int pawnShieldWeight = (m_board[i - 8] == WHITE_PAWN) +
-                               Bitboards::countBits(MovesLookup::PAWN_CAPTURE_MOVES[WHITE_PAWN, i] & m_board.bitboard(WHITE_PAWN));
+                               Bitboards::countBits(MovesLookup::PAWN_CAPTURE_MOVES.at(WHITE_PAWN, i) & m_board.bitboard(WHITE_PAWN));
 
         evaluationBonus += KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * pawnShieldWeight;
         continue;
@@ -264,7 +264,7 @@ namespace TungstenChess
       if (rank == 7 && m_board[i] == BLACK_KING)
       {
         int pawnShieldWeight = (m_board[i + 8] == BLACK_PAWN) +
-                               Bitboards::countBits(MovesLookup::PAWN_CAPTURE_MOVES[BLACK_PAWN, i] & m_board.bitboard(BLACK_PAWN));
+                               Bitboards::countBits(MovesLookup::PAWN_CAPTURE_MOVES.at(BLACK_PAWN, i) & m_board.bitboard(BLACK_PAWN));
 
         evaluationBonus -= KING_SAFETY_PAWN_SHIELD_PER_PAWN_BONUS * pawnShieldWeight;
         continue;

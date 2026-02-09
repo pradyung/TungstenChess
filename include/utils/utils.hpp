@@ -1,20 +1,20 @@
 #pragma once
 
 #include <chrono>
+#include <iostream>
 #include <mutex>
-#include <print>
 #include <vector>
 
-#define TIME_TEST(n, x)                                                                         \
-  do                                                                                            \
-  {                                                                                             \
-    auto start = std::chrono::high_resolution_clock::now();                                     \
-    for (int i = 0; i < n; i++)                                                                 \
-      x;                                                                                        \
-    auto end = std::chrono::high_resolution_clock::now();                                       \
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);          \
-    std::println("{:d} ns elapsed on average across {:d} iterations", duration.count() / n, n); \
-  }                                                                                             \
+#define TIME_TEST(n, x)                                                                              \
+  do                                                                                                 \
+  {                                                                                                  \
+    auto start = std::chrono::high_resolution_clock::now();                                          \
+    for (int i = 0; i < n; i++)                                                                      \
+      x;                                                                                             \
+    auto end = std::chrono::high_resolution_clock::now();                                            \
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);               \
+    std::cout << (duration.count() / n) << " ns elapsed on average across " << n << " iterations\n"; \
+  }                                                                                                  \
   while (0)
 
 namespace TungstenChess
@@ -131,7 +131,7 @@ namespace TungstenChess
        * @param c The column index.
        * @return A reference to the element at the specified row and column.
        */
-      T& operator[](size_t r, size_t c)
+      T& at(size_t r, size_t c)
       {
         return m_data[r * C + c];
       }
@@ -142,7 +142,7 @@ namespace TungstenChess
        * @param c The column index.
        * @return A const reference to the element at the specified row and column.
        */
-      const T& operator[](size_t r, size_t c) const
+      const T& at(size_t r, size_t c) const
       {
         return m_data[r * C + c];
       }
@@ -226,8 +226,8 @@ namespace TungstenChess
         m_data = new T[m_capacity];
       }
 
-      T& operator[](size_t r, size_t c) { return m_data[m_rowOffsets[r] + c]; }
-      const T& operator[](size_t r, size_t c) const { return m_data[m_rowOffsets[r] + c]; }
+      T& at(size_t r, size_t c) { return m_data[m_rowOffsets[r] + c]; }
+      const T& at(size_t r, size_t c) const { return m_data[m_rowOffsets[r] + c]; }
     };
 
     /**

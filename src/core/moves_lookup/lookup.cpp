@@ -74,28 +74,27 @@ namespace TungstenChess
     {
       Bitboard position = Bitboards::bit(square);
 
-      PAWN_CAPTURE_MOVES[WHITE_PAWN, square] = 0ULL;
-      PAWN_CAPTURE_MOVES[BLACK_PAWN, square] = 0ULL;
+      PAWN_CAPTURE_MOVES.at(WHITE_PAWN, square) = 0ULL;
+      PAWN_CAPTURE_MOVES.at(BLACK_PAWN, square) = 0ULL;
 
       if (square > 7 && square % 8 > 0)
-        PAWN_CAPTURE_MOVES[WHITE_PAWN, square] |= position >> 9;
+        PAWN_CAPTURE_MOVES.at(WHITE_PAWN, square) |= position >> 9;
       if (square > 7 && square % 8 < 7)
-        PAWN_CAPTURE_MOVES[WHITE_PAWN, square] |= position >> 7;
+        PAWN_CAPTURE_MOVES.at(WHITE_PAWN, square) |= position >> 7;
       if (square < 56 && square % 8 > 0)
-        PAWN_CAPTURE_MOVES[BLACK_PAWN, square] |= position << 7;
+        PAWN_CAPTURE_MOVES.at(BLACK_PAWN, square) |= position << 7;
       if (square < 56 && square % 8 < 7)
-        PAWN_CAPTURE_MOVES[BLACK_PAWN, square] |= position << 9;
+        PAWN_CAPTURE_MOVES.at(BLACK_PAWN, square) |= position << 9;
 
-      PAWN_REVERSE_SINGLE_MOVES[WHITE_PAWN, square] = position << 8;
-      PAWN_REVERSE_SINGLE_MOVES[BLACK_PAWN, square] = position >> 8;
-
-      PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN, square] = 0ULL;
-      PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN, square] = 0ULL;
+      PAWN_REVERSE_SINGLE_MOVES.at(WHITE_PAWN, square) = position << 8;
+      PAWN_REVERSE_SINGLE_MOVES.at(BLACK_PAWN, square) = position >> 8;
+      PAWN_REVERSE_DOUBLE_MOVES.at(WHITE_PAWN, square) = 0ULL;
+      PAWN_REVERSE_DOUBLE_MOVES.at(BLACK_PAWN, square) = 0ULL;
 
       if (square / 8 == 4)
-        PAWN_REVERSE_DOUBLE_MOVES[WHITE_PAWN, square] = position << 16;
+        PAWN_REVERSE_DOUBLE_MOVES.at(WHITE_PAWN, square) = position << 16;
       else if (square / 8 == 3)
-        PAWN_REVERSE_DOUBLE_MOVES[BLACK_PAWN, square] = position >> 16;
+        PAWN_REVERSE_DOUBLE_MOVES.at(BLACK_PAWN, square) = position >> 16;
     }
 
     PAWN_CAPTURE_MOVES.copyRow(WHITE_PAWN, WHITE);

@@ -1,7 +1,7 @@
 #include "bot/engine.hpp"
 
 #include <algorithm>
-#include <print>
+#include <iostream>
 
 #include "bot/piece_eval_tables.hpp"
 
@@ -57,7 +57,7 @@ namespace TungstenChess
         Move bestMove = moveInt & FROM_TO;
 
         if (m_botSettings.logSearchInfo)
-          std::println("Book: {:s}", m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove));
+          std::cout << "Book: " << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove)) << std::endl;
 
         return bestMove;
       }
@@ -73,22 +73,48 @@ namespace TungstenChess
     {
       std::string evalString;
       if (m_previousSearchInfo.lossFound)
-        evalString = std::format("Loss in {:d}", m_previousSearchInfo.mateIn);
+        evalString = "Loss in " + std::to_string(m_previousSearchInfo.mateIn);
       else if (m_previousSearchInfo.mateFound)
-        evalString = m_previousSearchInfo.mateIn == 0 ? "Mate" : std::format("Mate in {:d}", m_previousSearchInfo.mateIn);
+        evalString = m_previousSearchInfo.mateIn == 0 ? "Mate" : "Mate in " + std::to_string(m_previousSearchInfo.mateIn);
       else
         evalString = std::to_string(m_previousSearchInfo.evaluation * (m_board.sideToMove() == WHITE ? 1 : -1));
 
-      std::println(
-          "Move: {:<9s} Time: {:>6d} ms    Depth: {:<12s} Positions evaluated: {:>9d}   Transpositions used: {:>7d}   Occupied: {:>16s}   Evaluation: {:s}",
-          m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove),
-          std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count(),
-          std::format("{:d} + {:d}/{:d}", m_previousSearchInfo.depthSearched, m_previousSearchInfo.nextDepthNumMovesSearched, m_previousSearchInfo.nextDepthTotalMoves),
-          m_previousSearchInfo.positionsEvaluated,
-          m_previousSearchInfo.transpositionsUsed,
-          m_transpositionTable.occupancy(),
-          evalString
-      );
+      std::string depthString = std::to_string(m_previousSearchInfo.depthSearched) + " + " +
+                                std::to_string(m_previousSearchInfo.nextDepthNumMovesSearched) + "/" +
+                                std::to_string(m_previousSearchInfo.nextDepthTotalMoves);
+
+      std::cout
+          << "Move: "
+          << std::left << std::setw(9)
+          << (m_botSettings.logPGNMoves ? m_board.getMovePGN(bestMove) : Moves::getUCI(bestMove))
+
+          << " Time: "
+          << std::right << std::setw(6)
+          << std::chrono::duration_cast<std::chrono::milliseconds>(
+                 std::chrono::high_resolution_clock::now() - start
+             )
+                 .count()
+          << " ms    "
+
+          << "Depth: "
+          << std::left << std::setw(12)
+          << depthString
+
+          << " Positions evaluated: "
+          << std::right << std::setw(9)
+          << m_previousSearchInfo.positionsEvaluated
+
+          << "   Transpositions used: "
+          << std::right << std::setw(7)
+          << m_previousSearchInfo.transpositionsUsed
+
+          << "   Occupied: "
+          << std::right << std::setw(16)
+          << m_transpositionTable.occupancy()
+
+          << "   Evaluation: "
+          << evalString
+          << '\n';
     }
 
     return bestMove;

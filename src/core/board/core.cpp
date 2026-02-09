@@ -125,7 +125,7 @@ namespace TungstenChess
     {
       if (m_board[i])
       {
-        zobristKey ^= Zobrist::pieceKeys[m_board[i], i];
+        zobristKey ^= Zobrist::pieceKeys.at(m_board[i], i);
       }
     }
 

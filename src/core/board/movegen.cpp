@@ -1,6 +1,6 @@
 #include "core/board.hpp"
 
-#include <print>
+#include <iostream>
 
 #include "core/moves_lookup/lookup.hpp"
 #include "core/moves_lookup/magic.hpp"
@@ -25,7 +25,7 @@ namespace TungstenChess
 
       Bitboard captureSquares = m_bitboards[BLACK];
       captureSquares |= (0xFFULL & Bitboards::bit(m_enPassantFile)) << 16;
-      movesBitboard |= MovesLookup::PAWN_CAPTURE_MOVES[WHITE_PAWN, pieceIndex] & captureSquares;
+      movesBitboard |= MovesLookup::PAWN_CAPTURE_MOVES.at(WHITE_PAWN, pieceIndex) & captureSquares;
     }
     else if (color & BLACK)
     {
@@ -39,7 +39,7 @@ namespace TungstenChess
 
       Bitboard captureSquares = m_bitboards[WHITE];
       captureSquares |= (0xFFULL & Bitboards::bit(m_enPassantFile)) << 40;
-      movesBitboard |= MovesLookup::PAWN_CAPTURE_MOVES[BLACK_PAWN, pieceIndex] & captureSquares;
+      movesBitboard |= MovesLookup::PAWN_CAPTURE_MOVES.at(BLACK_PAWN, pieceIndex) & captureSquares;
     }
 
     return movesBitboard;
@@ -168,19 +168,19 @@ namespace TungstenChess
 
     if (targetPiece)
     {
-      Bitboard attackingPawns = MovesLookup::PAWN_CAPTURE_MOVES[color ^ COLOR, targetSquare] & friendlyBitboards[PAWN];
+      Bitboard attackingPawns = MovesLookup::PAWN_CAPTURE_MOVES.at(color ^ COLOR, targetSquare) & friendlyBitboards[PAWN];
       attackingPiecesBitboard |= attackingPawns;
     }
     else
     {
-      Bitboard reverseSinglePawnMoveSquare = MovesLookup::PAWN_REVERSE_SINGLE_MOVES[color, targetSquare];
+      Bitboard reverseSinglePawnMoveSquare = MovesLookup::PAWN_REVERSE_SINGLE_MOVES.at(color, targetSquare);
 
       Bitboard attackingSingleMovePawns = reverseSinglePawnMoveSquare & friendlyBitboards[PAWN];
       attackingPiecesBitboard |= attackingSingleMovePawns;
 
       if (!attackingSingleMovePawns && !(m_bitboards[ALL_PIECES] & reverseSinglePawnMoveSquare))
       {
-        Bitboard reverseDoublePawnMoveSquare = MovesLookup::PAWN_REVERSE_DOUBLE_MOVES[color, targetSquare];
+        Bitboard reverseDoublePawnMoveSquare = MovesLookup::PAWN_REVERSE_DOUBLE_MOVES.at(color, targetSquare);
 
         Bitboard attackingDoubleMovePawns = reverseDoublePawnMoveSquare & friendlyBitboards[PAWN];
         attackingPiecesBitboard |= attackingDoubleMovePawns;
@@ -324,7 +324,7 @@ namespace TungstenChess
       return true;
 
     // look for pawns in the reverse direction
-    if (MovesLookup::PAWN_CAPTURE_MOVES[attackedColor, square] & attackerBitboards[PAWN])
+    if (MovesLookup::PAWN_CAPTURE_MOVES.at(attackedColor, square) & attackerBitboards[PAWN])
       return true;
 
     if (MovesLookup::KING_MOVES[square] & attackerBitboards[KING])
@@ -415,7 +415,7 @@ namespace TungstenChess
         games++;
 
         if (verbose)
-          std::println("{:s}: 1", Moves::getUCI(legalMoves[i]));
+          std::cout << Moves::getUCI(legalMoves[i]) << ": 1" << std::endl;
 
         continue;
       }
@@ -425,7 +425,7 @@ namespace TungstenChess
       uint64_t newGames = countGames(moveStack, depth - 1, false);
 
       if (verbose)
-        std::println("{:s}: {:d}", Moves::getUCI(legalMoves[i]), newGames);
+        std::cout << Moves::getUCI(legalMoves[i]) << ": " << newGames << std::endl;
 
       games += newGames;
 

@@ -18,7 +18,7 @@ namespace TungstenChess
         continue;
 
       Piece piece = (rawPiece & TYPE) | (WHITE << (rawPiece >> 3));
-      key ^= Zobrist::pieceKeys[piece, i];
+      key ^= Zobrist::pieceKeys.at(piece, i);
     }
 
     uint8_t castlingRights;

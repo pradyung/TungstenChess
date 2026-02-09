@@ -16,7 +16,7 @@ namespace TungstenChess
 
     for (Piece piece : validPieces)
       for (Square square = 0; square < 64; square++)
-        pieceKeys[piece, square] = dis(gen);
+        pieceKeys.at(piece, square) = dis(gen);
 
     for (int i = 0; i < 16; i++)
       castlingKeys[i] = dis(gen);
@@ -29,7 +29,7 @@ namespace TungstenChess
     for (Square square = 0; square < 64; square++)
       for (Piece piece1 : validPieces)
         for (Piece piece2 : validPieces)
-          precomputedPieceCombinationKeys[square | (piece1 << 6) | (piece2 << 11)] = pieceKeys[piece1, square] ^ pieceKeys[piece2, square];
+          precomputedPieceCombinationKeys[square | (piece1 << 6) | (piece2 << 11)] = pieceKeys.at(piece1, square) ^ pieceKeys.at(piece2, square);
   }
 
   ZobristKey Zobrist::getPieceCombinationKey(Square square, Square before, Square after)

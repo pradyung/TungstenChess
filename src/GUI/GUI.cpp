@@ -1,7 +1,6 @@
 #include "GUI.hpp"
 
 #include <iostream>
-#include <print>
 
 using namespace sf;
 
@@ -415,11 +414,19 @@ void GUIHandler::makeMove(Move move)
 
   if (m_logPlayerMoves && !(m_board.sideToMove() & BOT_COLOR))
   {
-    std::println(
-        "Move: {:<9s} Time: {:>6d} ms",
-        m_logPGNMoves ? m_board.getMovePGN(move) : Moves::getUCI(move),
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_lastMoveTime).count()
-    );
+    std::cout
+        << "Move: "
+        << std::left << std::setw(9)
+        << (m_logPGNMoves ? m_board.getMovePGN(move) : Moves::getUCI(move))
+
+        << " Time: "
+        << std::right << std::setw(6)
+        << std::chrono::duration_cast<std::chrono::milliseconds>(
+               std::chrono::high_resolution_clock::now() - m_lastMoveTime
+           )
+               .count()
+        << " ms"
+        << '\n';
   }
 
   m_lastMoveTime = std::chrono::high_resolution_clock::now();
@@ -438,9 +445,9 @@ void GUIHandler::makeMove(Move move)
     m_gameOver = true;
 
     if (gameStatus == Board::LOSE)
-      std::println("Checkmate");
+      std::cout << "Checkmate" << std::endl;
     else
-      std::println("Stalemate");
+      std::cout << "Stalemate" << std::endl;
   }
 
   Bitboards::addBit(m_highlightsBitboards[YELLOW_HIGHLIGHT], from);
