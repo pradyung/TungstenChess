@@ -73,7 +73,7 @@ namespace TungstenChess
     if (m_lastMoveIndex != -1)
     {
       uint64_t nextMove = getMoveNextMove(m_openingBook[m_lastMoveIndex]);
-      if (nextMove == m_moveNoNextMove || nextMove == m_lastMoveIndex + 1)
+      if (nextMove == m_moveNoNextMove || nextMove == (uint64_t)m_lastMoveIndex + 1)
       {
         m_inOpeningBook = false;
         return false;

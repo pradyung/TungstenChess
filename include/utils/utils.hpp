@@ -314,8 +314,8 @@ namespace TungstenChess
         using iterator_category = std::random_access_iterator_tag;
 
         dynamic_top_allocation(auxiliary_stack& stack)
-            : m_stack(stack),
-              m_base(stack.m_top)
+            : m_base(stack.m_top),
+              m_stack(stack)
         {}
 
         ~dynamic_top_allocation() { free(); }

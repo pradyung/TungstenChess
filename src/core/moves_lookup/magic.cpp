@@ -29,7 +29,7 @@ namespace TungstenChess
     return ROOK_LOOKUP_TABLES.at(square, (ROOK_MAGICS[square] * maskedPieces) >> ROOK_SHIFTS[square]);
   }
 
-  void MagicMoveGen::getAllBlockers(std::vector<Bitboard>& blockers, Square square, Bitboard mask)
+  void MagicMoveGen::getAllBlockers(std::vector<Bitboard>& blockers, Bitboard mask)
   {
     blockers.clear();
 
@@ -120,7 +120,7 @@ namespace TungstenChess
 
     for (Square square = 0; square < 64; square++)
     {
-      getAllBlockers(blockers, square, MovesLookup::ROOK_MASKS[square]);
+      getAllBlockers(blockers, MovesLookup::ROOK_MASKS[square]);
 
       for (size_t i = 0; i < blockers.size(); i++)
       {
@@ -143,7 +143,7 @@ namespace TungstenChess
 
     for (Square square = 0; square < 64; square++)
     {
-      getAllBlockers(blockers, square, MovesLookup::BISHOP_MASKS[square]);
+      getAllBlockers(blockers, MovesLookup::BISHOP_MASKS[square]);
 
       for (size_t i = 0; i < blockers.size(); i++)
       {

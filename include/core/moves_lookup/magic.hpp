@@ -48,10 +48,9 @@ namespace TungstenChess
     /**
      * @brief Gets all possible blocker bitboards for a given square and mask
      * @param blockers The vector to store the blockers in
-     * @param square The square to get blockers for
      * @param mask The mask to get blockers for
      */
-    static void getAllBlockers(std::vector<Bitboard>& blockers, Square square, Bitboard mask);
+    static void getAllBlockers(std::vector<Bitboard>& blockers, Bitboard mask);
 
     /**
      * @brief Gets all possible shifted blocker bitboards for a given square, magic number, shift, and blockers
