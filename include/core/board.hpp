@@ -275,17 +275,7 @@ namespace TungstenChess
     Bitboard getBishopMoves(Square pieceIndex, PieceColor color) const;
     Bitboard getRookMoves(Square pieceIndex, PieceColor color) const;
     Bitboard getQueenMoves(Square pieceIndex, PieceColor color) const;
-    Bitboard getKingMoves(Square pieceIndex, PieceColor taggedColor) const;
-
-    Bitboard (TungstenChess::Board::* getPieceMoves[PIECE_TYPE_NUMBER])(Square, PieceColor) const = {
-      nullptr,
-      &TungstenChess::Board::getPawnMoves,
-      &TungstenChess::Board::getKnightMoves,
-      &TungstenChess::Board::getBishopMoves,
-      &TungstenChess::Board::getRookMoves,
-      &TungstenChess::Board::getQueenMoves,
-      &TungstenChess::Board::getKingMoves
-    };
+    Bitboard getKingMoves(Square pieceIndex, PieceColor color, bool includeCastling) const;
 
     /**
      * @brief Gets a bitboard of pseudo-legal moves for a piece (does not check for pins or checks)
